@@ -107,9 +107,16 @@ const sum=(l,type)=>l.filter(t=>t.type===type).reduce((s,t)=>s+t.amount,0);
 const sorted=l=>[...l].sort((a,b)=>b.date.localeCompare(a.date));
 
 // ===== Backend (Google Sheet via Apps Script) =====
+// GANTI nilai di bawah dengan URL Web App Apps Script milikmu yang lengkap, berakhiran /exec.
+// URL akan terisi otomatis; jangan masukkan passcode atau rahasia di sini.
+const APP_SCRIPT_URL='https://script.google.com/macros/s/AKfycbweUF3tDGCmHvoOByYX9guxkz93gVGtmad2KneTU2dtzhx25QvPt0ubkZAc1nbcDxZl/exec';
 const inScript=!!(window.google&&google.script&&google.script.run);
 const LS={get:k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
-const CFG={key:LS.get('olw_key'),url:LS.get('olw_url')};
+const CFG={key:LS.get('olw_key'),url:LS.get('olw_url')||(
+  APP_SCRIPT_URL.startsWith('https://script.google.com/macros/s/') &&
+  APP_SCRIPT_URL.endsWith('/exec') &&
+  !APP_SCRIPT_URL.includes('PASTE_URL_') ? APP_SCRIPT_URL : ''
+)};
 let loaded=false,pend=0,ME='';
 function call(payload){return new Promise((res,rej)=>{const p=JSON.stringify({...payload,key:CFG.key});
   const done=t=>{try{const r=JSON.parse(t);r.ok?res(r):rej(new Error(r.error||'Gagal'))}catch(e){rej(new Error('Respons tidak valid'))}};
@@ -131,8 +138,9 @@ function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactio
   S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));loaded=true}
 async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
 function gate(msg){ov.className='ov dlg';
-  ov.innerHTML=`<div class="sheet"><h3>Masuk ♡</h3><p class="sub">Masukkan passcode pribadi kamu. RAMA dan DESY punya passcode berbeda, dan data pribadi masing-masing tidak terlihat oleh yang lain di aplikasi.</p>${inScript?'':`<label for="g-u">URL Web App</label><input id="g-u" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(CFG.url)}">`}<label for="g-k">Passcode</label><input id="g-k" type="password" autocomplete="current-password"><label style="font-weight:400"><input type="checkbox" id="g-r" checked style="width:auto;min-height:0;margin-right:8px">Ingat di perangkat ini</label><div class="err" id="e-gk">${esc(msg||'')}</div><button class="btn" id="g-go">Masuk</button></div>`;
+  ov.innerHTML=`<div class="sheet"><h3>Masuk ♡</h3><p class="sub">Masukkan passcode pribadi kamu. RAMA dan DESY punya passcode berbeda, dan data pribadi masing-masing tidak terlihat oleh yang lain di aplikasi.</p>${inScript?'':(CFG.url?'':`<label for="g-u">URL Web App</label><input id="g-u" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(CFG.url)}">`)}<label for="g-k">Passcode</label><input id="g-k" type="password" autocomplete="current-password"><label style="font-weight:400"><input type="checkbox" id="g-r" checked style="width:auto;min-height:0;margin-right:8px">Ingat di perangkat ini</label><div class="err" id="e-gk">${esc(msg||'')}</div><button class="btn" id="g-go">Masuk</button></div>`;
   $('#g-go').onclick=async()=>{CFG.key=$('#g-k').value;if($('#g-u'))CFG.url=$('#g-u').value.trim();const rem=$('#g-r').checked;
+    if(!inScript&&!CFG.url){setErr('gk','URL Web App belum dikonfigurasi. Isi URL di kode APP_SCRIPT_URL lalu upload ulang.');return}
     if(!CFG.key){setErr('gk','Passcode wajib diisi');return}
     setErr('gk','Memeriksa…');const r=await load();
     if(r===true){if(rem){LS.set('olw_key',CFG.key);if(CFG.url)LS.set('olw_url',CFG.url)}closeSheet()}else setErr('gk',r)}}
