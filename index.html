@@ -72,7 +72,7 @@ h2{font-size:16px;line-height:1.35;font-weight:750;letter-spacing:-.01em;margin:
 .tx-edit{cursor:pointer}
 .av{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;font-weight:750;color:#fff;flex:none}
 .tx .m{flex:1;min-width:0}
-.tx .d{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx .d,.view-acc .tx .d{text-transform:uppercase;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tx .s{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .tx .a{font-weight:750;font-size:13px;text-align:right;white-space:nowrap;letter-spacing:-.015em}
 .del{background:transparent;border:0;color:var(--mut);padding:7px;border-radius:10px;cursor:pointer;display:grid;place-items:center;flex:none}
@@ -407,29 +407,29 @@ function txSheet(id){
   sheet(old?'Ubah transaksi':'Tambah transaksi',`<label>Jenis</label><div class="seg"><button data-act="ttype" data-v="in" class="${type==='in'?'on':''}">Pemasukan</button><button data-act="ttype" data-v="out" class="${type==='out'?'on':''}">Pengeluaran</button></div>
   <label for="f-date">Tanggal</label><input type="date" id="f-date" value="${esc(t0.date)}"><div class="err" id="e-date"></div>
   <label for="f-cat">Kategori</label><select id="f-cat">${catOpts(type,t0.cat)}</select>
-  <label for="f-desc">Keterangan</label><input id="f-desc" maxlength="60" placeholder="mis. Makan siang" value="${esc(t0.desc)}"><div class="err" id="e-desc"></div>
+  <label for="f-desc">Keterangan</label><input id="f-desc" maxlength="60" autocapitalize="characters" style="text-transform:uppercase" placeholder="mis. Makan siang" value="${esc(t0.desc)}"><div class="err" id="e-desc"></div>
   <label for="f-amt">Nominal (Rp)</label><input id="f-amt" inputmode="numeric" placeholder="0" autocomplete="off" value="${t0.amount?Number(t0.amount).toLocaleString('id-ID'):''}"><div class="err" id="e-amt"></div>
   <label for="f-acc">Akun</label><select id="f-acc">${S.accounts.map(a=>`<option value="${a.id}" ${a.id===t0.acc?'selected':''}>${esc(a.name)}</option>`).join('')}</select>
-  <label for="f-note">Catatan (opsional)</label><textarea id="f-note" maxlength="200">${esc(t0.note||'')}</textarea>
+  <label for="f-note">Catatan (opsional)</label><textarea id="f-note" maxlength="200" autocapitalize="characters" style="text-transform:uppercase">${esc(t0.note||'')}</textarea>
   <button class="btn" id="save">${old?'Simpan perubahan':'Simpan transaksi'}</button>`);
   ov.onclick2=v=>{const cur=$('#f-cat').value;type=v;ov.querySelectorAll('[data-act=ttype]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#f-cat').innerHTML=catOpts(v,cur)};
   $('#f-amt').oninput=e=>{const d=e.target.value.replace(/\D/g,'').replace(/^0+/,'');e.target.value=d?(+d).toLocaleString('id-ID'):''};
-  $('#save').onclick=()=>{const date=$('#f-date').value,desc=$('#f-desc').value.trim(),amt=parseInt($('#f-amt').value.replace(/\D/g,''),10);
+  $('#save').onclick=()=>{const date=$('#f-date').value,desc=$('#f-desc').value.trim().toUpperCase(),amt=parseInt($('#f-amt').value.replace(/\D/g,''),10);
     setErr('date',date?'':'Tanggal wajib diisi');setErr('desc',desc?'':'Keterangan wajib diisi');
     setErr('amt',!amt?'Masukkan nominal lebih dari 0':amt>999999999999?'Nominal terlalu besar':'');
     if(!date||!desc||!amt||amt>999999999999)return;
-    const o={date,type,cat:$('#f-cat').value,desc,amount:amt,acc:$('#f-acc').value,note:$('#f-note').value.trim()};
+    const o={date,type,cat:$('#f-cat').value,desc,amount:amt,acc:$('#f-acc').value,note:$('#f-note').value.trim().toUpperCase()};
     if(old)saveObj('Transactions',Object.assign(old,o));
     else saveNew('Transactions',S.transactions,{id:uid(),date:o.date,type:o.type,cat:o.cat,desc:o.desc,amount:o.amount,acc:o.acc,by:ME,note:o.note});
     closeSheet();render();toast(old?'Transaksi diperbarui':'Transaksi ditambahkan')}}
 
 function accSheet(id){const a=S.accounts.find(x=>x.id===id)||{name:'',owner:'DESY',opening:0};
-  sheet(id?'Ubah akun':'Tambah akun',`<label for="a-name">Nama akun</label><input id="a-name" maxlength="30" value="${esc(a.name)}" placeholder="mis. BCA Utama"><div class="err" id="e-an"></div>
+  sheet(id?'Ubah akun':'Tambah akun',`<label for="a-name">Nama akun</label><input id="a-name" maxlength="30" autocapitalize="characters" style="text-transform:uppercase" value="${esc(a.name)}" placeholder="mis. BCA Utama"><div class="err" id="e-an"></div>
   
   <label for="a-op">Saldo awal (Rp)</label><input id="a-op" inputmode="numeric" value="${a.opening?a.opening.toLocaleString('id-ID'):''}" placeholder="0">
   <button class="btn" id="a-save">Simpan</button>${id?'<button class="btn sec" id="a-del">Hapus akun</button>':''}`);
   $('#a-op').oninput=e=>{const d=e.target.value.replace(/\D/g,'').replace(/^0+/,'');e.target.value=d?(+d).toLocaleString('id-ID'):''};
-  $('#a-save').onclick=()=>{const name=$('#a-name').value.trim();if(!name){setErr('an','Nama akun wajib diisi');return}
+  $('#a-save').onclick=()=>{const name=$('#a-name').value.trim().toUpperCase();if(!name){setErr('an','Nama akun wajib diisi');return}
     const o={name,owner:ME,opening:parseInt($('#a-op').value.replace(/\D/g,''),10)||0};
     if(id)saveObj('Accounts',Object.assign(S.accounts.find(x=>x.id===id),o));else saveNew('Accounts',S.accounts,{id:uid(),...o});closeSheet();render();toast('Akun disimpan')};
   if(id)$('#a-del').onclick=()=>{if(S.transactions.some(t=>t.acc===id)){toast('Akun masih dipakai transaksi, tidak bisa dihapus');return}
