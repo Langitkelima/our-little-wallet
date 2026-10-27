@@ -37,7 +37,7 @@
 :root[data-theme="light"]{color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;max-width:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
-html{scroll-behavior:smooth}
+html{overflow-anchor:none}
 body{min-height:100vh;background:var(--page);transition:background-color .2s,color .2s}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
 button,input,select,textarea{font:inherit}
@@ -677,7 +677,8 @@ const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
   S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));loaded=true}
-async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
+let lastSig='';
+async function load(soft){if(!soft)setSync('load');try{const r=await call({action:'getAll'});const sig=JSON.stringify(r.data)+'|'+(r.me||'');ME=r.me||'';if(soft&&sig===lastSig&&loaded){setSync('ok');return true}hydrate(r.data);lastSig=sig;setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
 
 // ===== Layar masuk: keypad angka (bisa pindah ke keyboard biasa) =====
 let gateKb=false,gateRem=true;
@@ -758,9 +759,10 @@ function listTx(){let l=S.transactions.filter(t=>(F.type==='all'||t.type===F.typ
   let last='',h='';sorted(l).forEach(t=>{if(t.date!==last){last=t.date;h+=`<div class="dayhd"><span>${fday(t.date)}</span>${dOut[t.date]?`<span class="out">−${rp(dOut[t.date])}</span>`:''}</div>`}h+=txRow(t)});
   const ti=sum(l,'in'),to=sum(l,'out');
   $('#trxList').innerHTML=`<div class="sub" style="margin-bottom:2px">${l.length} transaksi${ti?` · Masuk <span class="in">+${rp(ti)}</span>`:''}${to?` · Keluar <span class="out">−${rp(to)}</span>`:''}</div><div class="sub" style="margin-bottom:2px;font-size:11.5px">Ketuk transaksi untuk mengubahnya.</div>`+h}
-function render(){const me=$('#me');if(me)me.textContent=ME?'Masuk sebagai '+ME:'';$('#view').className='view view-'+tab;$('#view').innerHTML=loaded?VIEWS[tab]():'<div class="empty"><b>Memuat data…</b></div>';if(loaded&&tab==='trx')listTx();
+function render(){const y=window.scrollY||document.documentElement.scrollTop||0;const vw=$('#view');if(vw&&y>0)vw.style.minHeight=vw.offsetHeight+'px';const me=$('#me');if(me)me.textContent=ME?'Masuk sebagai '+ME:'';$('#view').className='view view-'+tab;$('#view').innerHTML=loaded?VIEWS[tab]():'<div class="empty"><b>Memuat data…</b></div>';if(loaded&&tab==='trx')listTx();
   $('#nav').innerHTML=TABS.map(t=>`<button class="${(tab===t[0]||(tab==='sav'&&t[0]==='acc'))?'on':''}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`).join('');
-  $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';}
+  $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';
+  if(y>0){window.scrollTo({top:y,left:0,behavior:'instant'});requestAnimationFrame(()=>{window.scrollTo({top:y,left:0,behavior:'instant'});if(vw)vw.style.minHeight=''})}else if(vw)vw.style.minHeight=''}
 
 // ===== Sheets & dialogs =====
 const ov=$('#ov');
@@ -858,7 +860,7 @@ function goalSheet(id){const g=S.goals.find(x=>x.id===id)||{name:'',target:0,dea
 document.addEventListener('click',e=>{
   if(e.target===ov&&!ov.classList.contains('dlg')){closeSheet();return}
   const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id,v=b.dataset.v;
-  if(a==='tab'){tab=b.dataset.t;render();window.scrollTo(0,0)}
+  if(a==='tab'){tab=b.dataset.t;window.scrollTo({top:0,left:0,behavior:'instant'});render()}
   else if(a==='logout')logout();else if(a==='reload'){load().then(r=>{if(r!==true&&/passcode/i.test(r))gate(r)})}else if(a==='add')txSheet();else if(a==='editTx')txSheet(id);else if(a==='close')closeSheet();else if(a==='settings')setSheet();else if(a==='themeToggle')setTheme(currentTheme()==='dark'?'light':'dark');
   else if(a==='ttype')ov.onclick2(v);
   else if(a==='ftype'){F.type=v;render()}
@@ -877,6 +879,6 @@ document.addEventListener('input',e=>{if(e.target.id==='fq'){F.q=e.target.value;
 document.addEventListener('change',e=>{if(e.target.id==='fcat'){F.cat=e.target.value;listTx()}if(e.target.id==='facc'){F.acc=e.target.value;listTx()}if(e.target.id==='fmon'){F.month=e.target.value;listTx()}if(e.target.id==='fday'){F.day=e.target.value;listTx()}});
 $('#gear').innerHTML=ic('gear',22);syncThemeButton();$('#fab').innerHTML=ic('plus',28);
 render();
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!pend&&ov.classList.contains('hide'))load()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!pend&&ov.classList.contains('hide'))load(true)});
 (async()=>{if(CFG.key&&(inScript||CFG.url)){const r=await load();if(r!==true&&/passcode/i.test(r)){LS.del('olw_key');CFG.key='';gate(r)}}else gate()})();
 </script></body></html>
