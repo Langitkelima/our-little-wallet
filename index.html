@@ -120,6 +120,10 @@ nav button.on{color:var(--accent-strong);background:var(--accent-soft)}
 .dlg{align-items:center;padding:20px}
 .dlg .sheet{border-radius:24px;border-bottom:1px solid var(--line);max-height:min(88vh,860px);max-height:min(88dvh,860px)}
 .note{background:var(--accent-soft);color:var(--ink);border:1px solid var(--line);border-radius:15px;padding:11px 14px;font-size:12px;margin-bottom:14px}
+/* Perbaikan: tarik-ke-bawah di menu/panel tidak lagi me-refresh halaman (pull-to-refresh Chrome) */
+html,body{overscroll-behavior-y:none}
+.ov{overscroll-behavior:contain}
+.ov .sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 </style>
 <style data-m="1">
 .avlogo{background:none!important;padding:0;overflow:hidden}
