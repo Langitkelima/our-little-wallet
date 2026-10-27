@@ -36,7 +36,7 @@
 }
 :root[data-theme="light"]{color-scheme:light}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;max-width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
+html,body{margin:0;min-height:100%;max-width:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
 html{scroll-behavior:smooth}
 body{min-height:100vh;background:var(--page);transition:background-color .2s,color .2s}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
@@ -121,7 +121,8 @@ nav button.on{color:var(--accent-strong);background:var(--accent-soft)}
 .dlg .sheet{border-radius:24px;border-bottom:1px solid var(--line);max-height:min(88vh,860px);max-height:min(88dvh,860px)}
 .note{background:var(--accent-soft);color:var(--ink);border:1px solid var(--line);border-radius:15px;padding:11px 14px;font-size:12px;margin-bottom:14px}
 /* Perbaikan: tarik-ke-bawah di menu/panel tidak lagi me-refresh halaman (pull-to-refresh Chrome) */
-html,body{overscroll-behavior-y:none}
+/* scroll WebView: jangan pakai overflow-x:hidden / overscroll none di html+body */
+body{overflow-x:clip}
 .ov{overscroll-behavior:contain}
 .ov .sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 </style>
