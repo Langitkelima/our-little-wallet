@@ -980,9 +980,10 @@ const chatOk=it=>it&&S.categories.some(c=>c.id===it.cat)&&S.accounts.some(a=>a.i
 async function chatSend(){
   if(chatBusy)return;const inp=$('#chatIn');if(!inp)return;const text=inp.value.trim();if(!text)return;
   if(!S.accounts.length){toast('Tambahkan akun dulu di tab Accounts');return}
+  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.text}));
   inp.value='';chatBusy=true;CHAT.push({k:'me',text});CHAT.push({k:'typing'});chatDraw();
   try{
-    const r=await call({action:'parseChat',text});
+    const r=await call({action:'parseChat',text,history});
     CHAT=CHAT.filter(m=>m.k!=='typing');
     const res=r.result||{},items=(res.items||[]).filter(chatOk),g='g'+Date.now();
     const hasAcc=id=>S.accounts.some(a=>a.id===id);
