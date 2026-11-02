@@ -622,12 +622,13 @@ body.kb nav,body.kb #fab{display:none!important}
 body.kb .chatbar{bottom:calc(var(--kb,0px) + 8px)!important}
 body.kb .chatlog{padding-bottom:130px!important}
 body.kb .cchips{display:none}
-/* Mode keyboard cadangan (body.kbf): di dalam bingkai Apps Script, browser tidak memberi tahu tinggi keyboard.
-   Jadi bar chat dipindah ke ATAS layar, tidak bergantung pada tinggi keyboard. */
+/* Mode keyboard cadangan (body.kbf): beberapa WebView tidak melaporkan tinggi keyboard.
+   Letakkan bar di perkiraan batas atas keyboard, bukan di atas layar.
+   Gboard pada HP umumnya memakai sekitar 39vh; sesuaikan setelah tes perangkat asli. */
 body.kbf nav,body.kbf #fab,body.kbf .cchips{display:none!important}
-body.kbf .chatbar{top:calc(env(safe-area-inset-top,0px) + 6px);bottom:auto!important;padding:0 10px}
+body.kbf .chatbar{top:auto!important;bottom:calc(39vh + env(safe-area-inset-bottom,0px) + 6px)!important;padding:0 10px}
 body.kbf .chatbar-in{padding:8px}
-body.kbf .chatlog{padding-top:84px!important;padding-bottom:56vh!important}
+body.kbf .chatlog{padding-top:12px!important;padding-bottom:56vh!important}
 }
 
 html{--halo:rgba(255,196,84,.45);--botglow:drop-shadow(0 5px 9px rgba(46,74,154,.38)) drop-shadow(0 0 13px rgba(244,182,63,.42));--botglow-on:drop-shadow(0 5px 11px rgba(46,74,154,.5)) drop-shadow(0 0 20px rgba(244,182,63,.75))}
