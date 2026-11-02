@@ -622,13 +622,12 @@ body.kb nav,body.kb #fab{display:none!important}
 body.kb .chatbar{bottom:calc(var(--kb,0px) + 8px)!important}
 body.kb .chatlog{padding-bottom:130px!important}
 body.kb .cchips{display:none}
-/* Mode keyboard cadangan (body.kbf): beberapa WebView tidak melaporkan tinggi keyboard.
-   Letakkan bar di perkiraan batas atas keyboard, bukan di atas layar.
-   Gboard pada HP umumnya memakai sekitar 39vh; sesuaikan setelah tes perangkat asli. */
+/* Keyboard fallback dinamis: --kbf-kb diisi JS dari geometry keyboard/viewport.
+   Tidak lagi mengandalkan angka 39vh yang bisa meleset antar HP/keyboard. */
 body.kbf nav,body.kbf #fab,body.kbf .cchips{display:none!important}
-body.kbf .chatbar{top:auto!important;bottom:calc(39vh + env(safe-area-inset-bottom,0px) + 6px)!important;padding:0 10px}
+body.kbf .chatbar{top:auto!important;bottom:calc(var(--kbf-kb,42vh) + 6px)!important;padding:0 10px}
 body.kbf .chatbar-in{padding:8px}
-body.kbf .chatlog{padding-top:12px!important;padding-bottom:56vh!important}
+body.kbf .chatlog{padding-top:12px!important;padding-bottom:calc(var(--kbf-kb,42vh) + 112px)!important}
 }
 
 html{--halo:rgba(255,196,84,.45);--botglow:drop-shadow(0 5px 9px rgba(46,74,154,.38)) drop-shadow(0 0 13px rgba(244,182,63,.42));--botglow-on:drop-shadow(0 5px 11px rgba(46,74,154,.5)) drop-shadow(0 0 20px rgba(244,182,63,.75))}
@@ -1248,35 +1247,77 @@ document.addEventListener('change',e=>{if(e.target.id==='pacc'){F.acc=e.target.v
 window.__booted=1;$('#gear').innerHTML=ic('gear',22);syncHide();syncThemeButton();$('#fab').innerHTML=ic('plus',28);
 render();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!pend&&ov.classList.contains('hide'))load()});
-/* Keyboard HP: naikkan bar chat di atas keyboard supaya ketikan kelihatan */
-(function(){const vv=window.visualViewport;let last=-1;
+/* Keyboard HP v5: tempelkan composer ke batas atas keyboard, bukan ke persentase layar */
+(function(){
+  const vv=window.visualViewport;
+  const vk=navigator.virtualKeyboard;
+  let last=-1, baseH=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0);
+  let vkH=0;
+
+  /* Chromium/WebView baru: ini sumber paling akurat saat keyboard menimpa halaman. */
+  if(vk){
+    try{vk.overlaysContent=true}catch(e){}
+    try{vk.addEventListener('geometrychange',()=>{
+      const r=vk.boundingRect;
+      vkH=r&&r.height?Math.round(r.height):0;
+      kbSync();
+    })}catch(e){}
+  }
+
+  function measuredKb(){
+    const lay=Math.max(baseH,window.innerHeight||0,document.documentElement.clientHeight||0);
+    const now=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0);
+    const byWindow=Math.max(0,baseH-now);
+    const byVV=vv?Math.max(0,Math.round(lay-(vv.height+vv.offsetTop))):0;
+    return Math.max(vkH,byVV,byWindow);
+  }
   function kbSync(){
-    const lay=Math.max(window.innerHeight||0,document.documentElement.clientHeight||0);
-    const vh=vv?vv.height+vv.offsetTop:lay;
-    let kb=Math.max(0,Math.round(lay-vh));
     const a=document.activeElement,typing=a&&a.id==='chatIn';
+    let kb=measuredKb();
     if(kb<80)kb=0;
     document.documentElement.style.setProperty('--kb',kb+'px');
+    if(kb>0)document.documentElement.style.setProperty('--kbf-kb',kb+'px');
     document.body.classList.toggle('kb',kb>0&&tab==='chat'&&!!typing);
+    /* Kalau ukuran keyboard sudah benar-benar terukur, jangan pakai fallback. */
+    if(kb>0)document.body.classList.remove('kbf');
     if(kb!==last){last=kb;if(kb>0&&typing)setTimeout(()=>window.scrollTo({top:document.body.scrollHeight}),60)}
   }
   if(vv){vv.addEventListener('resize',kbSync);vv.addEventListener('scroll',kbSync)}
   window.addEventListener('resize',kbSync);
-  /* Cadangan: di Apps Script (iframe) dan di APK WebView, visualViewport tidak berubah saat keyboard muncul,
-     jadi kb selalu 0. Di HP (layar sentuh), kalau kb masih 0 sesudah kolom ketik difokus, bar chat dipindah ke atas. */
+
   const inFrame=(()=>{try{return window.self!==window.top}catch(e){return true}})();
   const touchy=()=>{try{return matchMedia('(pointer:coarse)').matches&&window.innerWidth<980}catch(e){return false}};
   function kbfSet(on){
     on=!!on&&tab==='chat';
     if(document.body.classList.contains('kbf')===on)return;
     document.body.classList.toggle('kbf',on);
-    if(on)setTimeout(()=>window.scrollTo({top:document.body.scrollHeight}),80)}
-  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='chatIn'){kbSync();setTimeout(kbSync,150);setTimeout(kbSync,400);if(touchy()){if(inFrame)kbfSet(true);else setTimeout(()=>{const a=document.activeElement;if(a&&a.id==='chatIn'&&!document.body.classList.contains('kb'))kbfSet(true)},450)}}});
-  document.addEventListener('focusout',e=>{if(e.target&&e.target.id==='chatIn'){setTimeout(kbSync,100);
-    /* jangan keluar dari mode ini kalau fokus hanya pindah sebentar (mis. menekan tombol kirim) */
-    setTimeout(()=>{const a=document.activeElement;if(!(a&&a.id==='chatIn'))kbfSet(false)},250)}});
-  /* Keyboard ditutup lewat tombol Back tidak membuat kolom ketik kehilangan fokus: ketuk area chat untuk keluar dari mode ini */
-  document.addEventListener('pointerdown',e=>{if(!document.body.classList.contains('kbf'))return;if(e.target.closest&&e.target.closest('#chatbar'))return;const i=$('#chatIn');if(i)i.blur();kbfSet(false)},true);
+    if(on)setTimeout(()=>window.scrollTo({top:document.body.scrollHeight}),80);
+  }
+  function probeFallback(){
+    const a=document.activeElement;
+    if(!(a&&a.id==='chatIn')||document.body.classList.contains('kb'))return;
+    /* WebView lama tidak memberi geometry keyboard. Pertahankan fallback hanya sebagai jalan terakhir.
+       42vh lebih dekat ke tinggi keyboard Android pada rekaman uji, dan tidak dipakai bila ukuran asli tersedia. */
+    document.documentElement.style.setProperty('--kbf-kb','42vh');
+    kbfSet(true);
+  }
+  document.addEventListener('focusin',e=>{
+    if(e.target&&e.target.id==='chatIn'){
+      baseH=Math.max(baseH,window.innerHeight||0,document.documentElement.clientHeight||0);
+      kbSync();
+      setTimeout(kbSync,120);setTimeout(kbSync,280);setTimeout(kbSync,500);
+      if(touchy())setTimeout(probeFallback,inFrame?520:600);
+    }
+  });
+  document.addEventListener('focusout',e=>{if(e.target&&e.target.id==='chatIn'){
+    setTimeout(kbSync,100);
+    setTimeout(()=>{const a=document.activeElement;if(!(a&&a.id==='chatIn'))kbfSet(false)},250);
+  }});
+  document.addEventListener('pointerdown',e=>{
+    if(!document.body.classList.contains('kbf'))return;
+    if(e.target.closest&&e.target.closest('#chatbar'))return;
+    const i=$('#chatIn');if(i)i.blur();kbfSet(false);
+  },true);
 })();
 (async()=>{if(CFG.key&&(inScript||CFG.url)){const r=await load();if(r!==true&&/passcode/i.test(r)){LS.del('olw_key');CFG.key='';gate(r)}}else gate()})();
 </script></body></html>
