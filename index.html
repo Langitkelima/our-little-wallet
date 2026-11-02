@@ -619,15 +619,44 @@ html[data-model] nav .cgap{display:block;width:22px;height:22px;flex:none}
 body.tchat .chatbar{bottom:calc(118px + env(safe-area-inset-bottom,0px))}
 body.tchat .chatlog{padding-bottom:210px}
 body.kb nav,body.kb #fab{display:none!important}
-body.kb .chatbar{bottom:calc(var(--kb,0px) - 8px)!important}
+body.kb .chatbar{top:auto!important;bottom:calc(var(--kb,0px) + 2px)!important;transform:none!important;padding:0 8px}
 body.kb .chatlog{padding-bottom:130px!important}
 body.kb .cchips{display:none}
 /* Keyboard fallback dinamis: --kbf-kb diisi JS dari geometry keyboard/viewport.
    Tidak lagi mengandalkan angka 39vh yang bisa meleset antar HP/keyboard. */
 body.kbf nav,body.kbf #fab,body.kbf .cchips{display:none!important}
-body.kbf .chatbar{top:auto!important;bottom:calc(var(--kbf-kb,42vh) - 8px)!important;padding:0 10px}
+body.kbf .chatbar{top:auto!important;bottom:calc(var(--kbf-kb,42vh) + 2px)!important;transform:none!important;padding:0 8px}
 body.kbf .chatbar-in{padding:8px}
 body.kbf .chatlog{padding-top:12px!important;padding-bottom:calc(var(--kbf-kb,42vh) + 98px)!important}
+
+body.tchat .chatbar{
+  transition:bottom .22s ease, padding .22s ease, transform .22s ease;
+}
+body.tchat .chatbar-in{
+  width:min(78%,520px);
+  margin:0 auto;
+  border-radius:24px;
+  transition:width .24s cubic-bezier(.2,.8,.2,1),border-radius .24s ease,
+             padding .24s ease,box-shadow .24s ease,transform .24s ease;
+}
+body.tchat .chatbar:focus-within .chatbar-in,
+body.kb .chatbar-in,
+body.kbf .chatbar-in{
+  width:100%;
+  border-radius:20px;
+  padding:9px 10px;
+  transform:translateY(0);
+}
+body.kb .chatbar,body.kbf .chatbar{
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+}
+body.kb .chatbar-in,body.kbf .chatbar-in{
+  max-width:760px;
+  margin:0 auto;
+}
+
 }
 
 html{--halo:rgba(255,196,84,.45);--botglow:drop-shadow(0 5px 9px rgba(46,74,154,.38)) drop-shadow(0 0 13px rgba(244,182,63,.42));--botglow-on:drop-shadow(0 5px 11px rgba(46,74,154,.5)) drop-shadow(0 0 20px rgba(244,182,63,.75))}
@@ -1247,7 +1276,7 @@ document.addEventListener('change',e=>{if(e.target.id==='pacc'){F.acc=e.target.v
 window.__booted=1;$('#gear').innerHTML=ic('gear',22);syncHide();syncThemeButton();$('#fab').innerHTML=ic('plus',28);
 render();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!pend&&ov.classList.contains('hide'))load()});
-/* Keyboard HP v6: V5 sudah tidak tertutup, tetapi dari tes HP composer masih terlalu tinggi. V6 memberi seating offset -8px agar rapat ke bibir keyboard. */
+/* Keyboard HP v8: composer compact saat idle, lalu expand saat fokus dan duduk di atas keyboard seperti pola UX aplikasi chat Android. */
 (function(){
   const vv=window.visualViewport;
   const vk=navigator.virtualKeyboard;
@@ -1278,7 +1307,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
     document.documentElement.style.setProperty('--kb',kb+'px');
     if(kb>0)document.documentElement.style.setProperty('--kbf-kb',kb+'px');
     document.body.classList.toggle('kb',kb>0&&tab==='chat'&&!!typing);
-    /* Kalau ukuran keyboard sudah benar-benar terukur, jangan pakai fallback. */
+    /* V8: ukuran keyboard menentukan docking composer; state focus-within menangani animasi compact -> expand. */
     if(kb>0)document.body.classList.remove('kbf');
     if(kb!==last){last=kb;if(kb>0&&typing)setTimeout(()=>window.scrollTo({top:document.body.scrollHeight}),60)}
   }
