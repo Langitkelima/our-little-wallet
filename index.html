@@ -1261,8 +1261,8 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
   }
   if(vv){vv.addEventListener('resize',kbSync);vv.addEventListener('scroll',kbSync)}
   window.addEventListener('resize',kbSync);
-  /* Cadangan: di Apps Script halaman ini ada di dalam iframe dan visualViewport tidak berubah saat keyboard muncul,
-     jadi kb selalu 0. Di HP (layar sentuh) dalam iframe, bar chat dipindah ke atas selama kolom ketik aktif. */
+  /* Cadangan: di Apps Script (iframe) dan di APK WebView, visualViewport tidak berubah saat keyboard muncul,
+     jadi kb selalu 0. Di HP (layar sentuh), kalau kb masih 0 sesudah kolom ketik difokus, bar chat dipindah ke atas. */
   const inFrame=(()=>{try{return window.self!==window.top}catch(e){return true}})();
   const touchy=()=>{try{return matchMedia('(pointer:coarse)').matches&&window.innerWidth<980}catch(e){return false}};
   function kbfSet(on){
@@ -1270,7 +1270,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
     if(document.body.classList.contains('kbf')===on)return;
     document.body.classList.toggle('kbf',on);
     if(on)setTimeout(()=>window.scrollTo({top:document.body.scrollHeight}),80)}
-  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='chatIn'){kbSync();setTimeout(kbSync,150);setTimeout(kbSync,400);if(inFrame&&touchy())kbfSet(true)}});
+  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='chatIn'){kbSync();setTimeout(kbSync,150);setTimeout(kbSync,400);if(touchy()){if(inFrame)kbfSet(true);else setTimeout(()=>{const a=document.activeElement;if(a&&a.id==='chatIn'&&!document.body.classList.contains('kb'))kbfSet(true)},450)}}});
   document.addEventListener('focusout',e=>{if(e.target&&e.target.id==='chatIn'){setTimeout(kbSync,100);
     /* jangan keluar dari mode ini kalau fokus hanya pindah sebentar (mis. menekan tombol kirim) */
     setTimeout(()=>{const a=document.activeElement;if(!(a&&a.id==='chatIn'))kbfSet(false)},250)}});
