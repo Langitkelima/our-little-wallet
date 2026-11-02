@@ -1297,18 +1297,31 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
   function input(){return document.getElementById('chatIn')}
   function bar(){return document.querySelector('.chatbar')}
 
+  /* Tinggi layar saat keyboard tertutup (acuan untuk mendeteksi keyboard). */
+  let baseH=Math.max(window.innerHeight||0,vv?vv.height:0,document.documentElement.clientHeight||0);
+  function refreshBase(){
+    if(composeOpen||document.activeElement===input())return;
+    baseH=Math.max(window.innerHeight||0,vv?vv.height:0,document.documentElement.clientHeight||0)||baseH;
+  }
+
   function dockComposer(){
     const i=input(), b=bar();
     if(!composeOpen||!i||!b||document.activeElement!==i)return;
     const h=Math.max(56,Math.round(b.getBoundingClientRect().height||64));
-    let visibleBottom;
-    if(vv) visibleBottom=Math.round(vv.offsetTop+vv.height);
-    else visibleBottom=Math.round(window.innerHeight||document.documentElement.clientHeight||0);
-    const top=Math.max(6,visibleBottom-h-3);
+    const curH=Math.min(window.innerHeight||baseH,vv?vv.height:baseH);
+    const shrunk=(baseH-curH)>100;
+    let top;
+    if(shrunk){
+      /* Browser / WebView yang mengecilkan area layar: ikuti area yang terlihat. */
+      const visibleBottom=Math.round((vv?vv.offsetTop:0)+curH);
+      top=visibleBottom-h-3;
+    }else{
+      /* Aplikasi (WebView) yang keyboard-nya menimpa layar tanpa mengecilkan area:
+         taruh kolom ketik di atas area keyboard (sekitar 55% tinggi layar dari atas). */
+      top=Math.round(baseH*0.5)-h-8;
+    }
+    top=Math.max(6,top);
     document.documentElement.style.setProperty('--vv-chat-top',top+'px');
-    /* Keyboard dianggap terbuka bila visual viewport menyusut cukup banyak. */
-    const full=Math.max(document.documentElement.clientHeight||0,window.innerHeight||0);
-    const shrunk=vv ? (full-vv.height>100) : false;
     document.body.classList.toggle('kb',isChat());
   }
 
@@ -1326,6 +1339,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
     setTimeout(dockComposer,80);
     setTimeout(dockComposer,220);
     setTimeout(dockComposer,450);
+    setTimeout(dockComposer,800);
   }
 
   function closeComposer(){
@@ -1369,7 +1383,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!
     vv.addEventListener('resize',dockComposer);
     vv.addEventListener('scroll',dockComposer);
   }
-  window.addEventListener('resize',dockComposer);
+  window.addEventListener('resize',function(){refreshBase();dockComposer()});
 })();
 (async()=>{if(CFG.key&&(inScript||CFG.url)){const r=await load();if(r!==true&&/passcode/i.test(r)){LS.del('olw_key');CFG.key='';gate(r)}}else gate()
 
