@@ -556,6 +556,38 @@ html[data-theme="dark"] .cav .botlogo{filter:drop-shadow(0 0 5px rgba(143,176,25
 .cb.gh{background:none;border-color:transparent;color:var(--mut)}
 .cst{margin-top:10px;font-size:12.5px;font-weight:700;color:var(--mut)}
 .cst.ok{color:var(--in,#1E9473)}
+.scard{margin-left:43px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 15px;color:var(--ink);box-shadow:var(--sh)}
+.shead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.sintro{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sintro span{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--mut)}
+.sintro strong{font-size:16px;line-height:1.25}
+.srange{font-size:11px;color:var(--mut);text-align:right}
+.smetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.smetric{min-width:0;border:1px solid var(--line);border-radius:13px;padding:10px;background:var(--bg)}
+.smetric span{display:block;font-size:11px;font-weight:700;color:var(--mut)}
+.smetric b{display:block;margin-top:4px;font-size:15px;overflow-wrap:anywhere}
+.smetric b.in{color:var(--in,#1E9473)}
+.smetric b.out{color:var(--out,#C0506A)}
+.snet{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 2px;border-bottom:1px solid var(--line);font-size:13px;font-weight:750}
+.snet b{font-size:15px;white-space:nowrap}
+.snet b.in{color:var(--in,#1E9473)}
+.snet b.out{color:var(--out,#C0506A)}
+.ssection{padding-top:12px}
+.ssect-title{font-size:12px;font-weight:800;margin-bottom:9px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+.srow-name{display:flex;align-items:center;gap:6px;min-width:0}
+.srow-name span{min-width:0;overflow-wrap:anywhere}
+.srow-value{font-weight:750;white-space:nowrap}
+.srow-value small{margin-left:4px;color:var(--mut);font-size:11px}
+.sbar{height:6px;border-radius:99px;background:var(--accent-soft);overflow:hidden;margin:5px 0 10px}
+.sbar i{display:block;height:100%;border-radius:inherit;background:var(--accent)}
+.sbest{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:13px;padding:10px}
+.sbest div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sbest strong{font-size:13px;overflow-wrap:anywhere}
+.sbest span{font-size:11px;color:var(--mut)}
+.sbest b{font-size:14px;white-space:nowrap}
+.sempty{font-size:12px;color:var(--mut);padding:7px 0}
+@media(max-width:390px){.scard{margin-left:0}.srange{width:100%;text-align:left}}
 .callrow{margin-left:43px}
 .chatbar{position:fixed;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:31;padding:0 12px;pointer-events:none}
 .chatbar-in{pointer-events:auto;max-width:736px;margin:0 auto;background:color-mix(in srgb,var(--card) 96%,transparent);border:1px solid var(--line);border-radius:22px;padding:10px;box-shadow:var(--sh);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
@@ -570,14 +602,12 @@ html[data-theme="dark"] .cav .botlogo{filter:drop-shadow(0 0 5px rgba(143,176,25
 @media (min-width:980px){.chatbar{left:260px;bottom:24px}}
 .kp{margin-top:8px}
 .kpd{background:var(--accent-soft,var(--bg));border:1px solid var(--line);border-radius:18px;padding:12px 16px;text-align:right;min-height:84px;display:flex;flex-direction:column;justify-content:flex-end}
-.kpx{font-size:13px;color:var(--mut);min-height:18px;overflow-wrap:anywhere}
 .kpn{display:flex;justify-content:flex-end;align-items:baseline;gap:8px}
 .kpn span{font-size:15px;color:var(--mut);font-weight:600}
 .kpn b{font:700 34px/1.1 Georgia,'Times New Roman',serif;color:var(--accent-strong);overflow-wrap:anywhere}
 .kpk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
 .kp .kk{height:52px;min-height:0;border-radius:16px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:20px;font-weight:700;cursor:pointer;display:grid;place-items:center;padding:0;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .kp .kk:active{transform:scale(.96);background:var(--accent-soft)}
-.kp .kk.op{color:var(--in,#1E9473);font-size:22px}
 .kp .kk.bs{color:var(--out,#C0506A)}
 .kpf{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;padding-bottom:env(safe-area-inset-bottom,0px)}
 .kpf>#save,.kpf>#t-save{order:-1;grid-column:1/-1}
@@ -1031,6 +1061,34 @@ function dCard(m,i){const t=m.tx,c=cat(t.cat),a=acct(t.acc),inn=t.type==='in',is
 function chatCard(m,i){if(m.type==='trf')return trfCard(m,i);const c=cat(m.cat),a=acct(m.acc),inn=m.type==='in';
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cSave" data-i="${i}">Simpan</button><button type="button" class="cb" data-act="cEdit" data-i="${i}">Edit</button><button type="button" class="cb gh" data-act="cDel" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Tersimpan</div>':'<div class="cst">Dibatalkan</div>';
   return `<div class="ccard ${inn?'in':'out'} ${m.st}"><div class="ct"><span class="cn">${esc(m.desc)}</span><span class="ca">${inn?'+':'−'}${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">${inn?'Pemasukan':'Pengeluaran'}</span><span>${fdate(m.date)}</span><span class="ccat">${catIc(c,16)}${esc(c.name)}</span><span>${esc(a.name)}</span></div>${foot}</div>`}
+const CHAT_SUMMARY_PERIODS=['this_week','last_week','this_month','last_month'];
+function chatSummaryOk(s){
+  const safeInt=n=>typeof n==='number'&&Number.isSafeInteger(n);
+  const dateOk=d=>/^\d{4}-\d{2}-\d{2}$/.test(String(d||''));
+  if(!s||typeof s!=='object'||CHAT_SUMMARY_PERIODS.indexOf(s.period)<0||!s.label||
+     !dateOk(s.from)||!dateOk(s.to)||s.from>s.to||
+     !safeInt(s.income)||Number(s.income)<0||!safeInt(s.expense)||Number(s.expense)<0||
+     !safeInt(s.net)||!Array.isArray(s.topCategories)||s.topCategories.length>3)return false;
+  if(!s.topCategories.every(c=>c&&typeof c.name==='string'&&safeInt(c.amount)&&Number(c.amount)>=0&&
+      safeInt(c.percent)&&Number(c.percent)>=0&&Number(c.percent)<=100))return false;
+  if(s.biggestExpense!==null&&s.biggestExpense!==undefined){
+    const b=s.biggestExpense;
+    if(!b||typeof b.desc!=='string'||!dateOk(b.date)||!safeInt(b.amount)||Number(b.amount)<0||
+       typeof b.category!=='string')return false;
+  }
+  return true;
+}
+function summaryCard(s){
+  const categories=s.topCategories.length?s.topCategories.map(c=>{
+    const pct=Math.max(0,Math.min(100,Number(c.percent)||0));
+    const icon=c.id&&S.categories.some(x=>x.id===c.id)?catIc(cat(c.id),18):'';
+    return `<div class="srow"><div class="srow-name">${icon}<span>${esc(c.name)}</span></div><div class="srow-value">${rpRaw(c.amount)} <small>${pct}%</small></div></div><div class="sbar"><i style="width:${pct}%"></i></div>`;
+  }).join(''):'<div class="sempty">Belum ada pengeluaran pada periode ini.</div>';
+  const b=s.biggestExpense;
+  const biggest=b?`<div class="sbest"><div><strong>${esc(b.desc)}</strong><span>${esc(b.category)}${b.date?' · '+fdate(b.date):''}${b.account?' · '+esc(b.account):''}</span></div><b>${rpRaw(b.amount)}</b></div>`:'<div class="sempty">Belum ada transaksi pengeluaran pada periode ini.</div>';
+  const netClass=Number(s.net)>=0?'in':'out';
+  return `<div class="scard"><div class="shead"><div class="sintro"><span>RINGKASAN KEUANGAN</span><strong>${esc(s.label)}</strong></div><div class="srange">${fdate(s.from)} – ${fdate(s.to)}</div></div><div class="smetrics"><div class="smetric"><span>Pemasukan</span><b class="in">${rpRaw(s.income)}</b></div><div class="smetric"><span>Pengeluaran</span><b class="out">${rpRaw(s.expense)}</b></div></div><div class="snet"><span>Selisih</span><b class="${netClass}">${Number(s.net)>=0?'+':'−'}${rpRaw(s.net)}</b></div><div class="ssection"><div class="ssect-title">Kategori pengeluaran terbesar</div>${categories}</div><div class="ssection"><div class="ssect-title">Transaksi pengeluaran terbesar</div>${biggest}</div></div>`;
+}
 function chatHtml(){
   let h=`<div class="cmsg bot">${chatAv()}<div class="cbub">${esc(CHAT_HELLO)}</div></div>`;
   CHAT.forEach((m,i)=>{
@@ -1038,6 +1096,7 @@ function chatHtml(){
     else if(m.k==='bot')h+=`<div class="cmsg bot">${chatAv()}<div class="cbub${m.err?' err':''}">${esc(m.text)}</div></div>`;
     else if(m.k==='typing')h+=`<div class="cmsg bot">${chatAv()}<div class="cbub typing">Sebentar, aku baca dulu…</div></div>`;
     else if(m.k==='card')h+=chatCard(m,i);
+    else if(m.k==='summary')h+=summaryCard(m.data);
     else if(m.k==='dcard')h+=dCard(m,i);
     else if(m.k==='acard')h+=aCard(m,i);
     else if(m.k==='all'){const n=CHAT.filter(x=>x.k==='card'&&x.g===m.g&&x.st==='new').length;if(n>1)h+=`<div class="callrow"><button type="button" class="cb pri" data-act="cAll" data-g="${m.g}">Simpan semua (${n})</button></div>`}
@@ -1050,7 +1109,7 @@ function chatSync(){const has=$('#chatbar');
   if(tab!=='chat'||!loaded){if(has)has.remove();return}
   if(has){chatDraw();return}
   const d=document.createElement('div');d.id='chatbar';d.className='chatbar';
-  d.innerHTML=`<div class="chatbar-in"><div class="cchips">${['Makan bakso 15rb','Bensin 50000','Gaji bulanan 8jt'].map(t=>`<button type="button" class="cchip" data-act="cChip" data-v="${esc(t)}">${esc(t)}</button>`).join('')+`<button type="button" class="cchip" data-act="cTrf">⇄ Transfer</button>`}</div><div class="cform"><input id="chatIn" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Ketik transaksi, mis. makan bakso 15rb"><button type="button" class="csend" id="chatBtn" data-act="cSend" aria-label="Kirim">${ic('send',20)}</button></div></div>`;
+  d.innerHTML=`<div class="chatbar-in"><div class="cchips">${['Makan bakso 15rb','Bensin 50000','Gaji bulanan 8jt','Summary minggu ini'].map(t=>`<button type="button" class="cchip" data-act="cChip" data-v="${esc(t)}">${esc(t)}</button>`).join('')+`<button type="button" class="cchip" data-act="cTrf">⇄ Transfer</button>`}</div><div class="cform"><input id="chatIn" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Ketik transaksi atau tanya, mis. summary minggu ini"><button type="button" class="csend" id="chatBtn" data-act="cSend" aria-label="Kirim">${ic('send',20)}</button></div></div>`;
   document.body.appendChild(d);chatDraw()}
 const chatOk=it=>it&&S.categories.some(c=>c.id===it.cat)&&S.accounts.some(a=>a.id===it.acc)&&Number(it.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(it.date||''));
 async function chatSend(){
@@ -1061,17 +1120,19 @@ async function chatSend(){
     const r=await call({action:'parseChat',text,history});
     CHAT=CHAT.filter(m=>m.k!=='typing');
     const res=r.result||{},items=(res.items||[]).filter(chatOk),g='g'+Date.now();
+    const summary=chatSummaryOk(res.summary)?res.summary:null;
     const hasAcc=id=>S.accounts.some(a=>a.id===id);
     const trfs=(res.transfers||[]).filter(t=>t&&hasAcc(t.from)&&hasAcc(t.to)&&t.from!==t.to&&Number(t.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(t.date||'')));
     const dels=(res.deletes||[]).filter(t=>t&&S.transactions.some(x=>x.id===t.id));
     const accs=(res.accounts||[]).filter(a=>a&&String(a.name||'').trim()&&!S.accounts.some(x=>String(x.name).trim().toUpperCase()===String(a.name).trim().toUpperCase()));
     if(res.reply)CHAT.push({k:'bot',text:res.reply});
+    if(summary){CHAT.push({k:'bot',text:'Ini ringkasan '+String(summary.label).toLowerCase()+'.'});CHAT.push({k:'summary',data:summary})}
     accs.forEach(a=>CHAT.push({k:'acard',st:'new',name:String(a.name).trim().toUpperCase().slice(0,30),opening:Math.max(0,Math.round(Number(a.opening)||0))}));
     items.forEach(it=>CHAT.push({k:'card',st:'new',g,date:it.date,type:it.type,cat:it.cat,desc:it.desc,amount:Math.round(Number(it.amount)),acc:it.acc}));
     trfs.forEach(t=>CHAT.push({k:'card',st:'new',g,type:'trf',from:t.from,to:t.to,amount:Math.round(Number(t.amount)),date:t.date}));
     dels.forEach(t=>CHAT.push({k:'dcard',st:'new',tx:{id:t.id,date:t.date,type:t.type,amount:t.amount,desc:t.desc,acc:t.acc,cat:t.cat,note:t.note||''}}));
     if(items.length+trfs.length>1)CHAT.push({k:'all',g});
-    if(!res.reply&&!items.length&&!trfs.length&&!dels.length&&!accs.length)CHAT.push({k:'bot',text:'Aku belum nangkap transaksinya. Coba tulis seperti "Makan bakso 15rb".'});
+    if(!res.reply&&!summary&&!items.length&&!trfs.length&&!dels.length&&!accs.length)CHAT.push({k:'bot',text:'Aku belum nangkap maksudnya. Coba tulis transaksi seperti "Makan bakso 15rb" atau ringkasan seperti "summary minggu ini".'});
   }catch(e){
     CHAT=CHAT.filter(m=>m.k!=='typing');CHAT.push({k:'bot',err:1,text:'Gagal: '+e.message});
     if(/passcode/i.test(e.message))resync(e.message);
@@ -1101,24 +1162,18 @@ function chatEdit(i){const m=CHAT[i];if(!m||m.k!=='card'||m.st!=='new')return;
   if(m.type==='trf'){trfSheet({from:m.from,to:m.to,amount:m.amount,date:m.date,_cb:()=>{m.st='saved'}});return}
   txSheet(null,{date:m.date,type:m.type,cat:m.cat,desc:m.desc,amount:m.amount,acc:m.acc,note:'',_cb:()=>{m.st='saved'}})}
 
-// ===== Keypad kalkulator (angka + / x - +) =====
-const KP_OPS={'+':'+','-':'\u2212','*':'\u00D7','/':'\u00F7'};
-function kpEval(e){e=String(e).replace(/[+\-*/]+$/,'');if(!e)return 0;const t=e.match(/\d+|[+\-*/]/g);const n=[+t[0]],o=[];
-  for(let i=1;i < t.length;i+=2){const op=t[i],v=+t[i+1];if(op==='*'){n.push(n.pop()*v)}else if(op==='/'){const a=n.pop();n.push(v===0?NaN:a/v)}else{o.push(op);n.push(v)}}
-  let r=n[0];o.forEach((op,i)=>{r=op==='+'?r+n[i+1]:r-n[i+1]});return isFinite(r)?Math.round(r):NaN}
-const kpHtml=id=>`<div class="kp" id="${id}"><div class="kpd"><div class="kpx" id="${id}-x"></div><div class="kpn"><span>Rp</span><b id="${id}-v">0</b></div></div><div class="kpk">${['7','8','9','4','5','6','1','2','3','000','0','bs'].map(k=>`<button type="button" class="kk ${KP_OPS[k]?'op':k==='bs'?'bs':''}" data-kp="${k}" aria-label="${k==='bs'?'Hapus angka':KP_OPS[k]||k}">${k==='bs'?'\u232B':KP_OPS[k]||k}</button>`).join('')}</div></div>`;
+// ===== Keypad nominal (angka saja; operasi kalkulator lama sudah dibuang) =====
+const kpHtml=id=>`<div class="kp" id="${id}"><div class="kpd"><div class="kpn"><span>Rp</span><b id="${id}-v">0</b></div></div><div class="kpk">${['7','8','9','4','5','6','1','2','3','000','0','bs'].map(k=>`<button type="button" class="kk ${k==='bs'?'bs':''}" data-kp="${k}" aria-label="${k==='bs'?'Hapus angka':k}">${k==='bs'?'\u232B':k}</button>`).join('')}</div></div>`;
 function kpInit(id,init){let e=init>0?String(Math.round(init)):'';
-  const draw=()=>{const sh=e.replace(/\d+/g,m=>(+m).toLocaleString('id-ID')).replace(/[+\-*/]/g,m=>' '+KP_OPS[m]+' ');
-    $('#'+id+'-x').textContent=/[+\-*/]/.test(e)?sh:'';const v=kpEval(e);$('#'+id+'-v').textContent=(v>0?v:0).toLocaleString('id-ID')};
+  const draw=()=>{$('#'+id+'-v').textContent=(Number(e)||0).toLocaleString('id-ID')};
   document.querySelectorAll('#'+id+' [data-kp]').forEach(b=>{const k=b.dataset.kp;let tm=0,cleared=false;
     if(k==='bs'){b.addEventListener('pointerdown',()=>{cleared=false;tm=setTimeout(()=>{e='';cleared=true;draw()},600)});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>clearTimeout(tm)))}
     b.addEventListener('click',()=>{if(cleared){cleared=false;return}
       if(k==='bs')e=e.slice(0,-1);
-      else if(KP_OPS[k]){if(!e)return;e=/[+\-*/]$/.test(e)?e.slice(0,-1)+k:e+k}
-      else{const cur=(e.match(/\d+$/)||[''])[0];if(k==='000'&&(cur===''||cur==='0'))return;if(cur.length+k.length>12)return;if(cur==='0')e=e.slice(0,-1);e+=k}
+      else{if(k==='000'&&(e===''||e==='0'))return;if(e.length+k.length>12)return;if(e==='0')e='';e+=k}
       try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}
       draw()})});
-  draw();return{get:()=>kpEval(e)}}
+  draw();return{get:()=>Number(e)||0}}
 
 // ===== Form transfer antar akun (nominal pakai keyboard bawaan HP) =====
 function trfSheet(draft){
