@@ -913,7 +913,7 @@ function call(payload){return new Promise((res,rej)=>{const p=JSON.stringify({..
   if(inScript)google.script.run.withSuccessHandler(done).withFailureHandler(e=>rej(new Error(e.message||'Gagal terhubung'))).api(p);
   else fetch(CFG.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:p}).then(r=>r.text()).then(done,()=>rej(new Error('Tidak bisa terhubung ke server')))})}
 function setSync(s,m){const el=$('#sync');if(el)el.textContent={load:'Memuat dari Google Sheet…',saving:'Menyimpan ke Google Sheet…',ok:'Terhubung ke Google Sheet',err:'Gagal: '+(m||'')+' · ketuk untuk muat ulang'}[s]}
-async function save(table,row){pend++;setSync('saving');try{await call({action:'upsert',table,row});pend--;if(!pend)setSync('ok')}catch(e){pend--;setSync('err',e.message);toast('Gagal menyimpan: '+e.message);resync(e.message)}}
+async function save(table,row){pend++;setSync('saving');try{await call({action:'upsert',table,row});pend--;if(!pend)setSync('ok');return true}catch(e){pend--;setSync('err',e.message);toast('Gagal menyimpan: '+e.message);resync(e.message);return false}}
 async function drop(table,id){pend++;setSync('saving');try{await call({action:'remove',table,id});pend--;if(!pend)setSync('ok')}catch(e){pend--;setSync('err',e.message);toast('Gagal menghapus: '+e.message);resync(e.message)}}
 async function resync(m){if(/passcode/i.test(m)){LS.del('olw_key');CFG.key='';loaded=false;gate(m);return}
   if(pend)return;const r=await load();if(r===true)setSync('err',m)}
@@ -1055,6 +1055,12 @@ function trfCard(m,i){const f=acct(m.from),t=acct(m.to);
 function aCard(m,i){
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cAccSave" data-i="${i}">Simpan akun</button><button type="button" class="cb gh" data-act="cAccNo" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Akun tersimpan</div>':'<div class="cst">Dibatalkan</div>';
   return `<div class="ccard trf ${m.st}"><div class="ct"><span class="cn">${esc(m.name)}</span><span class="ca">${rpRaw(m.opening)}</span></div><div class="cm"><span class="cpill">Akun baru</span><span>Saldo awal</span></div>${foot}</div>`}
+
+function depositCard(m,i){
+  const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cDepSave" data-i="${i}">Simpan setoran</button><button type="button" class="cb gh" data-act="cDepNo" data-i="${i}">Batal</button></div>`:
+    m.st==='saving'?'<div class="cst">Menyimpan setoran…</div>':
+    m.st==='saved'?'<div class="cst ok">✓ Setoran tersimpan</div>':'<div class="cst">Dibatalkan</div>';
+  return `<div class="ccard in ${m.st}"><div class="ct"><span class="cn">Setoran · ${esc(m.goalName)}</span><span class="ca">+${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">Setoran tabungan</span><span>${fdate(m.date)}</span>${m.note?`<span>Catatan: ${esc(m.note)}</span>`:''}</div>${foot}</div>`}
 function dCard(m,i){const t=m.tx,c=cat(t.cat),a=acct(t.acc),inn=t.type==='in',isT=String(t.note||'').indexOf('TRF:')===0;
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb dng" data-act="cDx" data-i="${i}">Hapus</button><button type="button" class="cb gh" data-act="cDxNo" data-i="${i}">Batal</button></div>`:m.st==='done'?'<div class="cst ok">✓ Dihapus</div>':'<div class="cst">Dibatalkan</div>';
   return `<div class="ccard dx ${inn?'in':'out'} ${m.st}"><div class="ct"><span class="cn">${esc(t.desc)}</span><span class="ca">${inn?'+':'−'}${rpRaw(t.amount)}</span></div><div class="cm"><span class="cpill dp">Hapus transaksi</span><span>${fdate(t.date)}</span><span class="ccat">${catIc(c,16)}${esc(c.name)}</span><span>${esc(a.name)}</span></div>${isT?'<div class="cnote">Ini bagian dari transfer, kedua sisinya ikut dihapus.</div>':''}${foot}</div>`}
@@ -1097,6 +1103,7 @@ function chatHtml(){
     else if(m.k==='typing')h+=`<div class="cmsg bot">${chatAv()}<div class="cbub typing">Sebentar, aku baca dulu…</div></div>`;
     else if(m.k==='card')h+=chatCard(m,i);
     else if(m.k==='summary')h+=summaryCard(m.data);
+    else if(m.k==='pcard')h+=depositCard(m,i);
     else if(m.k==='dcard')h+=dCard(m,i);
     else if(m.k==='acard')h+=aCard(m,i);
     else if(m.k==='all'){const n=CHAT.filter(x=>x.k==='card'&&x.g===m.g&&x.st==='new').length;if(n>1)h+=`<div class="callrow"><button type="button" class="cb pri" data-act="cAll" data-g="${m.g}">Simpan semua (${n})</button></div>`}
@@ -1121,18 +1128,21 @@ async function chatSend(){
     CHAT=CHAT.filter(m=>m.k!=='typing');
     const res=r.result||{},items=(res.items||[]).filter(chatOk),g='g'+Date.now();
     const summary=chatSummaryOk(res.summary)?res.summary:null;
+    const visibleGoalIds=new Set(S.goals.map(x=>String(x.id)));
+    const deposits=(res.deposits||[]).filter(d=>d&&visibleGoalIds.has(String(d.goal))&&Math.round(Number(d.amount))>0&&Math.round(Number(d.amount))<=999999999999&&/^\d{4}-\d{2}-\d{2}$/.test(String(d.date||''))).map(d=>({goal:String(d.goal),amount:Math.round(Number(d.amount)),date:String(d.date),note:String(d.note||'').trim().slice(0,60)}));
     const hasAcc=id=>S.accounts.some(a=>a.id===id);
     const trfs=(res.transfers||[]).filter(t=>t&&hasAcc(t.from)&&hasAcc(t.to)&&t.from!==t.to&&Number(t.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(t.date||'')));
     const dels=(res.deletes||[]).filter(t=>t&&S.transactions.some(x=>x.id===t.id));
     const accs=(res.accounts||[]).filter(a=>a&&String(a.name||'').trim()&&!S.accounts.some(x=>String(x.name).trim().toUpperCase()===String(a.name).trim().toUpperCase()));
     if(res.reply)CHAT.push({k:'bot',text:res.reply});
     if(summary){CHAT.push({k:'bot',text:'Ini ringkasan '+String(summary.label).toLowerCase()+'.'});CHAT.push({k:'summary',data:summary})}
+    deposits.forEach(d=>{const goal=S.goals.find(x=>String(x.id)===d.goal);if(goal)CHAT.push({k:'pcard',st:'new',goalId:d.goal,goalName:goal.name,date:d.date,amount:d.amount,note:d.note})});
     accs.forEach(a=>CHAT.push({k:'acard',st:'new',name:String(a.name).trim().toUpperCase().slice(0,30),opening:Math.max(0,Math.round(Number(a.opening)||0))}));
     items.forEach(it=>CHAT.push({k:'card',st:'new',g,date:it.date,type:it.type,cat:it.cat,desc:it.desc,amount:Math.round(Number(it.amount)),acc:it.acc}));
     trfs.forEach(t=>CHAT.push({k:'card',st:'new',g,type:'trf',from:t.from,to:t.to,amount:Math.round(Number(t.amount)),date:t.date}));
     dels.forEach(t=>CHAT.push({k:'dcard',st:'new',tx:{id:t.id,date:t.date,type:t.type,amount:t.amount,desc:t.desc,acc:t.acc,cat:t.cat,note:t.note||''}}));
     if(items.length+trfs.length>1)CHAT.push({k:'all',g});
-    if(!res.reply&&!summary&&!items.length&&!trfs.length&&!dels.length&&!accs.length)CHAT.push({k:'bot',text:'Aku belum nangkap maksudnya. Coba tulis transaksi seperti "Makan bakso 15rb" atau ringkasan seperti "summary minggu ini".'});
+    if(!res.reply&&!summary&&!deposits.length&&!items.length&&!trfs.length&&!dels.length&&!accs.length)CHAT.push({k:'bot',text:'Aku belum nangkap maksudnya. Coba tulis transaksi seperti "Makan bakso 15rb", setoran seperti "Nabung 100rb ke Liburan", atau ringkasan seperti "summary minggu ini".'});
   }catch(e){
     CHAT=CHAT.filter(m=>m.k!=='typing');CHAT.push({k:'bot',err:1,text:'Gagal: '+e.message});
     if(/passcode/i.test(e.message))resync(e.message);
@@ -1154,6 +1164,21 @@ function chatDx(i){const m=CHAT[i];if(!m||m.k!=='dcard'||m.st!=='new')return;con
 function chatAccSave(i){const m=CHAT[i];if(!m||m.k!=='acard'||m.st!=='new')return;
   if(S.accounts.some(x=>String(x.name).trim().toUpperCase()===m.name)){m.st='cancel';chatDraw();toast('Akun '+m.name+' sudah ada');return}
   saveNew('Accounts',S.accounts,{id:uid(),name:m.name,owner:ME,opening:m.opening});m.st='saved';chatDraw();toast('Akun ditambahkan')}
+
+async function chatDepSave(i){
+  const m=CHAT[i];if(!m||m.k!=='pcard'||m.st!=='new')return;
+  const g=S.goals.find(x=>String(x.id)===String(m.goalId));
+  const amount=Math.round(Number(m.amount));
+  if(!g){m.st='cancel';chatDraw();toast('Target tabungan tidak ditemukan atau tidak bisa diakses');return}
+  if(!isFinite(amount)||amount<1||amount>999999999999||!/^\d{4}-\d{2}-\d{2}$/.test(String(m.date||''))){m.st='cancel';chatDraw();toast('Draf setoran tidak valid');return}
+  m.st='saving';chatDraw();
+  const dp={id:uid(),date:m.date,by:ME,amount:amount,note:String(m.note||'').trim().slice(0,60)};
+  const ok=await save('Deposits',{...dp,goal:g.id});
+  if(ok){if(!Array.isArray(g.deps))g.deps=[];g.deps.push(dp);m.st='saved';toast('Setoran dicatat ke '+g.name)}
+  else m.st='new';
+  chatDraw();
+}
+function chatDepNo(i){const m=CHAT[i];if(!m||m.k!=='pcard'||m.st!=='new')return;m.st='cancel';chatDraw()}
 function chatAccNo(i){const m=CHAT[i];if(!m||m.k!=='acard'||m.st!=='new')return;m.st='cancel';chatDraw()}
 function chatDxNo(i){const m=CHAT[i];if(!m||m.k!=='dcard'||m.st!=='new')return;m.st='cancel';chatDraw()}
 function chatSaveAll(g){let n=0;CHAT.forEach(m=>{if(m.k==='card'&&m.g===g&&m.st==='new'){if(m.type==='trf'){m.st='saved';putTrf(m)}else chatPut(m);n++}});chatDraw();if(n)toast(n+' transaksi ditambahkan')}
@@ -1325,6 +1350,8 @@ document.addEventListener('click',e=>{
   else if(a==='cSave')chatSave(+b.dataset.i);
   else if(a==='cAccSave')chatAccSave(+b.dataset.i);
   else if(a==='cAccNo')chatAccNo(+b.dataset.i);
+  else if(a==='cDepSave')chatDepSave(+b.dataset.i);
+  else if(a==='cDepNo')chatDepNo(+b.dataset.i);
   else if(a==='cEdit')chatEdit(+b.dataset.i);
   else if(a==='cDel')chatDel(+b.dataset.i);
   else if(a==='cAll')chatSaveAll(b.dataset.g);
