@@ -745,6 +745,21 @@ html[data-model] .pmenu .pi{padding:9px 14px}
 html[data-model] .mpk{height:50px;min-height:0;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 html[data-model] .mpk.on{background:var(--btn);color:#fff;border-color:transparent}
 html[data-model] .mpk:disabled{opacity:.3;cursor:default}
+
+/* ===== Kendaraan & pajak ===== */
+.vstat{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;align-self:flex-start;display:inline-block}
+.vstat.aman{background:rgba(43,124,99,.14);color:var(--in)}
+.vstat.segera{background:rgba(214,158,46,.20);color:#B7791F}
+.vstat.terlambat{background:rgba(181,80,106,.16);color:var(--out)}
+.vstat.belum{background:var(--accent-soft);color:var(--accent-strong)}
+.vrem{display:flex;gap:10px;padding:12px 0;border-top:1px solid var(--line);margin-top:10px}
+.vrem .vm{flex:1;min-width:0}
+.vrem .vt{font-weight:600;font-size:14.5px;line-height:1.35}
+.vrem .vi{font-weight:400;color:var(--mut)}
+.vrem .vs{font-size:12.5px;color:var(--mut);line-height:1.5;margin-top:2px}
+.vbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.vbtns button{font:inherit;font-size:13px;padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.vbtns button.pri{background:var(--accent-soft);color:var(--accent-strong);border-color:transparent}
 </style></head>
 <body>
 <div class="app">
@@ -802,7 +817,7 @@ const ic=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="no
 // ===== Data layer =====
 const PEOPLE=['RAMA','DESY'];
 const COLORS=['#E4673A','#3C7BD9','#B94AA8','#8059D8','#B8730A','#1E9473','#E8609B','#D43F5E','#667189'];
-const S={accounts:[],categories:[],transactions:[],goals:[],dates:[]};
+const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[]};
 const cat=id=>S.categories.find(c=>c.id===id)||{name:'(dihapus)',color:'#999',icon:'tag'};
 const acct=id=>S.accounts.find(a=>a.id===id)||{name:'(dihapus)'};
 
@@ -926,7 +941,7 @@ async function save(table,row){pend++;setSync('saving');try{await call({action:'
 async function drop(table,id){pend++;setSync('saving');try{await call({action:'remove',table,id});pend--;if(!pend)setSync('ok')}catch(e){pend--;setSync('err',e.message);toast('Gagal menghapus: '+e.message);resync(e.message)}}
 async function resync(m){if(/passcode/i.test(m)){LS.del('olw_key');CFG.key='';loaded=false;gate(m);return}
   if(pend)return;const r=await load();if(r===true)setSync('err',m)}
-function logout(){LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
+function logout(){LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];S.vehicles=[];S.reminders=[];S.servicelog=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
 function savGroups(){const sh=S.goals.filter(g=>g.scope!=='private'),pv=S.goals.filter(g=>g.scope==='private');
   return (sh.length?`<h2 style="margin:6px 4px 10px">Tabungan bersama</h2><p class="sub" style="margin:-4px 4px 10px">RAMA dan DESY bisa melihat ini.</p>`+sh.map(goalCard).join(''):'')+(pv.length?`<h2 style="margin:6px 4px 10px">Tabungan pribadi ${ME} ${ic('lock',14)}</h2><p class="sub" style="margin:-4px 4px 10px">Hanya kamu yang bisa melihat ini.</p>`+pv.map(goalCard).join(''):'')}
 function saveNew(table,arr,row){arr.push(row);save(table,row)}
@@ -934,7 +949,7 @@ function saveObj(table,row){save(table,row);return row}
 const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope:g.scope,owner:g.owner});
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
-  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));loaded=true}
+  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];loaded=true}
 async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
 
 // ===== Layar masuk: keypad angka (bisa pindah ke keyboard biasa) =====
@@ -1010,7 +1025,7 @@ home(){const m=pFilter(S.transactions),inc=sum(m,'in'),exp=sum(m,'out'),r=pRange
   const ms=[5,4,3,2,1,0].map(k=>{const l=inMonth(ymOf(k));return {ym:ymOf(k),i:sum(l,'in'),o:sum(l,'out')}});const mx=Math.max(1,...ms.flatMap(x=>[x.i,x.o]));
   return `<div class="card hero"><div style="font-size:13px;opacity:.8">Total saldo pribadi · hanya kamu yang bisa lihat</div><div class="big">${rp(total())}${total() < 0&&!HIDE?' (minus)':''}</div><div style="font-size:13px;opacity:.8">dari ${S.accounts.length} akun</div></div>
   ${pBar()}<div class="row summary-row"><div class="card mini"><div class="lbl">Pemasukan</div><div class="v in">${rp(inc)}</div></div><div class="card mini"><div class="lbl">Pengeluaran</div><div class="v out">${rp(exp)}</div></div></div>
-  ${savCard()}<div class="card category-overview"><h2>Pengeluaran · ${esc(r.label)}</h2>${catBars(m)}</div>
+  ${vehBanner()}${savCard()}<div class="card category-overview"><h2>Pengeluaran · ${esc(r.label)}</h2>${catBars(m)}</div>
   <div class="card"><h2>6 bulan terakhir</h2><div class="cols">${ms.map(x=>`<div class="col"><div class="pair"><i style="height:${x.i/mx*100}%;background:var(--in)"></i><i style="height:${x.o/mx*100}%;background:var(--out)"></i></div>${MON[+x.ym.slice(5)-1]}</div>`).join('')}</div><div class="sub" style="margin-top:8px"><span class="in">■</span> Pemasukan &nbsp; <span class="out">■</span> Pengeluaran</div></div>
   <div class="card latest-overview"><h2>Transaksi terbaru <button class="link" data-act="tab" data-t="trx">Lihat semua</button></h2>${S.transactions.length?sorted(S.transactions).slice(0,5).map(txRow).join(''):emptyTx()}</div>`},
 trx(){const TL={all:'Semua transaksi',in:'Pemasukan',out:'Pengeluaran'},act=F.type!=='all'||F.cat||F.acc;
@@ -1018,12 +1033,13 @@ trx(){const TL={all:'Semua transaksi',in:'Pemasukan',out:'Pengeluaran'},act=F.ty
   <div class="psearch">${ic('search',18)}<input id="fq" type="text" enterkeyhint="search" autocomplete="off" placeholder="Cari transaksi…" value="${esc(F.q)}"></div>${act?'<div class="fhint" style="margin:-4px 0 12px"><button class="link" data-act="freset">Reset filter</button></div>':''}<div class="card" id="trxList"></div>`},
 acc(){return `<div class="card hero"><div style="font-size:13px;opacity:.8">Total akun pribadi · hanya kamu yang bisa lihat</div><div class="big">${rp(total())}</div></div>
   ${S.accounts.length?S.accounts.map(a=>`<div class="card tx${MODEL()==='2'?' acc-row':''}" style="padding:14px 16px;margin-bottom:12px">${MODEL()==='2'?accAv2(a):accAv1(a.name)}<div class="m"><div class="d">${esc(a.name)}</div><div class="s"><span class="badge">${esc(a.owner)}</span></div></div><div class="a">${bal(a.id) < 0?'−':''}${rp(bal(a.id))}</div><button class="del" data-act="editAcc" data-id="${a.id}" aria-label="Ubah akun">${ic('edit',18)}</button></div>`).join(''):'<div class="card empty"><b>Belum ada akun</b></div>'}
-  <button class="btn sec" data-act="editAcc">+ Tambah akun</button><button class="btn" data-act="tab" data-t="sav">♡ Tabungan (bersama dan pribadi)</button>
+  <button class="btn sec" data-act="editAcc">+ Tambah akun</button><button class="btn" data-act="tab" data-t="sav">♡ Tabungan (bersama dan pribadi)</button><button class="btn sec" data-act="tab" data-t="veh">Kendaraan &amp; pajak</button>
   <p class="sub" style="margin-top:12px">Akun dan saldo di sini pribadi: hanya kamu yang bisa melihatnya. Saldo = saldo awal + transaksi.</p>`},
 sav(){return `<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>`+(S.goals.length?savGroups():'<div class="card empty">'+ic('heart',34)+'<b>Belum ada target tabungan</b>Mulai dari target pertama kalian, misalnya tabungan nikah.</div>')+`<button class="btn sec" data-act="editGoal">+ Tambah target tabungan</button><p class="sub" style="margin-top:12px">Setoran tabungan dicatat terpisah dari saldo akun.</p>`},
 dates(){const t0=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate());
   const items=S.dates.map(d=>{const[y,m,dd]=d.date.split('-').map(Number);let tg=new Date(y,m-1,dd);if(d.yearly)while(tg < t0)tg=new Date(tg.getFullYear()+1,m-1,dd);return {...d,n:Math.round((tg-t0)/864e5)}}).sort((a,b)=>(a.n < 0)-(b.n < 0)||Math.abs(a.n)-Math.abs(b.n));
   return `<div class="card"><h2>Tanggal spesial kita ♡</h2>${items.length?items.map(d=>`<div class="tx"><div class="cd">${d.n===0?'Hari ini':Math.abs(d.n)}<small>${d.n===0?'♡':d.n>0?'hari lagi':'hari lalu'}</small></div><div class="m"><div class="d">${esc(d.title)}</div><div class="s">${fdate(d.date)}${d.yearly?' · tiap tahun':''}${d.note?' · '+esc(d.note):''}</div></div><button class="del" data-act="delDate" data-id="${d.id}" aria-label="Hapus">${ic('trash',18)}</button></div>`).join(''):'<div class="empty"><b>Belum ada tanggal spesial</b>Tambahkan anniversary atau rencana date kalian.</div>'}</div><button class="btn" data-act="addDate">+ Tambah tanggal</button>`},
+veh(){return vehView()},
 chat(){return chatView()},
 };
 const gSum=g=>g.deps.reduce((s,d)=>s+d.amount,0);
@@ -1045,7 +1061,7 @@ function listTx(){const _r=pRange();let l=S.transactions.filter(t=>(F.type==='al
   const ti=sum(l,'in'),to=sum(l,'out');
   $('#trxList').innerHTML=`<div class="sub" style="margin-bottom:2px">${l.length} transaksi${ti?` · Masuk <span class="in">+${rp(ti)}</span>`:''}${to?` · Keluar <span class="out">−${rp(to)}</span>`:''}</div><div class="sub" style="margin-bottom:2px;font-size:11.5px">Ketuk transaksi untuk mengubahnya.</div>`+h}
 function render(){const me=$('#me');if(me)me.textContent=ME?'Masuk sebagai '+ME:'';$('#view').className='view view-'+tab;$('#view').innerHTML=loaded?VIEWS[tab]():'<div class="empty"><b>Memuat data…</b></div>';if(loaded&&tab==='trx')listTx();
-  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||(tab==='sav'&&t[0]==='acc'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('');
+  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||((tab==='sav'||tab==='veh')&&t[0]==='acc'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('');
   $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';document.body.classList.toggle('tchat',tab==='chat');if(tab!=='chat')document.body.classList.remove('kbf');chatSync()}
 
 // ===== Chat Bot: ketik bahasa sehari-hari -> kartu transaksi -> Simpan =====
@@ -1416,6 +1432,92 @@ function goalSheet(id){const g=S.goals.find(x=>x.id===id)||{name:'',target:0,dea
  $('#g-s').onclick=()=>{const n=$('#g-n').value.trim().toUpperCase(),t=parseInt($('#g-t').value.replace(/\D/g,''),10),ok=t>0&&t<=999999999999;setErr('gn',n?'':'Nama wajib diisi');setErr('gt',ok?'':'Masukkan target lebih dari 0');if(!n||!ok)return;
   const o={name:n,target:t,deadline:$('#g-d').value};if(id)save('Goals',goalRow(Object.assign(S.goals.find(x=>x.id===id),o)));else{const sc=$('#g-s2').value,g1={id:uid(),...o,scope:sc,owner:sc==='private'?ME:'',deps:[]};S.goals.push(g1);save('Goals',goalRow(g1))}closeSheet();render();toast('Target disimpan')};
  if(id)$('#g-x').onclick=()=>confirmBox(`Target ${esc(g.name)} beserta semua setorannya akan dihapus.`,()=>{S.goals=S.goals.filter(x=>x.id!==id);drop('Goals',id);render()})}
+// ===== Kendaraan & pajak (Tahap 22 fase 1) =====
+ICON.veh='<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l-3-8H9M14 9h3l2 4"/>';
+// DUE-BEGIN
+function dueParse_(s) { var p = String(s || '').split('-'); return { y: +p[0], m: +p[1], d: +p[2] }; }
+function dueDays_(a, b) {
+  var A = dueParse_(a), B = dueParse_(b);
+  return Math.round((Date.UTC(A.y, A.m - 1, A.d) - Date.UTC(B.y, B.m - 1, B.d)) / 86400000);
+}
+function dueAddMonths_(s, n) {
+  var p = dueParse_(s), t = p.y * 12 + (p.m - 1) + n, y = Math.floor(t / 12), m = t % 12;
+  var last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), d = Math.min(p.d, last);
+  return y + '-' + ('0' + (m + 1)).slice(-2) + '-' + ('0' + d).slice(-2);
+}
+// Jadwal berikutnya: tanggal (terakhir + interval bulan) dan/atau km (km terakhir + interval km).
+// Terlambat = lewat tanggal atau lewat km; Segera = sisa <= 30 hari atau <= 300 km.
+function dueInfo_(r, v, today) {
+  var months = +r.everyMonths || 0, km = +r.everyKm || 0;
+  var dueDate = (months > 0 && r.lastDate) ? dueAddMonths_(r.lastDate, months) : '';
+  var dueKm = (km > 0 && +r.lastKm > 0) ? (+r.lastKm) + km : 0;
+  var daysLeft = dueDate ? dueDays_(dueDate, today) : null;
+  var kmLeft = (dueKm && v && +v.odo > 0) ? dueKm - (+v.odo) : null;
+  var st = 'aman';
+  if ((daysLeft !== null && daysLeft < 0) || (kmLeft !== null && kmLeft < 0)) st = 'terlambat';
+  else if ((daysLeft !== null && daysLeft <= 30) || (kmLeft !== null && kmLeft <= 300)) st = 'segera';
+  else if (daysLeft === null && kmLeft === null) st = 'belum';
+  return { dueDate: dueDate, dueKm: dueKm, daysLeft: daysLeft, kmLeft: kmLeft, status: st };
+}
+// DUE-END
+const STAT_ORD={terlambat:0,segera:1,aman:2,belum:3},STAT_LAB={aman:'Aman',segera:'Segera',terlambat:'Terlambat',belum:'Belum lengkap'};
+const todayIso=()=>isoL(new Date());
+const fkm=n=>Math.round(n).toLocaleString('id-ID');
+const vehOf=id=>S.vehicles.find(v=>v.id===id);
+const vehRow=v=>({id:v.id,name:v.name,plate:v.plate||'',scope:v.scope,owner:v.owner||'',odo:v.odo||0,odoDate:v.odoDate||''});
+const remRowData=r=>({id:r.id,vehicle:r.vehicle,name:r.name,kind:r.kind,everyKm:r.everyKm||0,everyMonths:r.everyMonths||0,lastDate:r.lastDate,lastKm:r.lastKm||0,lastCost:r.lastCost||0,note:r.note||''});
+const remInfo=r=>dueInfo_(r,vehOf(r.vehicle),todayIso());
+const remSort=(a,b)=>STAT_ORD[a.d.status]-STAT_ORD[b.d.status]||((a.d.daysLeft==null?1e9:a.d.daysLeft)-(b.d.daysLeft==null?1e9:b.d.daysLeft));
+const remIv=r=>'tiap '+[r.everyKm?fkm(r.everyKm)+' km':'',r.everyMonths?r.everyMonths+' bulan':''].filter(Boolean).join(' / ');
+function remLeft(d){const p=[];if(d.daysLeft!=null)p.push(d.daysLeft<0?'lewat '+(-d.daysLeft)+' hari':d.daysLeft===0?'jatuh tempo hari ini':d.daysLeft+' hari lagi');if(d.kmLeft!=null)p.push(d.kmLeft<0?'lewat '+fkm(-d.kmLeft)+' km':fkm(d.kmLeft)+' km lagi');return p.join(' · ')}
+function remNext(r,d){const a=[];if(d.dueDate)a.push(fdate(d.dueDate));if(d.dueKm)a.push(fkm(d.dueKm)+' km');return a.length?(r.kind==='pajak'?'Bayar lagi: ':'Service lagi: ')+a.join(' atau '):'Isi odometer terakhir supaya jadwal km bisa dihitung'}
+function remRow(x){const r=x.r,d=x.d,l=remLeft(d);
+  return `<div class="vrem"><div class="vm"><div class="vt">${esc(r.name)} <span class="vi">(${esc(remIv(r))})</span></div><div class="vs">Terakhir ${fdate(r.lastDate)}${r.lastKm?' · '+fkm(r.lastKm)+' km':''}${r.lastCost?' · '+rp(r.lastCost):''}</div><div class="vs">${remNext(r,d)}</div>${l?`<div class="vs">${l}</div>`:''}<div class="vbtns"><button class="pri" data-act="remDone" data-id="${r.id}">Sudah dilakukan</button><button data-act="remEdit" data-id="${r.id}">Ubah</button></div></div><span class="vstat ${d.status}">${STAT_LAB[d.status]}</span></div>`}
+function vehCard(v){const rs=S.reminders.filter(r=>r.vehicle===v.id).map(r=>({r,d:remInfo(r)})).sort(remSort);
+  return `<div class="card"><h2><span>${esc(v.name)} <span class="badge">${v.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="vehEdit" data-id="${v.id}" aria-label="Ubah kendaraan">${ic('edit',18)}</button></h2><div class="sub">${v.plate?esc(v.plate)+' · ':''}Odometer ${v.odo?fkm(v.odo)+' km':'belum diisi'}${v.odoDate?' (per '+fdate(v.odoDate)+')':''}</div><div class="vbtns"><button class="pri" data-act="odo" data-id="${v.id}">Update odometer</button><button data-act="remAdd" data-id="${v.id}">+ Pengingat</button></div>${rs.length?rs.map(remRow).join(''):'<p class="sub" style="margin-top:12px">Belum ada pengingat. Tekan + Pengingat untuk mulai.</p>'}</div>`}
+function vehView(){const back='<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>';
+  if(!S.vehicles.length)return back+`<div class="card empty">${ic('veh',34)}<b>Belum ada kendaraan</b>Tambah motor atau mobil, lalu pasang pengingat servis dan pajak.</div><button class="btn" data-act="vehEdit">+ Tambah kendaraan</button>`;
+  return back+S.vehicles.map(vehCard).join('')+`<button class="btn sec" data-act="vehEdit">+ Tambah kendaraan</button><p class="sub" style="margin-top:12px">Kendaraan pribadi hanya terlihat olehmu. Kendaraan bersama terlihat RAMA dan DESY. Status Segera = sisa 30 hari atau 300 km.</p>`}
+function vehBanner(){if(!S.vehicles.length||!S.reminders.length)return '';const c={terlambat:0,segera:0};S.reminders.forEach(r=>{const s=remInfo(r).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
+  return `<div class="card" data-act="tab" data-t="veh" style="cursor:pointer"><h2>Servis &amp; pajak <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
+function vehSheet(id){const v=id?vehOf(id):null;if(id&&!v)return;const x=v||{name:'',plate:'',odo:0};
+  sheet(id?'Ubah kendaraan':'Kendaraan baru',`<label for="v-n">Nama kendaraan</label><input id="v-n" maxlength="40" autocapitalize="characters" style="text-transform:uppercase" value="${esc(x.name)}" placeholder="mis. Motor Ram"><div class="err" id="e-vn"></div><label for="v-p">Plat nomor (opsional)</label><input id="v-p" maxlength="12" autocapitalize="characters" style="text-transform:uppercase" value="${esc(x.plate||'')}"><label for="v-o">Odometer sekarang (km)</label><input id="v-o" inputmode="numeric" value="${x.odo?fkm(x.odo):''}" placeholder="0"><div class="err" id="e-vo"></div>${id?'':'<label for="v-s">Siapa yang bisa melihat</label><select id="v-s"><option value="private">Pribadi (hanya aku)</option><option value="shared">Bersama (RAMA dan DESY)</option></select>'}<button class="btn" id="v-save">Simpan</button>${id?'<button class="btn sec" id="v-x">Hapus kendaraan</button>':''}`);
+  $('#v-o').oninput=fmtIn;
+  $('#v-save').onclick=()=>{const n=$('#v-n').value.trim().toUpperCase(),o=parseInt($('#v-o').value.replace(/\D/g,'')||'0',10),ok=o>=0&&o<=9999999;setErr('vn',n?'':'Nama wajib diisi');setErr('vo',ok?'':'Odometer tidak valid');if(!n||!ok)return;
+    const pl=$('#v-p').value.trim().toUpperCase();
+    if(id){Object.assign(v,{name:n,plate:pl});if(o!==v.odo){v.odo=o;v.odoDate=o?todayIso():''}save('Vehicles',vehRow(v))}
+    else{const sc=$('#v-s').value==='shared'?'shared':'private',nv={id:uid(),name:n,plate:pl,scope:sc,owner:sc==='private'?ME:'',odo:o,odoDate:o?todayIso():''};S.vehicles.push(nv);save('Vehicles',vehRow(nv))}
+    closeSheet();render();toast('Kendaraan disimpan')};
+  if(id)$('#v-x').onclick=()=>confirmBox(`Kendaraan ${esc(v.name)} beserta semua pengingat dan riwayatnya akan dihapus.`,()=>{const ids=S.reminders.filter(r=>r.vehicle===id).map(r=>r.id);S.servicelog=S.servicelog.filter(l=>!ids.includes(l.reminder));S.reminders=S.reminders.filter(r=>r.vehicle!==id);S.vehicles=S.vehicles.filter(z=>z.id!==id);drop('Vehicles',id);render()})}
+function odoSheet(id){const v=vehOf(id);if(!v)return;
+  sheet('Update odometer',`<p class="sub">${esc(v.name)} · sekarang ${v.odo?fkm(v.odo)+' km':'belum diisi'}</p><label for="o-k">Odometer sekarang (km)</label><input id="o-k" inputmode="numeric" placeholder="0" autocomplete="off"><div class="err" id="e-ok"></div><button class="btn" id="o-save">Simpan</button>`);
+  $('#o-k').oninput=fmtIn;
+  $('#o-save').onclick=()=>{const o=parseInt($('#o-k').value.replace(/\D/g,''),10),bad=!(o>0&&o<=9999999)?'Masukkan odometer dalam angka':o<(v.odo||0)?'Lebih kecil dari sebelumnya. Kalau memang koreksi, ubah lewat tombol pensil kendaraan.':'';setErr('ok',bad);if(bad)return;
+    v.odo=o;v.odoDate=todayIso();save('Vehicles',vehRow(v));closeSheet();render();toast('Odometer diperbarui')}}
+const REM_TPL=[['Ganti oli','servis',3000,3],['Servis berkala / CVT','servis',6000,6],['Kampas rem','servis',10000,12],['Ban','servis',20000,24],['Aki','servis',0,18],['Pajak tahunan','pajak',0,12],['Ganti plat (5 tahunan)','pajak',0,60],['SIM','pajak',0,60],['Asuransi','pajak',0,12]];
+function remSheet(vid,rid){const r=rid?S.reminders.find(z=>z.id===rid):null;if(rid&&!r)return;const vh=vehOf(r?r.vehicle:vid);if(!vh)return;
+  const x=r||{name:'',kind:'servis',everyKm:0,everyMonths:0,lastDate:todayIso(),lastKm:vh.odo||0,lastCost:0};
+  sheet(rid?'Ubah pengingat':'Pengingat baru',`<p class="sub">${esc(vh.name)}</p>${rid?'':`<label for="r-t">Isi cepat</label><select id="r-t"><option value="">Pilih contoh…</option>${REM_TPL.map((t,i)=>`<option value="${i}">${esc(t[0])}</option>`).join('')}</select>`}<label for="r-n">Nama</label><input id="r-n" maxlength="60" value="${esc(x.name)}" placeholder="mis. Ganti oli"><div class="err" id="e-rn"></div><label for="r-k">Jenis</label><select id="r-k"><option value="servis" ${x.kind==='servis'?'selected':''}>Servis (km dan/atau bulan)</option><option value="pajak" ${x.kind==='pajak'?'selected':''}>Pajak / dokumen (bulan)</option></select><div id="r-kmw"><label for="r-ik">Ulangi tiap (km)</label><input id="r-ik" inputmode="numeric" value="${x.everyKm?fkm(x.everyKm):''}" placeholder="mis. 3.000"></div><label for="r-im">Ulangi tiap (bulan)</label><input id="r-im" inputmode="numeric" value="${x.everyMonths||''}" placeholder="mis. 3"><div class="err" id="e-ri"></div><label for="r-d">Terakhir dilakukan (tanggal)</label><input type="date" id="r-d" value="${x.lastDate}"><div class="err" id="e-rd"></div><div id="r-lkw"><label for="r-lk">Odometer saat itu (km)</label><input id="r-lk" inputmode="numeric" value="${x.lastKm?fkm(x.lastKm):''}" placeholder="0"><div class="err" id="e-rl"></div></div><label for="r-lc">Biaya terakhir (Rp, opsional)</label><input id="r-lc" inputmode="numeric" value="${x.lastCost?fkm(x.lastCost):''}" placeholder="0"><p class="sub">Jadwal berikutnya dihitung dari tanggal dan odometer terakhir; mana yang tercapai lebih dulu.</p><button class="btn" id="r-save">Simpan</button>${rid?'<button class="btn sec" id="r-x">Hapus pengingat</button>':''}`);
+  ['#r-ik','#r-lk','#r-lc'].forEach(s=>$(s).oninput=fmtIn);
+  const kmShow=()=>{const p=$('#r-k').value==='pajak';$('#r-kmw').style.display=p?'none':'';$('#r-lkw').style.display=p?'none':''};kmShow();$('#r-k').onchange=kmShow;
+  if(!rid)$('#r-t').onchange=e=>{const t=REM_TPL[e.target.value];if(!t)return;$('#r-n').value=t[0];$('#r-k').value=t[1];$('#r-ik').value=t[2]?fkm(t[2]):'';$('#r-im').value=t[3]||'';kmShow()};
+  $('#r-save').onclick=()=>{const num=s=>parseInt($(s).value.replace(/\D/g,'')||'0',10),n=$('#r-n').value.trim(),k=$('#r-k').value==='pajak'?'pajak':'servis',ik=k==='pajak'?0:num('#r-ik'),im=num('#r-im'),d=$('#r-d').value,lk=k==='pajak'?0:num('#r-lk'),lc=num('#r-lc');
+    const eI=!ik&&!im?'Isi interval km atau bulan':(im>600||ik>1000000)?'Interval terlalu besar':'',eL=ik>0&&!(lk>0)?'Isi odometer saat terakhir dilakukan':'';
+    setErr('rn',n?'':'Nama wajib diisi');setErr('ri',eI);setErr('rd',d?'':'Tanggal wajib diisi');setErr('rl',eL);if(!n||eI||!d||eL)return;
+    const o={name:n,kind:k,everyKm:ik,everyMonths:im,lastDate:d,lastKm:lk,lastCost:lc};
+    if(r){Object.assign(r,o);save('Reminders',remRowData(r))}else{const nr={id:uid(),vehicle:vh.id,note:'',...o};S.reminders.push(nr);save('Reminders',remRowData(nr))}
+    closeSheet();render();toast('Pengingat disimpan')};
+  if(rid)$('#r-x').onclick=()=>confirmBox(`Pengingat ${esc(r.name)} beserta riwayatnya akan dihapus.`,()=>{S.servicelog=S.servicelog.filter(l=>l.reminder!==rid);S.reminders=S.reminders.filter(z=>z.id!==rid);drop('Reminders',rid);render()})}
+function doneSheet(rid){const r=S.reminders.find(z=>z.id===rid);if(!r)return;const vh=vehOf(r.vehicle);
+  const accs=S.accounts.length?`<label for="d-a">Catat sebagai pengeluaran (Transportasi)</label><select id="d-a"><option value="">Tidak dicatat</option>${S.accounts.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select>`:'';
+  sheet('Sudah dilakukan',`<p class="sub">${esc(r.name)} · ${esc(vh?vh.name:'')}</p><label for="d-d">Tanggal</label><input type="date" id="d-d" value="${todayIso()}"><div class="err" id="e-dd"></div>${r.kind==='pajak'?'':`<label for="d-k">Odometer saat ini (km)</label><input id="d-k" inputmode="numeric" value="${vh&&vh.odo?fkm(vh.odo):''}" placeholder="0">`}<label for="d-c">Biaya (Rp)</label><input id="d-c" inputmode="numeric" placeholder="0" autocomplete="off"><div class="err" id="e-dc"></div><label for="d-s">Bengkel / keterangan (opsional)</label><input id="d-s" maxlength="60">${accs}<div class="err" id="e-dx"></div><button class="btn" id="d-save">Simpan</button>`);
+  ['#d-k','#d-c'].forEach(s=>{const el=$(s);if(el)el.oninput=fmtIn});
+  $('#d-save').onclick=async()=>{const btn=$('#d-save'),num=s=>$(s)?parseInt($(s).value.replace(/\D/g,'')||'0',10):0,d=$('#d-d').value,c=num('#d-c'),k=num('#d-k'),pa=$('#d-a')?$('#d-a').value:'';
+    setErr('dd',d?'':'Tanggal wajib diisi');setErr('dc',pa&&!(c>0)?'Isi biaya untuk mencatat pengeluaran':c>999999999999?'Nominal terlalu besar':'');if(!d||(pa&&!(c>0))||c>999999999999)return;
+    btn.disabled=true;btn.textContent='Menyimpan…';setErr('dx','');
+    try{await call({action:'serviceDone',reminder:rid,date:d,km:k,cost:c,shop:$('#d-s').value.trim(),payAcc:pa});closeSheet();await load();toast(pa?'Tercatat + pengeluaran disimpan':'Tercatat')}
+    catch(e){btn.disabled=false;btn.textContent='Simpan';setErr('dx','Gagal: '+e.message)}}}
+
 // ===== Events =====
 document.addEventListener('click',e=>{
   if(e.target===ov&&!ov.classList.contains('dlg')){closeSheet();return}
@@ -1438,7 +1540,7 @@ document.addEventListener('click',e=>{
   else if(a==='freset'){F={type:'all',cat:'',acc:'',q:'',month:'',day:''};P.mode=pDef();P.off=0;pmenu=false;render()}
   else if(a==='del')confirmBox('Transaksi ini akan dihapus dari daftar.',()=>{S.transactions=S.transactions.filter(t=>t.id!==id);drop('Transactions',id);render();toast('Transaksi dihapus')});
   else if(a==='editAcc')accSheet(id);else if(a==='addDate')dateSheet();
-  else if(a==='editGoal')goalSheet(id);else if(a==='addDep')depSheet(id);
+  else if(a==='editGoal')goalSheet(id);else if(a==='addDep')depSheet(id);else if(a==='vehEdit')vehSheet(id);else if(a==='odo')odoSheet(id);else if(a==='remAdd')remSheet(id,'');else if(a==='remEdit')remSheet('',id);else if(a==='remDone')doneSheet(id);
   else if(a==='delDep')confirmBox('Setoran ini akan dihapus.',()=>{const g=S.goals.find(x=>x.id===id);g.deps=g.deps.filter(d=>d.id!==b.dataset.d);drop('Deposits',b.dataset.d);render()});
   else if(a==='delDate')confirmBox('Tanggal spesial ini akan dihapus.',()=>{S.dates=S.dates.filter(d=>d.id!==id);drop('Dates',id);render()});
   else if(a==='delCat'){if(S.transactions.some(t=>t.cat===id)){toast('Kategori masih dipakai transaksi');return}S.categories=S.categories.filter(c=>c.id!==id);drop('Categories',id);setSheet();render()}
