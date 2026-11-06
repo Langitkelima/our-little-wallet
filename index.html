@@ -1233,7 +1233,7 @@ function chatUpdateOk(u){
 }
 async function chatSend(){
   if(chatBusy)return;const inp=$('#chatIn');if(!inp)return;const text=inp.value.trim();if(!text)return;
-  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.priv?(m.k==='me'?'(pesan pribadi)':'(info pribadi ditampilkan)'):m.text}));
+  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.priv?(m.k==='me'?'(pesan pribadi)':'(info pribadi ditampilkan)'):m.text,q:m.qa?1:0}));
   inp.value='';chatBusy=true;CHAT.push({k:'me',text});CHAT.push({k:'typing'});chatDraw();
   try{
     const r=await call({action:'parseChat',text,history});
@@ -1250,7 +1250,7 @@ async function chatSend(){
     const trfs=(res.transfers||[]).filter(t=>t&&hasAcc(t.from)&&hasAcc(t.to)&&t.from!==t.to&&Number(t.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(t.date||'')));
     const dels=(res.deletes||[]).filter(t=>t&&S.transactions.some(x=>x.id===t.id));
     const accs=(res.accounts||[]).filter(a=>a&&String(a.name||'').trim()&&!S.accounts.some(x=>String(x.name).trim().toUpperCase()===String(a.name).trim().toUpperCase()));
-    if(res.reply)CHAT.push({k:'bot',text:res.reply,priv:!!res.privateReply});
+    if(res.reply)CHAT.push({k:'bot',text:res.reply,priv:!!res.privateReply,qa:!!res.qa});
     if(summary){CHAT.push({k:'bot',text:'Ini ringkasan '+String(summary.label).toLowerCase()+'.'});CHAT.push({k:'summary',data:summary})}
     deposits.forEach(d=>{const goal=S.goals.find(x=>String(x.id)===d.goal);if(goal)CHAT.push({k:'pcard',st:'new',goalId:d.goal,goalName:goal.name,date:d.date,amount:d.amount,note:d.note})});
     accs.forEach(a=>CHAT.push({k:'acard',st:'new',name:String(a.name).trim().toUpperCase().slice(0,30),opening:Math.max(0,Math.round(Number(a.opening)||0))}));
