@@ -564,6 +564,7 @@ html[data-theme="dark"] .cav .botlogo{filter:drop-shadow(0 0 5px rgba(143,176,25
 .cb.pri{background:var(--btn,var(--accent));color:var(--btn-ink,#fff);border-color:transparent}
 .cb.gh{background:none;border-color:transparent;color:var(--mut)}
 .cst{margin-top:10px;font-size:12.5px;font-weight:700;color:var(--mut)}
+.cwarn{margin-top:10px;font-size:12.5px;font-weight:700;color:var(--out)}
 .cst.ok{color:var(--in,#1E9473)}
 .scard{margin-left:43px;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 15px;color:var(--ink);box-shadow:var(--sh)}
 .shead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -1085,8 +1086,16 @@ const BOT_LOGO_L='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5v
 const botLogo=()=>`<img class="botlogo bl-l" src="${BOT_LOGO_L}" alt=""><img class="botlogo bl-d" src="${BOT_LOGO_D}" alt="">`;
 const chatAv=()=>`<div class="cav">${botLogo()}</div>`;
 const cFoot=(m,i)=>m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cSave" data-i="${i}">Simpan</button><button type="button" class="cb" data-act="cEdit" data-i="${i}">Edit</button><button type="button" class="cb gh" data-act="cDel" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Tersimpan</div>':'<div class="cst">Dibatalkan</div>';
+// Peringatan saldo di kartu draf chatbot + tombol ganti ke akun yang cukup (dihitung ulang tiap kartu digambar)
+function chatNegBox(m,i){if(m.st!=='new')return '';
+  const trf=m.type==='trf',ng=negCheck(trf?[{acc:m.from,delta:-m.amount},{acc:m.to,delta:m.amount}]:[{acc:m.acc,delta:eff(m)}]);
+  if(!ng)return '';
+  const cur=trf?m.from:m.acc,alts=(trf||m.type==='out')?S.accounts.filter(x=>x.id!==cur&&x.id!==(trf?m.to:'')&&(+x.allowNeg||bal(x.id)>=m.amount)).slice(0,4):[];
+  return `<div class="cwarn">${esc(ng)}</div>`+(alts.length?`<div class="cact">${alts.map(x=>`<button type="button" class="cb" data-act="cAcc" data-i="${i}" data-acc="${esc(x.id)}">Pakai ${esc(x.name)}</button>`).join('')}</div>`:'')}
+function chatSetAcc(i,id){const m=CHAT[i];if(!m||m.k!=='card'||m.st!=='new'||!S.accounts.some(x=>x.id===id))return;
+  if(m.type==='trf'){if(id===m.to)return;m.from=id}else m.acc=id;chatDraw()}
 function trfCard(m,i){const f=acct(m.from),t=acct(m.to);
-  return `<div class="ccard trf ${m.st}"><div class="ct"><span class="cn">TRANSFER</span><span class="ca">${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">Transfer</span><span>${fdate(m.date)}</span><span>${esc(f.name)} → ${esc(t.name)}</span></div>${cFoot(m,i)}</div>`}
+  return `<div class="ccard trf ${m.st}"><div class="ct"><span class="cn">TRANSFER</span><span class="ca">${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">Transfer</span><span>${fdate(m.date)}</span><span>${esc(f.name)} → ${esc(t.name)}</span></div>${chatNegBox(m,i)}${cFoot(m,i)}</div>`}
 function aCard(m,i){
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cAccSave" data-i="${i}">Simpan akun</button><button type="button" class="cb gh" data-act="cAccNo" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Akun tersimpan</div>':'<div class="cst">Dibatalkan</div>';
   return `<div class="ccard trf ${m.st}"><div class="ct"><span class="cn">${esc(m.name)}</span><span class="ca">${rpRaw(m.opening)}</span></div><div class="cm"><span class="cpill">Akun baru</span><span>Saldo awal</span></div>${foot}</div>`}
@@ -1135,7 +1144,7 @@ function chatEditCard(m,i){
 }
 function chatCard(m,i){if(m.type==='trf')return trfCard(m,i);const c=cat(m.cat),a=acct(m.acc),inn=m.type==='in';
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cSave" data-i="${i}">Simpan</button><button type="button" class="cb" data-act="cEdit" data-i="${i}">Edit</button><button type="button" class="cb gh" data-act="cDel" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Tersimpan</div>':'<div class="cst">Dibatalkan</div>';
-  return `<div class="ccard ${inn?'in':'out'} ${m.st}"><div class="ct"><span class="cn">${esc(m.desc)}</span><span class="ca">${inn?'+':'−'}${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">${inn?'Pemasukan':'Pengeluaran'}</span><span>${fdate(m.date)}</span><span class="ccat">${catIc(c,16)}${esc(c.name)}</span><span>${esc(a.name)}</span></div>${foot}</div>`}
+  return `<div class="ccard ${inn?'in':'out'} ${m.st}"><div class="ct"><span class="cn">${esc(m.desc)}</span><span class="ca">${inn?'+':'−'}${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">${inn?'Pemasukan':'Pengeluaran'}</span><span>${fdate(m.date)}</span><span class="ccat">${catIc(c,16)}${esc(c.name)}</span><span>${esc(a.name)}</span></div>${chatNegBox(m,i)}${foot}</div>`}
 const CHAT_SUMMARY_PERIODS=['this_week','last_week','this_month','last_month'];
 function chatSummaryOk(s){
   const safeInt=n=>typeof n==='number'&&Number.isSafeInteger(n);
@@ -1681,6 +1690,7 @@ document.addEventListener('click',e=>{
   else if(a==='cDepSave')chatDepSave(+b.dataset.i);
   else if(a==='cDepNo')chatDepNo(+b.dataset.i);
   else if(a==='cEdit')chatEdit(+b.dataset.i);
+  else if(a==='cAcc')chatSetAcc(+b.dataset.i,b.dataset.acc);
   else if(a==='cDel')chatDel(+b.dataset.i);
   else if(a==='cAll')chatSaveAll(b.dataset.g);
   else if(a==='cTrf'||a==='trfgo')trfSheet();
