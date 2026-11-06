@@ -819,7 +819,7 @@ const ic=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="no
 // ===== Data layer =====
 const PEOPLE=['RAMA','DESY'];
 const COLORS=['#E4673A','#3C7BD9','#B94AA8','#8059D8','#B8730A','#1E9473','#E8609B','#D43F5E','#667189'];
-const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[]};
+const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[],billpay:[]};
 const cat=id=>S.categories.find(c=>c.id===id)||{name:'(dihapus)',color:'#999',icon:'tag'};
 const acct=id=>S.accounts.find(a=>a.id===id)||{name:'(dihapus)'};
 
@@ -907,6 +907,13 @@ const logoSvg=(b,s=42)=>b.img?`<img class="blogo" src="${b.img}" width="${s}" he
 const accAv2=a=>{const b=brandOf2(a.name);return b?`<div class="av acc-logo">${logoSvg(b,42)}</div>`:`<div class="av" style="background:var(--pink)">${ic('wallet',20)}</div>`};
 const accBadge=id=>{const a=S.accounts.find(x=>x.id===id),b=a&&brandOf2(a.name);return b?`<span class="alogo">${logoSvg(b,28)}</span>`:`<span class="alogo gen">${ic('wallet',16)}</span>`};
 const bal=id=>{const a=S.accounts.find(x=>x.id===id);return a.opening+S.transactions.filter(t=>t.acc===id).reduce((s,t)=>s+(t.type==='in'?t.amount:-t.amount),0)};
+const eff=t=>t.type==='in'?t.amount:-t.amount;
+const sgnRp=n=>(n<0?'\u2212':'')+rpRaw(n);
+// Penjaga saldo minus: akun tanpa "Boleh minus" menolak perubahan yang membuat saldo makin minus (pemasukan selalu boleh)
+function negCheck(changes){const d={};changes.forEach(c=>{if(c.acc)d[c.acc]=(d[c.acc]||0)+c.delta});
+  for(const id in d){const a=S.accounts.find(x=>x.id===id);if(!a||+a.allowNeg)continue;const b=bal(id),af=b+d[id];
+    if(af<0&&af<b)return 'Saldo '+a.name+' tidak cukup ('+sgnRp(b)+' jadi '+sgnRp(af)+'). Isi saldo dulu atau aktifkan "Boleh minus" di pengaturan akun.'}
+  return ''}
 const total=()=>S.accounts.reduce((s,a)=>s+bal(a.id),0);
 const inMonth=ym=>S.transactions.filter(t=>t.date.startsWith(ym));
 const sum=(l,type)=>l.filter(t=>t.type===type&&t.cat!=='ctrf').reduce((s,t)=>s+t.amount,0);
@@ -943,7 +950,7 @@ async function save(table,row){pend++;setSync('saving');try{await call({action:'
 async function drop(table,id){pend++;setSync('saving');try{await call({action:'remove',table,id});pend--;if(!pend)setSync('ok')}catch(e){pend--;setSync('err',e.message);toast('Gagal menghapus: '+e.message);resync(e.message)}}
 async function resync(m){if(/passcode/i.test(m)){LS.del('olw_key');CFG.key='';loaded=false;gate(m);return}
   if(pend)return;const r=await load();if(r===true)setSync('err',m)}
-function logout(){LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];S.vehicles=[];S.reminders=[];S.servicelog=[];S.bills=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
+function logout(){LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];S.vehicles=[];S.reminders=[];S.servicelog=[];S.bills=[];S.billpay=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
 function savGroups(){const sh=S.goals.filter(g=>g.scope!=='private'),pv=S.goals.filter(g=>g.scope==='private');
   return (sh.length?`<h2 style="margin:6px 4px 10px">Tabungan bersama</h2><p class="sub" style="margin:-4px 4px 10px">RAMA dan DESY bisa melihat ini.</p>`+sh.map(goalCard).join(''):'')+(pv.length?`<h2 style="margin:6px 4px 10px">Tabungan pribadi ${ME} ${ic('lock',14)}</h2><p class="sub" style="margin:-4px 4px 10px">Hanya kamu yang bisa melihat ini.</p>`+pv.map(goalCard).join(''):'')}
 function saveNew(table,arr,row){arr.push(row);save(table,row)}
@@ -951,7 +958,7 @@ function saveObj(table,row){save(table,row);return row}
 const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope:g.scope,owner:g.owner});
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
-  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];loaded=true}
+  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];loaded=true}
 async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
 
 // ===== Layar masuk: keypad angka (bisa pindah ke keyboard biasa) =====
@@ -1034,7 +1041,7 @@ trx(){const TL={all:'Semua transaksi',in:'Pemasukan',out:'Pengeluaran'},act=F.ty
   return pBar(true)+`<div class="pbar"><div class="pnav"><button type="button" data-act="tprev" aria-label="Sebelumnya">${ic('chevl',18)}</button><span class="plab ${F.type}" data-act="tnext">${TL[F.type]}</span><button type="button" data-act="tnext" aria-label="Berikutnya">${ic('chevr',18)}</button></div></div>
   <div class="psearch">${ic('search',18)}<input id="fq" type="text" enterkeyhint="search" autocomplete="off" placeholder="Cari transaksi…" value="${esc(F.q)}"></div>${act?'<div class="fhint" style="margin:-4px 0 12px"><button class="link" data-act="freset">Reset filter</button></div>':''}<div class="card" id="trxList"></div>`},
 acc(){return `<div class="card hero"><div style="font-size:13px;opacity:.8">Total akun pribadi · hanya kamu yang bisa lihat</div><div class="big">${rp(total())}</div></div>
-  ${S.accounts.length?S.accounts.map(a=>`<div class="card tx${MODEL()==='2'?' acc-row':''}" style="padding:14px 16px;margin-bottom:12px">${MODEL()==='2'?accAv2(a):accAv1(a.name)}<div class="m"><div class="d">${esc(a.name)}</div><div class="s"><span class="badge">${esc(a.owner)}</span></div></div><div class="a">${bal(a.id) < 0?'−':''}${rp(bal(a.id))}</div><button class="del" data-act="editAcc" data-id="${a.id}" aria-label="Ubah akun">${ic('edit',18)}</button></div>`).join(''):'<div class="card empty"><b>Belum ada akun</b></div>'}
+  ${S.accounts.length?S.accounts.map(a=>`<div class="card tx${MODEL()==='2'?' acc-row':''}" style="padding:14px 16px;margin-bottom:12px">${MODEL()==='2'?accAv2(a):accAv1(a.name)}<div class="m"><div class="d">${esc(a.name)}</div><div class="s"><span class="badge">${esc(a.owner)}</span>${+a.allowNeg?' <span class="badge">Boleh minus</span>':''}</div></div><div class="a">${bal(a.id) < 0?'−':''}${rp(bal(a.id))}</div><button class="del" data-act="editAcc" data-id="${a.id}" aria-label="Ubah akun">${ic('edit',18)}</button></div>`).join(''):'<div class="card empty"><b>Belum ada akun</b></div>'}
   <button class="btn sec" data-act="editAcc">+ Tambah akun</button><button class="btn" data-act="tab" data-t="sav">♡ Tabungan (bersama dan pribadi)</button><button class="btn sec" data-act="tab" data-t="veh">Kendaraan &amp; pajak</button><button class="btn sec" data-act="tab" data-t="bill">Tagihan &amp; pengingat</button>
   <p class="sub" style="margin-top:12px">Akun dan saldo di sini pribadi: hanya kamu yang bisa melihatnya. Saldo = saldo awal + transaksi.</p>`},
 sav(){return `<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>`+(S.goals.length?savGroups():'<div class="card empty">'+ic('heart',34)+'<b>Belum ada target tabungan</b>Mulai dari target pertama kalian, misalnya tabungan nikah.</div>')+`<button class="btn sec" data-act="editGoal">+ Tambah target tabungan</button><p class="sub" style="margin-top:12px">Setoran tabungan dicatat terpisah dari saldo akun.</p>`},
@@ -1238,17 +1245,18 @@ async function chatSend(){
     if(/passcode/i.test(e.message))resync(e.message);
   }
   chatBusy=false;chatDraw();const i2=$('#chatIn');if(i2)i2.focus()}
-function chatPut(m){saveNew('Transactions',S.transactions,{id:uid(),date:m.date,type:m.type,cat:m.cat,desc:m.desc,amount:m.amount,acc:m.acc,by:ME,note:''});m.st='saved'}
+function chatPut(m){const ng=negCheck([{acc:m.acc,delta:eff(m)}]);if(ng){toast(ng);return false}saveNew('Transactions',S.transactions,{id:uid(),date:m.date,type:m.type,cat:m.cat,desc:m.desc,amount:m.amount,acc:m.acc,by:ME,note:''});m.st='saved'}
 async function ensureTrf(){if(S.categories.some(c=>c.id==='ctrf'))return;const c={id:'ctrf',name:'TRANSFER',kind:'both',icon:'tag',color:'#7FA6F0'};S.categories.push(c);await save('Categories',c)}
 async function putTrf(m){await ensureTrf();const g='TRF:'+uid();
   saveNew('Transactions',S.transactions,{id:uid(),date:m.date,type:'out',cat:'ctrf',desc:('TRANSFER KE '+acct(m.to).name).slice(0,60),amount:m.amount,acc:m.from,by:ME,note:g});
   saveNew('Transactions',S.transactions,{id:uid(),date:m.date,type:'in',cat:'ctrf',desc:('TRANSFER DARI '+acct(m.from).name).slice(0,60),amount:m.amount,acc:m.to,by:ME,note:g})}
 function chatSave(i){const m=CHAT[i];if(!m||m.k!=='card'||m.st!=='new')return;
-  if(m.type==='trf'){m.st='saved';chatDraw();putTrf(m).then(()=>toast('Transfer dicatat'));return}
-  chatPut(m);chatDraw();toast('Transaksi ditambahkan')}
+  if(m.type==='trf'){const ng=negCheck([{acc:m.from,delta:-m.amount},{acc:m.to,delta:m.amount}]);if(ng){toast(ng);return}m.st='saved';chatDraw();putTrf(m).then(()=>toast('Transfer dicatat'));return}
+  if(chatPut(m)===false)return;chatDraw();toast('Transaksi ditambahkan')}
 function chatDx(i){const m=CHAT[i];if(!m||m.k!=='dcard'||m.st!=='new')return;const t=m.tx;
   if(!S.transactions.some(x=>x.id===t.id)){m.st='cancel';chatDraw();toast('Transaksi sudah tidak ada');return}
   const ids=new Set([t.id]);if(String(t.note||'').indexOf('TRF:')===0)S.transactions.forEach(x=>{if(x.note===t.note)ids.add(x.id)});
+  {const ng=negCheck(S.transactions.filter(x=>ids.has(x.id)).map(x=>({acc:x.acc,delta:-eff(x)})));if(ng){toast(ng);return}}
   S.transactions=S.transactions.filter(x=>!ids.has(x.id));ids.forEach(id=>drop('Transactions',id));
   m.st='done';chatDraw();toast(ids.size>1?'Transfer dihapus':'Transaksi dihapus')}
 function chatAccSave(i){const m=CHAT[i];if(!m||m.k!=='acard'||m.st!=='new')return;
@@ -1281,6 +1289,7 @@ async function chatUpdateSave(i){
   })){
     m.st='cancel';chatDraw();toast('Transaksi sudah berubah. Muat ulang data lalu buat draf edit lagi.');load();return;
   }
+  {const ng=negCheck(rows.flatMap(r=>[{acc:r.next.acc,delta:eff(r.next)},{acc:r.old.acc,delta:-eff(r.old)}]));if(ng){toast(ng);return}}
   m.st='saving';chatDraw();
   const saved=[];
   for(const row of rows){
@@ -1329,7 +1338,7 @@ async function chatBillSave(i){
 function chatBillNo(i){const m=CHAT[i];if(!m||m.k!=='bcard'||m.st!=='new')return;m.st='cancel';chatDraw()}
 
 function chatUpdateNo(i){const m=CHAT[i];if(!m||m.k!=='ucard'||m.st!=='new')return;m.st='cancel';chatDraw()}
-function chatSaveAll(g){let n=0;CHAT.forEach(m=>{if(m.k==='card'&&m.g===g&&m.st==='new'){if(m.type==='trf'){m.st='saved';putTrf(m)}else chatPut(m);n++}});chatDraw();if(n)toast(n+' transaksi ditambahkan')}
+function chatSaveAll(g){let n=0;CHAT.forEach(m=>{if(m.k==='card'&&m.g===g&&m.st==='new'){if(m.type==='trf'){const ng=negCheck([{acc:m.from,delta:-m.amount},{acc:m.to,delta:m.amount}]);if(ng){toast(ng);return}m.st='saved';putTrf(m);n++}else if(chatPut(m)!==false)n++}});chatDraw();if(n)toast(n+' transaksi ditambahkan')}
 function chatDel(i){const m=CHAT[i];if(!m||m.k!=='card'||m.st!=='new')return;m.st='cancel';chatDraw()}
 function chatEdit(i){const m=CHAT[i];if(!m||m.k!=='card'||m.st!=='new')return;
   if(m.type==='trf'){trfSheet({from:m.from,to:m.to,amount:m.amount,date:m.date,_cb:()=>{m.st='saved'}});return}
@@ -1363,6 +1372,7 @@ function trfSheet(draft){
   $('#t-save').onclick=async()=>{const date=$('#t-date').value,f=$('#t-from').value,t=$('#t-to').value,amt=KPT.get();
     setErr('tdate',date?'':'Tanggal wajib diisi');setErr('tto',f===t?'Akun asal dan tujuan harus berbeda':'');setErr('tamt',!(amt>0)?'Masukkan nominal lebih dari 0':amt>999999999999?'Nominal terlalu besar':'');
     if(!date||f===t||!(amt>0)||amt>999999999999)return;
+    {const ng=negCheck([{acc:f,delta:-amt},{acc:t,delta:amt}]);if(ng){setErr('tamt',ng);return}}
     $('#t-save').disabled=true;await putTrf({from:f,to:t,amount:amt,date});
     if(draft&&draft._cb)draft._cb();closeSheet();render();toast('Transfer dicatat')}}
 
@@ -1396,6 +1406,7 @@ function txSheet(id,draft){
     setErr('date',date?'':'Tanggal wajib diisi');setErr('desc',desc?'':'Keterangan wajib diisi');
     setErr('amt',!(amt>0)?'Masukkan nominal lebih dari 0':amt>999999999999?'Nominal terlalu besar':'');
     if(!date||!desc||!(amt>0)||amt>999999999999)return;
+    {const ng=negCheck([{acc:$('#f-acc').value,delta:eff({type,amount:amt})}].concat(old?[{acc:old.acc,delta:-eff(old)}]:[]));if(ng){setErr('amt',ng);return}}
     const o={date,type,cat:$('#f-cat').value,desc,amount:amt,acc:$('#f-acc').value,note:$('#f-note').value.trim().toUpperCase()};
     if(old)saveObj('Transactions',Object.assign(old,o));
     else saveNew('Transactions',S.transactions,{id:uid(),date:o.date,type:o.type,cat:o.cat,desc:o.desc,amount:o.amount,acc:o.acc,by:ME,note:o.note});
@@ -1411,13 +1422,14 @@ function accSheet1(id){const a=S.accounts.find(x=>x.id===id)||{name:'',owner:'DE
   <div class="bpick">${Object.keys(BRANDS1).filter(k=>k!=='superbank').map(k=>`<button type="button" data-brand="${k}" aria-label="${esc(BRANDS1[k].n)}">${logo1(BRANDS1[k],30)}<span>${esc(BRANDS1[k].n.replace(' TABUNGAN BY JAGO',' TAB.').replace(' NABUNG BY SUPERBANK',' NAB.').replace('TUNAI / CASH','TUNAI'))}</span></button>`).join('')}</div>
   
   <label for="a-op">Saldo awal (Rp)</label><input id="a-op" inputmode="numeric" value="${a.opening?a.opening.toLocaleString('id-ID'):''}" placeholder="0">
+  <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="a-neg" style="width:auto;margin:0" ${+a.allowNeg?'checked':''}> Boleh minus (mis. PayLater, kartu kredit)</label><p class="sub">Kalau tidak dicentang, pengeluaran dan transfer keluar ditolak saat saldo tidak cukup. Pemasukan tetap boleh dan mengurangi minus.</p>
   <button class="btn" id="a-save">Simpan</button>${id?'<button class="btn sec" id="a-del">Hapus akun</button>':''}`);
   const prevLogo=()=>{const v=$('#a-name').value,b=brandOf1(v);$('#a-prev').innerHTML=b?logo1(b,30)+'<span>Logo: '+esc(b.n)+'</span>':'<span>Logo muncul otomatis kalau nama akun mengandung nama bank/e-wallet</span>'};
   $('#a-name').oninput=prevLogo;prevLogo();
   document.querySelectorAll('.bpick button').forEach(btn=>btn.onclick=()=>{$('#a-name').value=BRANDS1[btn.dataset.brand].n;prevLogo()});
   $('#a-op').oninput=e=>{const d=e.target.value.replace(/\D/g,'').replace(/^0+/,'');e.target.value=d?(+d).toLocaleString('id-ID'):''};
   $('#a-save').onclick=()=>{const name=$('#a-name').value.trim().toUpperCase();if(!name){setErr('an','Nama akun wajib diisi');return}
-    const o={name,owner:ME,opening:parseInt($('#a-op').value.replace(/\D/g,''),10)||0};
+    const o={name,owner:ME,opening:parseInt($('#a-op').value.replace(/\D/g,''),10)||0,allowNeg:$('#a-neg').checked?1:0};
     if(id)saveObj('Accounts',Object.assign(S.accounts.find(x=>x.id===id),o));else saveNew('Accounts',S.accounts,{id:uid(),...o});closeSheet();render();toast('Akun disimpan')};
   if(id)$('#a-del').onclick=()=>{if(S.transactions.some(t=>t.acc===id)){toast('Akun masih dipakai transaksi, tidak bisa dihapus');return}
     confirmBox(`Hapus akun ${esc(a.name)}?`,()=>{S.accounts=S.accounts.filter(x=>x.id!==id);drop('Accounts',id);render()})}}
@@ -1426,12 +1438,13 @@ function accSheet2(id){const a=S.accounts.find(x=>x.id===id)||{name:'',owner:'DE
   sheet(id?'Ubah akun':'Tambah akun',`<label for="a-name">Nama akun</label><input id="a-name" maxlength="30" autocapitalize="characters" style="text-transform:uppercase" value="${esc(a.name)}" placeholder="mis. BCA Utama"><div class="err" id="e-an"></div><div class="bprev" id="a-prev"></div><label>Pilih cepat bank / e-wallet</label><div class="bpick">${BRANDS2.map(b=>`<button type="button" class="bchip" data-brand="${b.id}"><span class="bl">${logoSvg(b,36)}</span><span>${b.short}</span></button>`).join('')}</div>
   
   <label for="a-op">Saldo awal (Rp)</label><input id="a-op" inputmode="numeric" value="${a.opening?a.opening.toLocaleString('id-ID'):''}" placeholder="0">
+  <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="a-neg" style="width:auto;margin:0" ${+a.allowNeg?'checked':''}> Boleh minus (mis. PayLater, kartu kredit)</label><p class="sub">Kalau tidak dicentang, pengeluaran dan transfer keluar ditolak saat saldo tidak cukup. Pemasukan tetap boleh dan mengurangi minus.</p>
   <button class="btn" id="a-save">Simpan</button>${id?'<button class="btn sec" id="a-del">Hapus akun</button>':''}`);
   const _pv=()=>{const b=brandOf2($('#a-name').value);$('#a-prev').innerHTML=b?`<span class="bl">${logoSvg(b,36)}</span><span>Logo: <b>${esc(b.short)}</b></span>`:'<span>Belum ada logo untuk nama ini</span>';document.querySelectorAll('.bchip').forEach(c=>c.classList.toggle('on',!!b&&c.dataset.brand===b.id))};
   $('#a-name').addEventListener('input',_pv);document.querySelectorAll('.bchip').forEach(c=>c.onclick=()=>{$('#a-name').value=BRANDS2.find(b=>b.id===c.dataset.brand).label;_pv()});_pv();
   $('#a-op').oninput=e=>{const d=e.target.value.replace(/\D/g,'').replace(/^0+/,'');e.target.value=d?(+d).toLocaleString('id-ID'):''};
   $('#a-save').onclick=()=>{const name=$('#a-name').value.trim().toUpperCase();if(!name){setErr('an','Nama akun wajib diisi');return}
-    const o={name,owner:ME,opening:parseInt($('#a-op').value.replace(/\D/g,''),10)||0};
+    const o={name,owner:ME,opening:parseInt($('#a-op').value.replace(/\D/g,''),10)||0,allowNeg:$('#a-neg').checked?1:0};
     if(id)saveObj('Accounts',Object.assign(S.accounts.find(x=>x.id===id),o));else saveNew('Accounts',S.accounts,{id:uid(),...o});closeSheet();render();toast('Akun disimpan')};
   if(id)$('#a-del').onclick=()=>{if(S.transactions.some(t=>t.acc===id)){toast('Akun masih dipakai transaksi, tidak bisa dihapus');return}
     confirmBox(`Hapus akun ${esc(a.name)}?`,()=>{S.accounts=S.accounts.filter(x=>x.id!==id);drop('Accounts',id);render()})}}
@@ -1591,11 +1604,11 @@ const billRep=b=>b.repeat==='monthly'?'tiap bulan tgl '+(b.dueDay||dueParse_(b.n
 const billRem=b=>{const r=billRemindParse_(b.remind);return r.length?r.map(x=>(x.d?'H-'+x.d:'Hari-H')+' '+x.t.replace(':','.')).join(' · '):'Belum ada pengingat'};
 function billLeft(i){return i.daysLeft==null?'':i.daysLeft<0?'lewat '+(-i.daysLeft)+' hari':i.daysLeft===0?'jatuh tempo hari ini':i.daysLeft+' hari lagi'}
 function billCard(b){const i=billInfo_(b,todayIso()),l=billLeft(i);
-  return `<div class="card"><h2><span>${esc(b.name)} <span class="badge">${b.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="billEdit" data-id="${b.id}" aria-label="Ubah tagihan">${ic('edit',18)}</button></h2><div class="vrem" style="border-top:0;margin-top:0;padding-top:4px"><div class="vm"><div class="vs">${b.amount?rp(b.amount)+' · ':''}${billRep(b)}</div>${+b.done?`<div class="vs">Lunas${b.lastPaid?' · dibayar '+fdate(b.lastPaid):''}</div>`:`<div class="vs">Jatuh tempo ${fdate(b.nextDue)}${l?' · '+l:''}</div><div class="vs">Pengingat: ${billRem(b)}</div>`}</div><span class="vstat ${i.status}">${BILL_LAB[i.status]}</span></div>${+b.done?'':`<div class="vbtns"><button class="pri" data-act="billPay" data-id="${b.id}">Sudah dibayar</button></div>`}</div>`}
+  return `<div class="card"><h2><span>${esc(b.name)} <span class="badge">${b.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="billEdit" data-id="${b.id}" aria-label="Ubah tagihan">${ic('edit',18)}</button></h2><div class="vrem" style="border-top:0;margin-top:0;padding-top:4px"><div class="vm"><div class="vs">${b.amount?rp(b.amount)+' · ':''}${billRep(b)}</div>${+b.done?`<div class="vs">Lunas${b.lastPaid?' · dibayar '+fdate(b.lastPaid):''}</div>`:`<div class="vs">Jatuh tempo ${fdate(b.nextDue)}${l?' · '+l:''}</div><div class="vs">Pengingat: ${billRem(b)}</div>`}</div><span class="vstat ${i.status}">${BILL_LAB[i.status]}</span></div><div class="vbtns">${+b.done?'':`<button class="pri" data-act="billPay" data-id="${b.id}">Sudah dibayar</button>`}<button data-act="billHist" data-id="${b.id}">Riwayat</button></div></div>`}
 function billView(){const back='<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>',T=todayIso();
-  if(!S.bills.length)return back+`<div class="card empty">${ic('veh',34)}<b>Belum ada tagihan</b>Tambah listrik, internet, cicilan, atau tagihan lain, lalu atur jam pengingatnya sendiri.</div><button class="btn" data-act="billEdit">+ Tambah tagihan</button>`;
+  if(!S.bills.length)return back+`<div class="card empty">${ic('veh',34)}<b>Belum ada tagihan</b>Tambah listrik, internet, cicilan, atau tagihan lain, lalu atur jam pengingatnya sendiri.</div><button class="btn" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button>`;
   const ord={terlambat:0,segera:1,aman:2,lunas:3},rows=S.bills.map(b=>({b,i:billInfo_(b,T)})).sort((x,y)=>ord[x.i.status]-ord[y.i.status]||((x.i.daysLeft==null?1e9:x.i.daysLeft)-(y.i.daysLeft==null?1e9:y.i.daysLeft)));
-  return back+rows.map(x=>billCard(x.b)).join('')+`<button class="btn sec" data-act="billEdit">+ Tambah tagihan</button><p class="sub" style="margin-top:12px">Tagihan pribadi hanya terlihat olehmu; tagihan bersama terlihat RAMA dan DESY. Alarm di jam pilihanmu dibunyikan aplikasi Notes Kelimaa (Lainnya › Two Pockets), jadi buka Notes sesekali agar jadwal terbaru terpasang. Status Segera = sisa 7 hari.</p>`}
+  return back+rows.map(x=>billCard(x.b)).join('')+`<button class="btn sec" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button><p class="sub" style="margin-top:12px">Tagihan pribadi hanya terlihat olehmu; tagihan bersama terlihat RAMA dan DESY. Alarm di jam pilihanmu dibunyikan aplikasi Notes Kelimaa (Lainnya › Two Pockets), jadi buka Notes sesekali agar jadwal terbaru terpasang. Status Segera = sisa 7 hari.</p>`}
 function billBanner(){if(!S.bills.length)return '';const c={terlambat:0,segera:0},T=todayIso();S.bills.forEach(b=>{const s=billInfo_(b,T).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
   return `<div class="card" data-act="tab" data-t="bill" style="cursor:pointer"><h2>Tagihan <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
 function billSheet(id){const b=id?S.bills.find(z=>z.id===id):null;if(id&&!b)return;
@@ -1621,6 +1634,19 @@ function billPaySheet(id){const b=S.bills.find(z=>z.id===id);if(!b)return;
     try{await call({action:'billPaid',bill:id,paymentId:paymentId,date:d,amount:m,payAcc:pa});closeSheet();await load();toast(pa?'Tercatat + pengeluaran disimpan':'Tercatat')}
     catch(e){btn.disabled=false;btn.textContent='Simpan';setErr('yx','Gagal: '+e.message)}}}
 
+// ===== Riwayat pembayaran tagihan =====
+const billFd=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))?fdate(s):'-';
+function billPayRows(list,showName){return list.map(p=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><b>${showName?esc(p.billName||'Tagihan')+' · ':''}${billFd(p.date)}</b><b>${rp(p.amount)}</b></div><div class="vs">Periode jatuh tempo ${billFd(p.periodDue)} · ${esc(p.accountName||'Akun tidak dicatat')} · ${esc(p.by||'')}</div></div>`).join('')}
+function billHistSheet(id){const b=S.bills.find(z=>z.id===id);if(!b)return;
+  const list=(S.billpay||[]).filter(p=>p.bill===id).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:0),total=list.reduce((t,p)=>t+(Number(p.amount)||0),0);
+  sheet('Riwayat pembayaran',`<p class="sub">${esc(b.name)}${list.length?' · '+list.length+' pembayaran · total '+rp(total):''}</p>${list.length?billPayRows(list,false):'<p class="sub">Belum ada pembayaran yang tercatat. Pembayaran lewat tombol Sudah dibayar atau chatbot akan muncul di sini. Pembayaran sebelum fitur riwayat dipasang tidak tercatat.</p>'}`)}
+async function billArcSheet(){
+  sheet('Riwayat tagihan terhapus','<p class="sub">Memuat riwayat…</p>');
+  try{const r=await call({action:'billArchive'}),list=r.history||[];
+    if(!ov.innerHTML.includes('Memuat riwayat'))return;
+    sheet('Riwayat tagihan terhapus',`<p class="sub">Pembayaran dari tagihan yang sudah dihapus. Hanya pembayaran yang kamu catat sendiri yang tampil.${list.length?' '+list.length+' pembayaran.':''}</p>${list.length?billPayRows(list,true):'<p class="sub">Belum ada riwayat dari tagihan yang sudah dihapus.</p>'}`)}
+  catch(e){if(!ov.innerHTML.includes('Memuat riwayat'))return;sheet('Riwayat tagihan terhapus',`<p class="sub">Gagal memuat: ${esc(e.message)}</p>`)}}
+
 // ===== Events =====
 document.addEventListener('click',e=>{
   if(e.target===ov&&!ov.classList.contains('dlg')){closeSheet();return}
@@ -1641,9 +1667,9 @@ document.addEventListener('click',e=>{
   else if(a==='tnext'||a==='tprev'){const o=['all','in','out'],k=o.indexOf(F.type)+(a==='tnext'?1:-1);F.type=o[(k+3)%3];render()}
   else if(a==='ftype'){F.type=v;render()}
   else if(a==='freset'){F={type:'all',cat:'',acc:'',q:'',month:'',day:''};P.mode=pDef();P.off=0;pmenu=false;render()}
-  else if(a==='del')confirmBox('Transaksi ini akan dihapus dari daftar.',()=>{S.transactions=S.transactions.filter(t=>t.id!==id);drop('Transactions',id);render();toast('Transaksi dihapus')});
+  else if(a==='del'){const tx0=S.transactions.find(t=>t.id===id),ng=tx0?negCheck([{acc:tx0.acc,delta:-eff(tx0)}]):'';if(ng){toast(ng);return}confirmBox('Transaksi ini akan dihapus dari daftar.',()=>{S.transactions=S.transactions.filter(t=>t.id!==id);drop('Transactions',id);render();toast('Transaksi dihapus')})}
   else if(a==='editAcc')accSheet(id);else if(a==='addDate')dateSheet();
-  else if(a==='editGoal')goalSheet(id);else if(a==='addDep')depSheet(id);else if(a==='vehEdit')vehSheet(id);else if(a==='odo')odoSheet(id);else if(a==='remAdd')remSheet(id,'');else if(a==='remEdit')remSheet('',id);else if(a==='remDone')doneSheet(id);else if(a==='billEdit')billSheet(id);else if(a==='billPay')billPaySheet(id);
+  else if(a==='editGoal')goalSheet(id);else if(a==='addDep')depSheet(id);else if(a==='vehEdit')vehSheet(id);else if(a==='odo')odoSheet(id);else if(a==='remAdd')remSheet(id,'');else if(a==='remEdit')remSheet('',id);else if(a==='remDone')doneSheet(id);else if(a==='billEdit')billSheet(id);else if(a==='billPay')billPaySheet(id);else if(a==='billHist')billHistSheet(id);else if(a==='billArc')billArcSheet();
   else if(a==='delDep')confirmBox('Setoran ini akan dihapus.',()=>{const g=S.goals.find(x=>x.id===id);g.deps=g.deps.filter(d=>d.id!==b.dataset.d);drop('Deposits',b.dataset.d);render()});
   else if(a==='delDate')confirmBox('Tanggal spesial ini akan dihapus.',()=>{S.dates=S.dates.filter(d=>d.id!==id);drop('Dates',id);render()});
   else if(a==='delCat'){if(S.transactions.some(t=>t.cat===id)){toast('Kategori masih dipakai transaksi');return}S.categories=S.categories.filter(c=>c.id!==id);drop('Categories',id);setSheet();render()}
