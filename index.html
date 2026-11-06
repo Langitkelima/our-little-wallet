@@ -1118,6 +1118,14 @@ function chatBillCard(m,i){
     `<div class="cm"><span class="cpill">Hapus tagihan</span><span>${rpRaw(m.amount||0)}</span><span>${m.scope==='shared'?'Bersama':'Pribadi'}</span></div>`;
   return `<div class="ccard ${m.st||'new'}"><div class="ct"><span class="cn">${esc(m.name)}</span>${m.op==='delete'?'<span class="ca">Hapus?</span>':''}</div>${detail}${foot}</div>`;
 }
+// Kartu edit chatbot: peringatan saldo + tombol pindah akun (tidak untuk edit transfer berpasangan)
+function chatEditNegBox(m,i){if(m.st!=='new'||!m.old||!m.next)return '';
+  const rows=[{old:m.old,next:m.next}].concat(m.linked||[]),ng=negCheck(rows.flatMap(r=>[{acc:r.next.acc,delta:eff(r.next)},{acc:r.old.acc,delta:-eff(r.old)}]));
+  if(!ng)return '';
+  const alts=m.transfer?[]:S.accounts.filter(x=>x.id!==m.next.acc&&!negCheck([{acc:x.id,delta:eff(m.next)},{acc:m.old.acc,delta:-eff(m.old)}])).slice(0,4);
+  return `<div class="cwarn">${esc(ng)}</div>`+(alts.length?`<div class="cact">${alts.map(x=>`<button type="button" class="cb" data-act="cUpAcc" data-i="${i}" data-acc="${esc(x.id)}">Pindah ke ${esc(x.name)}</button>`).join('')}</div>`:'')}
+function chatSetUpAcc(i,id){const m=CHAT[i];if(!m||m.k!=='ucard'||m.st!=='new'||m.transfer||!m.next||!S.accounts.some(x=>x.id===id))return;
+  m.next={...m.next,acc:id};chatDraw()}
 function chatEditCard(m,i){
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cUpSave" data-i="${i}">Simpan perubahan</button><button type="button" class="cb gh" data-act="cUpNo" data-i="${i}">Batal</button></div>`:
     m.st==='saving'?'<div class="cst">Menyimpan perubahan…</div>':
@@ -1140,7 +1148,7 @@ function chatEditCard(m,i){
   const diffs=fields.filter(f=>String(old[f]??'')!==String(next[f]??'')).map(f=>
     `<div class="edit-diff-row"><span class="edit-diff-label">${labels[f]}</span><span class="edit-diff-values"><span class="edit-old">${value(f,old)}</span><span class="edit-arrow">→</span><strong class="edit-new">${value(f,next)}</strong></span></div>`
   ).join('');
-  return `<div class="ccard edit ${m.st}"><div class="ct"><span class="cn">${title}</span><span class="cpill">Edit transaksi</span></div>${transfer?'<div class="cm">Kedua sisi transfer akan diperbarui bersama.</div>':''}<div class="edit-diff">${diffs||'<div class="sempty">Tidak ada perubahan.</div>'}</div>${foot}</div>`;
+  return `<div class="ccard edit ${m.st}"><div class="ct"><span class="cn">${title}</span><span class="cpill">Edit transaksi</span></div>${transfer?'<div class="cm">Kedua sisi transfer akan diperbarui bersama.</div>':''}<div class="edit-diff">${diffs||'<div class="sempty">Tidak ada perubahan.</div>'}</div>${chatEditNegBox(m,i)}${foot}</div>`;
 }
 function chatCard(m,i){if(m.type==='trf')return trfCard(m,i);const c=cat(m.cat),a=acct(m.acc),inn=m.type==='in';
   const foot=m.st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cSave" data-i="${i}">Simpan</button><button type="button" class="cb" data-act="cEdit" data-i="${i}">Edit</button><button type="button" class="cb gh" data-act="cDel" data-i="${i}">Batal</button></div>`:m.st==='saved'?'<div class="cst ok">✓ Tersimpan</div>':'<div class="cst">Dibatalkan</div>';
@@ -1223,7 +1231,7 @@ function chatUpdateOk(u){
 }
 async function chatSend(){
   if(chatBusy)return;const inp=$('#chatIn');if(!inp)return;const text=inp.value.trim();if(!text)return;
-  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.text}));
+  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.priv?'(info saldo ditampilkan)':m.text}));
   inp.value='';chatBusy=true;CHAT.push({k:'me',text});CHAT.push({k:'typing'});chatDraw();
   try{
     const r=await call({action:'parseChat',text,history});
@@ -1238,7 +1246,7 @@ async function chatSend(){
     const trfs=(res.transfers||[]).filter(t=>t&&hasAcc(t.from)&&hasAcc(t.to)&&t.from!==t.to&&Number(t.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(t.date||'')));
     const dels=(res.deletes||[]).filter(t=>t&&S.transactions.some(x=>x.id===t.id));
     const accs=(res.accounts||[]).filter(a=>a&&String(a.name||'').trim()&&!S.accounts.some(x=>String(x.name).trim().toUpperCase()===String(a.name).trim().toUpperCase()));
-    if(res.reply)CHAT.push({k:'bot',text:res.reply});
+    if(res.reply)CHAT.push({k:'bot',text:res.reply,priv:!!res.privateReply});
     if(summary){CHAT.push({k:'bot',text:'Ini ringkasan '+String(summary.label).toLowerCase()+'.'});CHAT.push({k:'summary',data:summary})}
     deposits.forEach(d=>{const goal=S.goals.find(x=>String(x.id)===d.goal);if(goal)CHAT.push({k:'pcard',st:'new',goalId:d.goal,goalName:goal.name,date:d.date,amount:d.amount,note:d.note})});
     accs.forEach(a=>CHAT.push({k:'acard',st:'new',name:String(a.name).trim().toUpperCase().slice(0,30),opening:Math.max(0,Math.round(Number(a.opening)||0))}));
@@ -1691,6 +1699,7 @@ document.addEventListener('click',e=>{
   else if(a==='cDepNo')chatDepNo(+b.dataset.i);
   else if(a==='cEdit')chatEdit(+b.dataset.i);
   else if(a==='cAcc')chatSetAcc(+b.dataset.i,b.dataset.acc);
+  else if(a==='cUpAcc')chatSetUpAcc(+b.dataset.i,b.dataset.acc);
   else if(a==='cDel')chatDel(+b.dataset.i);
   else if(a==='cAll')chatSaveAll(b.dataset.g);
   else if(a==='cTrf'||a==='trfgo')trfSheet();
