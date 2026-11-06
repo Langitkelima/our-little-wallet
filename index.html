@@ -763,6 +763,148 @@ html[data-model] .mpk:disabled{opacity:.3;cursor:default}
 .brow{display:flex;gap:8px;align-items:center;margin-bottom:8px}.brow select{flex:1.2;min-width:0}.brow input{flex:1;min-width:0}
 .vbtns button{font:inherit;font-size:13px;padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
 .vbtns button.pri{background:var(--accent-soft);color:var(--accent-strong);border-color:transparent}
+
+/* ===== HX redesign ===== */
+.hx-acc{--tn:var(--accent)}.hx-in{--tn:var(--in)}.hx-out{--tn:var(--out)}.hx-warn{--tn:#E0A93B}.hx-rose{--tn:#EE7FAE}.hx-mut{--tn:var(--mut)}
+.hx-top{display:flex;flex-direction:column;gap:12px;margin:0 0 14px}
+.hx-hub{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hx-tile{position:relative;appearance:none;text-align:left;font:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:14px;min-width:0;border-radius:22px;overflow:hidden;border:1px solid color-mix(in srgb,var(--tn) 30%,var(--line));background:radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--tn) 24%,transparent),transparent 62%),var(--card);transition:transform .15s}
+.hx-tile:active{transform:scale(.97)}.hx-tile:focus-visible,.hx-ag:focus-visible{outline:2px solid var(--tn);outline-offset:2px}
+.hx-tile.wide{grid-column:1/-1}
+.hx-chip{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--tn) 22%,transparent);color:var(--tn);margin-bottom:8px}
+.hx-l{font-size:12px;color:var(--mut);font-weight:600}
+.hx-v{font:700 19px/1.15 var(--f-disp,inherit);letter-spacing:-.01em;overflow-wrap:anywhere}
+.hx-s{font-size:12px;color:var(--mut);line-height:1.4}
+.hx-tw{display:flex;align-items:center;justify-content:space-between;gap:14px}.hx-tm{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hx-dot{position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:var(--tn);box-shadow:0 0 0 4px color-mix(in srgb,var(--tn) 28%,transparent)}
+.hx-ring{flex:none}.hx-ring .t{stroke:color-mix(in srgb,var(--tn) 22%,transparent)}.hx-ring .f{stroke:var(--tn)}.hx-ring text{fill:var(--ink);font:700 12px var(--f-body,inherit)}
+.hx-agenda h2{display:flex;justify-content:space-between;align-items:center}
+.hx-ag{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-top:1px solid var(--line);padding:11px 0;cursor:pointer}
+.hx-ag>i{width:4px;align-self:stretch;border-radius:4px;background:var(--tn)}.hx-ag .m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.hx-ag .m b{font-size:14px}.hx-ag .m span{font-size:12px;color:var(--mut)}
+.hx-ok{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:18px;font-size:13px;line-height:1.4;color:var(--in);background:color-mix(in srgb,var(--in) 12%,var(--card));border:1px solid color-mix(in srgb,var(--in) 26%,var(--line))}
+.hx-goal{display:flex;align-items:center;gap:12px;padding:8px 0}.hx-gm{display:flex;flex-direction:column;gap:2px;min-width:0}.hx-gm span{font-size:12.5px;color:var(--mut)}
+.hx-head{margin:2px 4px 14px}.hx-head h2{font:700 27px/1.1 var(--f-disp,inherit);letter-spacing:-.01em;margin:0 0 5px}.hx-head p{margin:0;color:var(--mut);font-size:13px;line-height:1.45}
+.hx-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.hx-st{border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:3px;background:color-mix(in srgb,var(--tn) 13%,var(--card));border:1px solid color-mix(in srgb,var(--tn) 28%,var(--line))}
+.hx-st b{font:700 22px/1.1 var(--f-disp,inherit);color:var(--tn);overflow-wrap:anywhere}.hx-st span{font-size:11.5px;color:var(--mut);font-weight:600}
+.hx-duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hx-duo .hx-st{padding:15px}.hx-duo .hx-st b{font-size:19px}
+.hx-card{position:relative;overflow:hidden;padding:16px 16px 16px 21px}
+.hx-card::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:4px;border-radius:0 4px 4px 0;background:var(--tn)}
+.hx-row{display:flex;align-items:center;gap:12px}.hx-row .hx-chip{margin:0}.hx-row h3{margin:0;font:700 17px/1.2 var(--f-disp,inherit);overflow-wrap:anywhere}
+.hx-tt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.hx-plate{font:800 12.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.09em;color:#fff;background:#0B0E14;border-radius:7px;padding:6px 9px;white-space:nowrap;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 0 0 1px color-mix(in srgb,var(--accent) 40%,transparent)}
+.hx-odo{display:flex;align-items:baseline;gap:8px;margin:16px 0 2px;flex-wrap:wrap}.hx-odo b{font:700 32px/1 var(--f-disp,inherit);letter-spacing:-.02em}.hx-odo span{font-size:12.5px;color:var(--mut)}
+.hx-list{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.hx-rem{padding:12px;border-radius:16px;background:color-mix(in srgb,var(--tn) 8%,var(--bg));border:1px solid color-mix(in srgb,var(--tn) 22%,var(--line))}
+.hx-rt{display:flex;justify-content:space-between;align-items:center;gap:8px}.hx-rt b{font-size:14.5px}
+.hx-meter{height:6px;border-radius:9px;background:color-mix(in srgb,var(--tn) 20%,transparent);margin:10px 0 8px;overflow:hidden}.hx-meter i{display:block;height:100%;border-radius:9px;background:var(--tn)}
+.hx-rl{font-size:13px;font-weight:600;line-height:1.4}.hx-rs{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.5}.hx-rs:empty{display:none}
+.hx-bill{display:flex;gap:14px}.hx-bm{flex:1;min-width:0}.hx-bn{font:700 16px/1.25 var(--f-disp,inherit)}
+.hx-date{flex:none;width:56px;align-self:flex-start;text-align:center;padding:9px 0;border-radius:16px;background:color-mix(in srgb,var(--tn) 16%,transparent);color:var(--tn)}.hx-date b{display:grid;place-items:center;min-height:24px;font:700 23px/1 var(--f-disp,inherit)}.hx-date span{font-size:11px;font-weight:700}
+.hx-av{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:700 18px var(--f-disp,inherit);background:color-mix(in srgb,var(--tn) 20%,transparent);color:var(--tn)}
+.hx-amt{font:700 24px/1.15 var(--f-disp,inherit);letter-spacing:-.01em;margin:14px 0 3px;overflow-wrap:anywhere}
+.hx-back{margin-bottom:8px}
+@media (min-width:720px){html[data-model] .view-home,html[data-model] .view-home:not(:has(.savings-overview)){grid-template-areas:"hero summary" "hub hub" "savings categories" "latest latest"}html[data-model] .view-home:not(:has(.savings-overview)){grid-template-areas:"hero summary" "hub hub" "categories categories" "latest latest"}.view-home>.hx-top{grid-area:hub;margin:0}.hx-hub{grid-template-columns:repeat(4,1fr)}.hx-tile.wide{grid-column:span 2}}
+
+/* ===== Latar langit: terang = fajar pastel, gelap = gradasi senja (tanpa bintang/animasi, ringan untuk scroll) ===== */
+html[data-model]{--sky:radial-gradient(110% 55% at 0% 0%,#C7D7FF 0%,transparent 62%),radial-gradient(90% 50% at 100% 28%,#E6D3FF 0%,transparent 62%),radial-gradient(100% 55% at 0% 100%,#FFD8E7 0%,transparent 62%),linear-gradient(#F2F5FF,#F2F5FF);--st1:radial-gradient(1.6px 1.6px at 18px 26px,#fff,transparent),radial-gradient(1.2px 1.2px at 90px 70px,#F3EEFF,transparent),radial-gradient(1.8px 1.8px at 140px 20px,#fff,transparent),radial-gradient(1.2px 1.2px at 60px 120px,#FFF3F6,transparent),radial-gradient(1.4px 1.4px at 170px 110px,#fff,transparent);--st2:none;--st3:none;--shootd:none;--tw1:none;--tw2:none;--bg:#F2F5FF;--card:#FBFCFF;--line:#DCE3F5;}
+@media (prefers-color-scheme:dark){html[data-model]:not([data-theme="light"]){--sky:radial-gradient(130% 50% at 50% 110%,rgba(255,150,95,.42) 0%,transparent 68%),linear-gradient(180deg,#0B0E24 0%,#191640 28%,#33205A 55%,#5E2A66 78%,#9C4468 100%);--st1:none;--st2:none;--bg:#0B0E24;}}
+html[data-model][data-theme="dark"]{--sky:radial-gradient(130% 50% at 50% 110%,rgba(255,150,95,.42) 0%,transparent 68%),linear-gradient(180deg,#0B0E24 0%,#191640 28%,#33205A 55%,#5E2A66 78%,#9C4468 100%);--st1:none;--st2:none;--bg:#0B0E24;}
+html[data-model] body{background:transparent}html[data-model]{background-color:var(--bg)}
+html[data-model]::before,html[data-model]::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-repeat:no-repeat}
+html[data-model]::before{background-image:var(--sky);background-size:100% 100%}
+html[data-model]::after{background-image:var(--st1);background-repeat:repeat;background-size:230px 180px}
+
+/* ===== Our Space: Hari Spesial, Ngobrol, Sticky Notes ===== */
+nav button[data-t="dates"]{position:relative}
+.nbadge{position:absolute;top:2px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 5px;border-radius:99px;background:var(--out,#C0506A);color:#fff;font:800 10px/17px var(--f-body,system-ui,sans-serif);font-style:normal;text-align:center;box-shadow:0 0 0 2px var(--card)}
+.os-head{display:flex;align-items:center;gap:14px;margin:2px 2px 16px}
+.os-avs{display:flex;flex:none}
+.os-avs .os-av+.os-av{margin-left:-12px}
+.os-av{position:relative;flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 18px/1 var(--f-disp,Georgia,serif);border:3px solid var(--card);box-sizing:border-box;background:linear-gradient(135deg,#8a93a6,#b5bccb)}
+.os-av[data-who="RAMA"]{background:linear-gradient(135deg,#4A74CC,#8FB0F5)}
+.os-av[data-who="DESY"]{background:linear-gradient(135deg,#E8609B,#F7A1C4)}
+.os-av.p::after{content:"";position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:#8a93a6;border:3px solid var(--card);box-sizing:border-box}
+.os-av.p.on::after{background:#3ecf8e;box-shadow:0 0 0 3px rgba(62,207,142,.28)}
+.os-av.s{width:22px;height:22px;font-size:11px;border-width:2px;border-color:rgba(255,255,255,.7)}
+.os-htx{min-width:0}
+.os-title{font:700 24px/1.05 var(--f-disp,Georgia,serif);letter-spacing:-.01em}
+.os-title i{font-style:normal;color:var(--out,#C0506A)}
+.os-st{font-size:12.5px;color:var(--mut);margin-top:4px}
+.dsub{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;margin:0 0 18px;background:var(--card);border:1.5px solid var(--line);border-radius:22px;box-shadow:var(--sh)}
+.dsub button{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px 9px;border:0;border-radius:17px;background:transparent;color:var(--mut);font:700 11.5px/1.1 var(--f-body,system-ui,sans-serif);cursor:pointer;transition:background .2s,color .2s,transform .15s}
+.dsub button.on{background:linear-gradient(135deg,var(--btn),var(--accent));color:var(--btn-ink,#fff);box-shadow:0 7px 16px rgba(60,90,160,.3)}
+.dsub button:active{transform:scale(.96)}
+.ubadge{position:absolute;top:4px;right:calc(50% - 30px);min-width:17px;height:17px;padding:0 5px;border-radius:99px;background:var(--out,#C0506A);color:#fff;font:800 10px/17px var(--f-body,system-ui,sans-serif)}
+.os-sec{font:700 11.5px/1 var(--f-body,system-ui,sans-serif);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:20px 4px 11px}
+.os-hero{position:relative;overflow:hidden;border-radius:26px;padding:22px 20px 20px;margin:0 0 6px;color:#fff;background:var(--hero,linear-gradient(128deg,#3B5F96,#8FA9D8));border:1.5px solid var(--edge,transparent);box-shadow:5px 5px 0 var(--pop,rgba(0,0,0,.15))}
+.os-hero.today{background:linear-gradient(130deg,#B8346F,#F0709F 62%,#F7A8C8)}
+.os-hl{font:700 11.5px/1 var(--f-body,system-ui,sans-serif);letter-spacing:.16em;opacity:.85}
+.os-hbig{display:flex;align-items:baseline;gap:10px;margin:14px 0 8px;font:700 66px/1 var(--f-disp,Georgia,serif);letter-spacing:-.03em}
+.os-hbig small{font:700 15px/1.2 var(--f-body,system-ui,sans-serif);letter-spacing:0;opacity:.88}
+.os-ht2{font:700 21px/1.25 var(--f-disp,Georgia,serif);overflow-wrap:anywhere;position:relative}
+.os-hd{font-size:13px;opacity:.82;margin-top:5px;position:relative;overflow-wrap:anywhere}
+.os-fl{position:absolute;border-radius:50%;pointer-events:none;background:rgba(255,255,255,.12)}
+.os-f1{width:130px;height:130px;right:-34px;top:-38px}
+.os-f2{width:76px;height:76px;right:46px;bottom:-30px;background:rgba(255,255,255,.09)}
+.os-f3{width:16px;height:16px;right:34px;top:74px;background:rgba(255,255,255,.4)}
+.os-it{display:flex;align-items:center;gap:13px;padding:12px;margin-bottom:10px;background:var(--card);border:1.5px solid var(--line);border-radius:20px;box-shadow:var(--sh)}
+.os-it.past{opacity:.6}
+.os-cal{flex:none;width:52px;border-radius:14px;overflow:hidden;text-align:center;border:1.5px solid var(--line);background:var(--bg)}
+.os-cal b{display:block;background:linear-gradient(135deg,var(--btn),var(--accent));color:#fff;font:700 10px/1 var(--f-body,system-ui,sans-serif);letter-spacing:.1em;text-transform:uppercase;padding:5px 0}
+.os-cal span{display:block;font:700 22px/1 var(--f-disp,Georgia,serif);padding:7px 0 8px;color:var(--ink)}
+.os-im{flex:1;min-width:0}
+.os-it1{font:700 15.5px/1.25 var(--f-disp,Georgia,serif);overflow-wrap:anywhere}
+.os-it2{font-size:12px;color:var(--mut);margin-top:3px;overflow-wrap:anywhere}
+.os-ir{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.os-pill{font:700 11px/1 var(--f-body,system-ui,sans-serif);padding:6px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent-strong);white-space:nowrap}
+.os-pill.soon{background:rgba(240,160,70,.2);color:#C77A12}
+.os-pill.hot{background:var(--out,#C0506A);color:#fff}
+.os-empty{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:30px 16px;color:var(--mut);font-size:13px}
+.os-empty b{color:var(--ink);font:700 16px/1.2 var(--f-disp,Georgia,serif)}
+.os-heart{color:var(--out,#C0506A);opacity:.85;margin-bottom:4px}
+.os-chat{background:var(--card);border:1.5px solid var(--line);border-radius:26px;box-shadow:var(--sh);padding:14px 14px 12px}
+.os-ch{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.os-chm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.os-chm b{font:700 17px/1.2 var(--f-disp,Georgia,serif)}
+.os-chm span{font-size:12px;color:var(--mut)}
+.os-ghost{flex:none;font:700 10.5px/1 var(--f-body,system-ui,sans-serif);color:var(--accent-strong);background:var(--accent-soft);padding:7px 10px;border-radius:99px}
+.duo-log{display:flex;flex-direction:column;gap:7px;height:clamp(200px,calc(100vh - 380px),480px);overflow-y:auto;padding:14px 2px 8px;overscroll-behavior:contain}
+.duo-log .empty,.duo-log .os-empty{margin:auto}
+.cmsg.me .duo-b{background:linear-gradient(135deg,var(--btn),var(--accent));border-radius:20px 20px 6px 20px;cursor:pointer}
+.cmsg.bot .duo-b{border-radius:20px 20px 20px 6px}
+.duo-b small{display:block;font-size:10.5px;opacity:.65;margin-top:3px;text-align:right}
+.os-chips{display:flex;gap:8px;overflow-x:auto;padding:6px 0 10px;scrollbar-width:none}
+.os-chips::-webkit-scrollbar{display:none}
+.os-chips button{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;padding:9px 14px;font:600 12.5px/1 var(--f-body,system-ui,sans-serif);cursor:pointer}
+.os-chips button:active{transform:scale(.96)}
+.duo-form{display:flex;gap:8px;align-items:center;background:var(--bg);border:1.5px solid var(--line);border-radius:99px;padding:5px 5px 5px 16px}
+.duo-form input{flex:1;min-width:0;border:0!important;background:transparent!important;box-shadow:none!important;padding:8px 0!important;min-height:0!important}
+.os-note{font-size:11px;color:var(--mut);text-align:center;margin:10px 0 0}
+.os-bh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 4px 16px}
+.os-bt{font:700 21px/1.1 var(--f-disp,Georgia,serif)}
+.os-bs{font-size:12.5px;color:var(--mut);margin-top:4px}
+.os-count{min-width:36px;height:36px;display:grid;place-items:center;border-radius:13px;background:var(--accent-soft);color:var(--accent-strong);font:700 16px/1 var(--f-disp,Georgia,serif)}
+.ngrid{display:grid;grid-template-columns:1fr 1fr;gap:20px 14px;padding:8px 2px 4px}
+.nstk{position:relative;min-height:132px;padding:20px 14px 12px;border:0;border-radius:4px 4px 22px 4px;color:#2b2b2b;text-align:left;font:500 14px/1.45 var(--f-disp,var(--f-body,system-ui,sans-serif));cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.2),inset 0 -22px 30px -26px rgba(0,0,0,.28);display:flex;flex-direction:column;justify-content:space-between;gap:12px;overflow-wrap:anywhere;transition:transform .2s}
+.nstk::before{content:"";position:absolute;top:-9px;left:50%;width:54px;height:18px;transform:translateX(-50%) rotate(-3deg);background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.05);box-shadow:0 1px 2px rgba(0,0,0,.12);border-radius:2px}
+.nstk:nth-child(3n+1){transform:rotate(-1.4deg)}
+.nstk:nth-child(3n+2){transform:rotate(1.1deg)}
+.nstk:nth-child(3n){transform:rotate(-.4deg)}
+.nstk:active{transform:scale(.97)}
+.nstk .nt{white-space:pre-wrap;flex:1}
+.nstk .nf{display:flex;align-items:center;gap:7px;font:600 11px/1.2 var(--f-body,system-ui,sans-serif);opacity:.78}
+.nstk .pin{position:absolute;top:8px;right:9px;opacity:.7;color:#2b2b2b}
+.nstk.nadd{background:transparent;border:2px dashed var(--line);box-shadow:none;color:var(--mut);align-items:center;justify-content:center;font-weight:700;gap:8px}
+.nstk.nadd::before{display:none}
+.nc-kuning{background:#FFE98A}.nc-pink{background:#FFC2D6}.nc-biru{background:#BFDDFF}.nc-hijau{background:#C4EFC9}.nc-ungu{background:#DCCBFF}
+.ntxt{border-radius:6px 6px 20px 6px;padding:14px 14px 8px;box-shadow:0 8px 16px rgba(0,0,0,.18);transition:background .2s}
+html[data-model] .ntxt textarea,html[data-model] .ntxt textarea:focus{background:transparent!important;border:0!important;box-shadow:none!important;color:#2b2b2b!important;font:500 15px/1.5 var(--f-disp,system-ui,sans-serif)!important;padding:0!important;min-height:120px;resize:none}
+html[data-model] .ntxt textarea::placeholder{color:#2b2b2b!important;opacity:.45}
+.ntxt small{display:block;text-align:right;color:#2b2b2b;opacity:.55;font:600 11px/1 var(--f-body,system-ui,sans-serif);margin-top:6px}
+.ncol{display:flex;gap:10px;margin:6px 0 12px}
+.ncol button{width:38px;height:38px;border-radius:50%;border:3px solid transparent;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.ncol button.on{border-color:var(--ink)}
 </style></head>
 <body>
 <div class="app">
@@ -820,7 +962,7 @@ const ic=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="no
 // ===== Data layer =====
 const PEOPLE=['RAMA','DESY'];
 const COLORS=['#E4673A','#3C7BD9','#B94AA8','#8059D8','#B8730A','#1E9473','#E8609B','#D43F5E','#667189'];
-const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[],billpay:[],debts:[],debtpay:[]};
+const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[],billpay:[],debts:[],debtpay:[],notes:[]};
 const cat=id=>S.categories.find(c=>c.id===id)||{name:'(dihapus)',color:'#999',icon:'tag'};
 const acct=id=>S.accounts.find(a=>a.id===id)||{name:'(dihapus)'};
 
@@ -951,7 +1093,7 @@ async function save(table,row){pend++;setSync('saving');try{await call({action:'
 async function drop(table,id){pend++;setSync('saving');try{await call({action:'remove',table,id});pend--;if(!pend)setSync('ok')}catch(e){pend--;setSync('err',e.message);toast('Gagal menghapus: '+e.message);resync(e.message)}}
 async function resync(m){if(/passcode/i.test(m)){LS.del('olw_key');CFG.key='';loaded=false;gate(m);return}
   if(pend)return;const r=await load();if(r===true)setSync('err',m)}
-function logout(){LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];S.vehicles=[];S.reminders=[];S.servicelog=[];S.bills=[];S.billpay=[];S.debts=[];S.debtpay=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
+function logout(){duoLeave();duoStop();Object.assign(duo,{ver:'',msgs:[],on:false,nv:null,draft:'',partner:'',unread:0});S.notes=[];DT='tgl';LS.del('olw_key');CFG.key='';ME='';loaded=false;S.accounts=[];S.categories=[];S.transactions=[];S.goals=[];S.dates=[];S.vehicles=[];S.reminders=[];S.servicelog=[];S.bills=[];S.billpay=[];S.debts=[];S.debtpay=[];tab='home';CHAT=[];chatBusy=false;closeSheet();render();gate()}
 function savGroups(){const sh=S.goals.filter(g=>g.scope!=='private'),pv=S.goals.filter(g=>g.scope==='private');
   return (sh.length?`<h2 style="margin:6px 4px 10px">Tabungan bersama</h2><p class="sub" style="margin:-4px 4px 10px">RAMA dan DESY bisa melihat ini.</p>`+sh.map(goalCard).join(''):'')+(pv.length?`<h2 style="margin:6px 4px 10px">Tabungan pribadi ${ME} ${ic('lock',14)}</h2><p class="sub" style="margin:-4px 4px 10px">Hanya kamu yang bisa melihat ini.</p>`+pv.map(goalCard).join(''):'')}
 function saveNew(table,arr,row){arr.push(row);save(table,row)}
@@ -959,8 +1101,8 @@ function saveObj(table,row){save(table,row);return row}
 const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope:g.scope,owner:g.owner});
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
-  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];loaded=true}
-async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();return true}catch(e){setSync('err',e.message);return e.message}}
+  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];S.notes=(d.Notes||[]).map(x=>({...x,pinned:Number(x.pinned)||0,updated:Number(x.updated)||0}));loaded=true}
+async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();duoStart();return true}catch(e){setSync('err',e.message);return e.message}}
 
 // ===== Layar masuk: keypad angka (bisa pindah ke keyboard biasa) =====
 let gateKb=false,gateRem=true;
@@ -988,7 +1130,7 @@ function gate(msg){
 }
 // ===== UI state =====
 let tab='home',F={type:'all',cat:'',acc:'',q:'',month:'',day:''};
-const TABS=[['home','Home','home'],['trx','Transaksi','list'],['chat','Chat Bot','chat'],['acc','Accounts','wallet'],['dates','Our Dates','heart']];
+const TABS=[['home','Home','home'],['trx','Transaksi','list'],['chat','Chat Bot','chat'],['acc','Accounts','wallet'],['dates','Our Space','heart']];
 HIDE=LS.get('tp_hide')==='1';
 const PM=['hari','minggu','bulan','semua'],PLAB={hari:'Hari Ini',minggu:'Minggu',bulan:'Bulan',tahun:'Tahun',semua:'Semua',kustom:'Kustom'};
 const pDef=()=>{const m=LS.get('tp_pmode');return PM.includes(m)?m:'bulan'};
@@ -1035,7 +1177,7 @@ home(){const m=pFilter(S.transactions),inc=sum(m,'in'),exp=sum(m,'out'),r=pRange
   const ms=[5,4,3,2,1,0].map(k=>{const l=inMonth(ymOf(k));return {ym:ymOf(k),i:sum(l,'in'),o:sum(l,'out')}});const mx=Math.max(1,...ms.flatMap(x=>[x.i,x.o]));
   return `<div class="card hero"><div style="font-size:13px;opacity:.8">Total saldo pribadi · hanya kamu yang bisa lihat</div><div class="big">${rp(total())}${total() < 0&&!HIDE?' (minus)':''}</div><div style="font-size:13px;opacity:.8">dari ${S.accounts.length} akun</div></div>
   ${pBar()}<div class="row summary-row"><div class="card mini"><div class="lbl">Pemasukan</div><div class="v in">${rp(inc)}</div></div><div class="card mini"><div class="lbl">Pengeluaran</div><div class="v out">${rp(exp)}</div></div></div>
-  ${vehBanner()}${billBanner()}${debtBanner()}${savCard()}<div class="card category-overview"><h2>Pengeluaran · ${esc(r.label)}</h2>${catBars(m)}</div>
+  ${hxHub()}${savCard()}<div class="card category-overview"><h2>Pengeluaran · ${esc(r.label)}</h2>${catBars(m)}</div>
   <div class="card"><h2>6 bulan terakhir</h2><div class="cols">${ms.map(x=>`<div class="col"><div class="pair"><i style="height:${x.i/mx*100}%;background:var(--in)"></i><i style="height:${x.o/mx*100}%;background:var(--out)"></i></div>${MON[+x.ym.slice(5)-1]}</div>`).join('')}</div><div class="sub" style="margin-top:8px"><span class="in">■</span> Pemasukan &nbsp; <span class="out">■</span> Pengeluaran</div></div>
   <div class="card latest-overview"><h2>Transaksi terbaru <button class="link" data-act="tab" data-t="trx">Lihat semua</button></h2>${S.transactions.length?sorted(S.transactions).slice(0,5).map(txRow).join(''):emptyTx()}</div>`},
 trx(){const TL={all:'Semua transaksi',in:'Pemasukan',out:'Pengeluaran'},act=F.type!=='all'||F.cat||F.acc;
@@ -1043,12 +1185,10 @@ trx(){const TL={all:'Semua transaksi',in:'Pemasukan',out:'Pengeluaran'},act=F.ty
   <div class="psearch">${ic('search',18)}<input id="fq" type="text" enterkeyhint="search" autocomplete="off" placeholder="Cari transaksi…" value="${esc(F.q)}"></div>${act?'<div class="fhint" style="margin:-4px 0 12px"><button class="link" data-act="freset">Reset filter</button></div>':''}<div class="card" id="trxList"></div>`},
 acc(){return `<div class="card hero"><div style="font-size:13px;opacity:.8">Total akun pribadi · hanya kamu yang bisa lihat</div><div class="big">${rp(total())}</div></div>
   ${S.accounts.length?S.accounts.map(a=>`<div class="card tx${MODEL()==='2'?' acc-row':''}" style="padding:14px 16px;margin-bottom:12px">${MODEL()==='2'?accAv2(a):accAv1(a.name)}<div class="m"><div class="d">${esc(a.name)}</div><div class="s"><span class="badge">${esc(a.owner)}</span>${+a.allowNeg?' <span class="badge">Boleh minus</span>':''}</div></div><div class="a">${bal(a.id) < 0?'−':''}${rp(bal(a.id))}</div><button class="del" data-act="editAcc" data-id="${a.id}" aria-label="Ubah akun">${ic('edit',18)}</button></div>`).join(''):'<div class="card empty"><b>Belum ada akun</b></div>'}
-  <button class="btn sec" data-act="editAcc">+ Tambah akun</button><button class="btn" data-act="tab" data-t="sav">♡ Tabungan (bersama dan pribadi)</button><button class="btn sec" data-act="tab" data-t="veh">Kendaraan &amp; pajak</button><button class="btn sec" data-act="tab" data-t="bill">Tagihan &amp; pengingat</button><button class="btn sec" data-act="tab" data-t="debt">Utang &amp; piutang</button>
+  <button class="btn sec" data-act="editAcc">+ Tambah akun</button>
   <p class="sub" style="margin-top:12px">Akun dan saldo di sini pribadi: hanya kamu yang bisa melihatnya. Saldo = saldo awal + transaksi.</p>`},
-sav(){return `<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>`+(S.goals.length?savGroups():'<div class="card empty">'+ic('heart',34)+'<b>Belum ada target tabungan</b>Mulai dari target pertama kalian, misalnya tabungan nikah.</div>')+`<button class="btn sec" data-act="editGoal">+ Tambah target tabungan</button><p class="sub" style="margin-top:12px">Setoran tabungan dicatat terpisah dari saldo akun.</p>`},
-dates(){const t0=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate());
-  const items=S.dates.map(d=>{const[y,m,dd]=d.date.split('-').map(Number);let tg=new Date(y,m-1,dd);if(d.yearly)while(tg < t0)tg=new Date(tg.getFullYear()+1,m-1,dd);return {...d,n:Math.round((tg-t0)/864e5)}}).sort((a,b)=>(a.n < 0)-(b.n < 0)||Math.abs(a.n)-Math.abs(b.n));
-  return `<div class="card"><h2>Tanggal spesial kita ♡</h2>${items.length?items.map(d=>`<div class="tx"><div class="cd">${d.n===0?'Hari ini':Math.abs(d.n)}<small>${d.n===0?'♡':d.n>0?'hari lagi':'hari lalu'}</small></div><div class="m"><div class="d">${esc(d.title)}</div><div class="s">${fdate(d.date)}${d.yearly?' · tiap tahun':''}${d.note?' · '+esc(d.note):''}</div></div><button class="del" data-act="delDate" data-id="${d.id}" aria-label="Hapus">${ic('trash',18)}</button></div>`).join(''):'<div class="empty"><b>Belum ada tanggal spesial</b>Tambahkan anniversary atau rencana date kalian.</div>'}</div><button class="btn" data-act="addDate">+ Tambah tanggal</button>`},
+sav(){return `<button class="link hx-back" data-act="tab" data-t="home">← Kembali ke Home</button>`+(S.goals.length?savGroups():'<div class="card empty">'+ic('heart',34)+'<b>Belum ada target tabungan</b>Mulai dari target pertama kalian, misalnya tabungan nikah.</div>')+`<button class="btn sec" data-act="editGoal">+ Tambah target tabungan</button><p class="sub" style="margin-top:12px">Setoran tabungan dicatat terpisah dari saldo akun.</p>`},
+dates(){return osHead()+datesSub()+(DT==='obr'?duoView():DT==='cat'?notesView():hariView())},
 veh(){return vehView()},
 bill(){return billView()},
 debt(){return debtView()},
@@ -1057,10 +1197,38 @@ chat(){return chatView()},
 const gSum=g=>g.deps.reduce((s,d)=>s+d.amount,0);
 const gBy=(g,n)=>g.deps.filter(d=>d.by===n).reduce((s,d)=>s+d.amount,0);
 const fmtIn=e=>{const d=e.target.value.replace(/\D/g,'').replace(/^0+/,'');e.target.value=d?(+d).toLocaleString('id-ID'):''};
+
+// ===== HX: tampilan baru Home hub, Kendaraan, Tagihan, Utang =====
+const hxTone=s=>s==='terlambat'?'out':s==='segera'?'warn':s==='lunas'?'mut':s==='belum'?'acc':'in';
+const hxBadge=sc=>`<span class="badge">${sc==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span>`;
+const hxHead=(t,s)=>`<div class="hx-head"><h2>${t}</h2><p>${s}</p></div>`;
+const hxStats=a=>`<div class="hx-stats">${a.map(s=>`<div class="hx-st hx-${s[2]}"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>`;
+const hxRing=(p,sz)=>{const r=sz/2-5,c=2*Math.PI*r,h=sz/2;return `<svg class="hx-ring" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" aria-label="${Math.round(p)} persen"><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke-width="5" class="t"/><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke-width="5" stroke-linecap="round" class="f" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 ${h} ${h})"/><text x="50%" y="50%" dy=".35em" text-anchor="middle">${Math.round(p)}%</text></svg>`};
+function hxHub(){const T=todayIso();
+  const sh=S.goals.filter(g=>g.scope!=='private'),gt=sh.reduce((s,g)=>s+gSum(g),0),tg=sh.reduce((s,g)=>s+(+g.target||0),0),sp=tg?Math.min(100,gt/tg*100):0;
+  const sev=(t,s)=>t?'terlambat':s?'segera':'';
+  const rc={terlambat:0,segera:0};S.reminders.forEach(r=>{const s=remInfo(r).status;if(rc[s]!==undefined)rc[s]++});
+  const bl=S.bills.map(b=>({b,i:billInfo_(b,T)})).filter(x=>x.i.status!=='lunas'),bc={terlambat:0,segera:0};bl.forEach(x=>{if(bc[x.i.status]!==undefined)bc[x.i.status]++});
+  const nb=bl.slice().sort((a,b)=>a.i.daysLeft-b.i.daysLeft)[0];
+  const dl=k=>S.debts.filter(d=>d.kind===k).reduce((t,d)=>t+debtInfo(d,T).left,0),dc={terlambat:0,segera:0};S.debts.forEach(d=>{const s=debtInfo(d,T).status;if(dc[s]!==undefined)dc[s]++});
+  const dot=x=>x?`<i class="hx-dot hx-${hxTone(x)}"></i>`:'';
+  const sav=`<button type="button" class="hx-tile wide hx-rose" data-act="tab" data-t="sav"><div class="hx-tw"><div class="hx-tm"><span class="hx-chip">${ic('heart',20)}</span><span class="hx-l">Tabungan bersama</span><b class="hx-v">${sh.length?rp(gt):'Belum ada target'}</b><span class="hx-s">${sh.length?`dari ${rp(tg)} · ${sh.length} target`:'Mulai target pertama kalian'}</span></div>${sh.length?hxRing(sp,68):''}</div></button>`;
+  const veh=`<button type="button" class="hx-tile hx-acc" data-act="tab" data-t="veh">${dot(sev(rc.terlambat,rc.segera))}<span class="hx-chip">${ic('veh',20)}</span><span class="hx-l">Kendaraan &amp; pajak</span><b class="hx-v">${S.vehicles.length} kendaraan</b><span class="hx-s">${rc.terlambat?rc.terlambat+' terlambat':rc.segera?rc.segera+' segera jatuh tempo':S.reminders.length?'Semua jadwal aman':'Pasang pengingat servis'}</span></button>`;
+  const bill=`<button type="button" class="hx-tile hx-warn" data-act="tab" data-t="bill">${dot(sev(bc.terlambat,bc.segera))}<span class="hx-chip">${ic('receipt',20)}</span><span class="hx-l">Tagihan</span><b class="hx-v">${nb?(nb.b.amount?rp(nb.b.amount):esc(nb.b.name)):S.bills.length?'Semua lunas':'Belum ada'}</b><span class="hx-s">${nb?esc(nb.b.name)+' · '+billLeft(nb.i):'Catat listrik, internet, cicilan'}</span></button>`;
+  const debt=`<button type="button" class="hx-tile wide hx-out" data-act="tab" data-t="debt">${dot(sev(dc.terlambat,dc.segera))}<div class="hx-tw"><div class="hx-tm"><span class="hx-l">Utang saya</span><b class="hx-v" style="color:var(--out)">${rp(dl('utang'))}</b></div><div class="hx-tm"><span class="hx-l">Piutang saya</span><b class="hx-v" style="color:var(--in)">${rp(dl('piutang'))}</b></div><span class="hx-chip" style="margin:0">${ic('wallet',20)}</span></div></button>`;
+  return `<div class="hx-top"><div class="hx-hub">${sav}${veh}${bill}${debt}</div>${hxAgenda()}</div>`}
+function hxAgenda(){const T=todayIso(),it=[],hot=s=>s==='terlambat'||s==='segera';
+  S.reminders.forEach(r=>{const d=remInfo(r),v=vehOf(r.vehicle);if(hot(d.status))it.push({s:d.status,n:d.daysLeft==null?(d.kmLeft<0?-1:999):d.daysLeft,t:r.name+(v?' · '+v.name:''),sub:remLeft(d),tab:'veh',lab:STAT_LAB[d.status]})});
+  S.bills.forEach(b=>{const i=billInfo_(b,T);if(hot(i.status))it.push({s:i.status,n:i.daysLeft,t:b.name,sub:(b.amount?rp(b.amount)+' · ':'')+billLeft(i),tab:'bill',lab:BILL_LAB[i.status]})});
+  S.debts.forEach(d=>{const i=debtInfo(d,T);if(hot(i.status))it.push({s:i.status,n:i.daysLeft,t:(d.kind==='utang'?'Bayar ':'Tagih ')+d.person,sub:rp(i.left)+(i.daysLeft==null?'':' · '+billLeft(i)),tab:'debt',lab:DEBT_LAB[i.status]})});
+  it.sort((a,b)=>(a.s==='terlambat'?0:1)-(b.s==='terlambat'?0:1)||a.n-b.n);
+  if(!it.length)return (S.vehicles.length||S.bills.length||S.debts.length)?`<div class="hx-ok">${ic('sparkle',16)}<span>Semua jadwal aman. Tidak ada yang perlu diurus sekarang.</span></div>`:'';
+  return `<div class="card hx-agenda"><h2>Perlu perhatian <span class="badge">${it.length}</span></h2>${it.slice(0,4).map(x=>`<button type="button" class="hx-ag hx-${hxTone(x.s)}" data-act="tab" data-t="${x.tab}"><i></i><span class="m"><b>${esc(x.t)}</b><span>${x.sub}</span></span><span class="vstat ${x.s}">${x.lab}</span></button>`).join('')}${it.length>4?`<p class="sub" style="margin:8px 0 0">+${it.length-4} lainnya di menu masing-masing</p>`:''}</div>`}
 function savCard(){if(!S.goals.length)return '';
-  const row=g=>{const got=gSum(g),p=g.target?Math.min(100,got/g.target*100):0;return `<div class="bar"><div class="t"><span>${esc(g.name)}</span><span>${rp(got)} / ${rp(g.target)}</span></div><div class="track"><div class="fill" style="width:${p}%;background:var(--pink)"></div></div></div>`};
   const sh=S.goals.filter(g=>g.scope!=='private'),pv=S.goals.filter(g=>g.scope==='private');
-  return `<div class="card savings-overview" data-act="tab" data-t="sav" style="cursor:pointer"><h2>Tabungan <span class="badge">Lihat</span></h2>${sh.length?`<div class="sub">Bersama · terlihat RAMA &amp; DESY</div>`+sh.map(row).join(''):''}${pv.length?`<div class="sub" style="margin-top:12px">${ic('lock',12)} Pribadi ${ME} · hanya kamu yang bisa lihat</div>`+pv.map(row).join(''):''}</div>`}
+  const row=g=>{const got=gSum(g),p=g.target?Math.min(100,got/g.target*100):0;return `<div class="hx-goal hx-rose">${hxRing(p,52)}<div class="hx-gm"><b>${esc(g.name)}</b><span>${rp(got)} / ${rp(g.target)}</span></div></div>`};
+  return `<div class="card savings-overview hx-sav" data-act="tab" data-t="sav" style="cursor:pointer"><h2>Tabungan <span class="badge">Lihat</span></h2>${sh.length?`<div class="sub">Bersama · terlihat RAMA &amp; DESY</div>`+sh.map(row).join(''):''}${pv.length?`<div class="sub" style="margin-top:12px">${ic('lock',12)} Pribadi ${ME} · hanya kamu yang bisa lihat</div>`+pv.map(row).join(''):''}</div>`}
+
 function goalCard(g){const got=gSum(g),pct=g.target?Math.min(100,got/g.target*100):0,left=Math.max(0,g.target-got);let hint='';
  if(left===0)hint='Target tercapai ♡';
  else if(g.deadline){const [y,m]=g.deadline.split('-').map(Number),mo=(y-NOW.getFullYear())*12+(m-1-NOW.getMonth());hint=mo>0?`Menuju ${fdate(g.deadline)} · butuh sekitar ${rp(left/mo)} per bulan`:`Tanggal target ${fdate(g.deadline)} sudah dekat atau lewat`}
@@ -1073,8 +1241,8 @@ function listTx(){const _r=pRange();let l=S.transactions.filter(t=>(F.type==='al
   const ti=sum(l,'in'),to=sum(l,'out');
   $('#trxList').innerHTML=`<div class="sub" style="margin-bottom:2px">${l.length} transaksi${ti?` · Masuk <span class="in">+${rp(ti)}</span>`:''}${to?` · Keluar <span class="out">−${rp(to)}</span>`:''}</div><div class="sub" style="margin-bottom:2px;font-size:11.5px">Ketuk transaksi untuk mengubahnya.</div>`+h}
 function render(){const me=$('#me');if(me)me.textContent=ME?'Masuk sebagai '+ME:'';$('#view').className='view view-'+tab;$('#view').innerHTML=loaded?VIEWS[tab]():'<div class="empty"><b>Memuat data…</b></div>';if(loaded&&tab==='trx')listTx();
-  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||((tab==='sav'||tab==='veh'||tab==='bill'||tab==='debt')&&t[0]==='acc'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('');
-  $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';document.body.classList.toggle('tchat',tab==='chat');if(tab!=='chat')document.body.classList.remove('kbf');chatSync()}
+  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||((tab==='sav'||tab==='veh'||tab==='bill'||tab==='debt')&&t[0]==='home'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('');
+  $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';document.body.classList.toggle('tchat',tab==='chat');if(tab!=='chat')document.body.classList.remove('kbf');chatSync();duoSync()}
 
 // ===== Chat Bot: ketik bahasa sehari-hari -> kartu transaksi -> Simpan =====
 ICON.chat='<path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z"/>';
@@ -1519,12 +1687,104 @@ function setSheet(){sheet('Pengaturan',`<p class="sub">Kelola kategori. Akun dia
     if(S.categories.some(c=>c.name.toLowerCase()===n.toLowerCase())){setErr('cn','Kategori sudah ada');return}
     saveNew('Categories',S.categories,{id:uid(),name:n,kind:$('#c-kind').value,icon:$('#c-ic').value,color:COLORS[S.categories.length%COLORS.length]});setSheet();render()}}
 
-function dateSheet(){sheet('Tambah tanggal spesial',`<label for="x-t">Judul</label><input id="x-t" maxlength="40"><div class="err" id="e-xt"></div>
+function dateSheet(){sheet('Tambah hari spesial',`<label for="x-t">Judul</label><input id="x-t" maxlength="40"><div class="err" id="e-xt"></div>
   <label for="x-d">Tanggal</label><input type="date" id="x-d"><div class="err" id="e-xd"></div>
   <label><input type="checkbox" id="x-y" style="width:auto;min-height:0;margin-right:8px">Berulang tiap tahun</label>
   <label for="x-n">Catatan (opsional)</label><input id="x-n" maxlength="60"><button class="btn" id="x-s">Simpan</button>`);
   $('#x-s').onclick=()=>{const t=$('#x-t').value.trim(),d=$('#x-d').value;setErr('xt',t?'':'Judul wajib diisi');setErr('xd',d?'':'Tanggal wajib diisi');if(!t||!d)return;
     saveNew('Dates',S.dates,{id:uid(),title:t,date:d,yearly:$('#x-y').checked,note:$('#x-n').value.trim()});closeSheet();render()}}
+
+
+// ===== Our Space (menu "dates"): Hari Spesial, Ngobrol, Sticky Notes =====
+let DT='tgl';
+const duo={ver:'',msgs:[],partner:'',on:false,sending:0,t:null,nv:null,run:false,draft:'',unread:0};
+ICON.note='<path d="M5 3h10l4 4v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h5"/>';
+const hhmm=t=>{const d=new Date(Number(t)||0);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+const inDuo=()=>tab==='dates'&&DT==='obr';
+const pName=()=>duo.partner||(ME==='RAMA'?'DESY':'RAMA');
+const ago=t=>{t=Number(t);if(!(t>0))return '';const m=Math.floor((Date.now()-t)/6e4);if(m<1)return 'baru saja';if(m<60)return m+' mnt lalu';const h=Math.floor(m/60);if(h<24)return h+' jam lalu';const d=Math.floor(h/24);return d<30?d+' hari lalu':fdate(isoL(new Date(t)))};
+const osAv=(n,cls)=>`<span class="os-av${cls?' '+cls:''}" data-who="${esc(n)}">${esc(String(n).charAt(0))}</span>`;
+const osStatus=()=>duo.on?esc(pName())+' sedang online':esc(pName())+' offline';
+const HEARTS='<svg class="os-heart" width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
+
+function osHead(){return `<div class="os-head"><div class="os-avs">${osAv(ME)}${osAv(pName(),'p'+(duo.on?' on':''))}</div><div class="os-htx"><div class="os-title">Our Space <i>♡</i></div><div class="os-st" id="osSt">${osStatus()}</div></div></div>`}
+const DTABS=[['tgl','Hari Spesial','heart'],['obr','Ngobrol','chat'],['cat','Sticky Notes','note']];
+function datesSub(){return `<div class="dsub" role="tablist">${DTABS.map(x=>`<button type="button" role="tab" class="${DT===x[0]?'on':''}" data-act="dtab" data-v="${x[0]}">${ic(x[2],20)}<span>${x[1]}</span>${x[0]==='obr'&&duo.unread&&!inDuo()?`<b class="ubadge">${duo.unread>9?'9+':duo.unread}</b>`:''}</button>`).join('')}</div>`}
+// Masuk ke Ngobrol: gulir supaya kartu obrolan (termasuk kolom ketik) pas di atas menu bawah
+function osFocusChat(){if(!inDuo())return;requestAnimationFrame(()=>{const c=$('.os-chat');if(c)window.scrollTo({top:Math.max(0,c.getBoundingClientRect().top+window.scrollY-12)})})}
+function osPresence(){document.querySelectorAll('.os-av.p').forEach(e=>e.classList.toggle('on',duo.on));const st=$('#osSt');if(st)st.innerHTML=osStatus();const w=$('#duoWho');if(w)w.textContent=duo.on?'online sekarang':'offline'}
+function osBadges(){const n=duo.unread;
+  const nb=document.querySelector('nav button[data-t="dates"]');
+  if(nb){let e=nb.querySelector('.nbadge');if(n&&tab!=='dates'){if(!e){e=document.createElement('i');e.className='nbadge';nb.appendChild(e)}e.textContent=n>9?'9+':n}else if(e)e.remove()}
+  const sb=document.querySelector('.dsub button[data-v="obr"]');
+  if(sb){let e=sb.querySelector('.ubadge');if(n&&!inDuo()){if(!e){e=document.createElement('b');e.className='ubadge';sb.appendChild(e)}e.textContent=n>9?'9+':n}else if(e)e.remove()}}
+
+// ---- Hari Spesial ----
+function hariView(){const t0=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate());
+  const items=S.dates.map(d=>{const[y,m,dd]=d.date.split('-').map(Number);let tg=new Date(y,m-1,dd);if(d.yearly)while(tg<t0)tg=new Date(tg.getFullYear()+1,m-1,dd);return {...d,tg,n:Math.round((tg-t0)/864e5)}}).sort((a,b)=>(a.n<0)-(b.n<0)||Math.abs(a.n)-Math.abs(b.n));
+  const next=items.find(x=>x.n>=0),up=items.filter(x=>x.n>=0&&x!==next),past=items.filter(x=>x.n<0);
+  const hero=next?`<div class="os-hero${next.n===0?' today':''}"><span class="os-fl os-f1"></span><span class="os-fl os-f2"></span><span class="os-fl os-f3"></span><div class="os-hl">${next.n===0?'HARI INI ♡':'SEBENTAR LAGI'}</div><div class="os-hbig">${next.n===0?'♡':next.n}<small>${next.n===0?'selamat ya, sayang!':'hari lagi'}</small></div><div class="os-ht2">${esc(next.title)}</div><div class="os-hd">${fday(isoL(next.tg))}${next.yearly?' · tiap tahun':''}${next.note?' · '+esc(next.note):''}</div></div>`:'';
+  const row=d=>`<div class="os-it${d.n<0?' past':''}"><div class="os-cal"><b>${MON[d.tg.getMonth()]}</b><span>${d.tg.getDate()}</span></div><div class="os-im"><div class="os-it1">${esc(d.title)}</div><div class="os-it2">${d.yearly?'Tiap tahun':fdate(d.date)}${d.note?' · '+esc(d.note):''}</div></div><div class="os-ir"><span class="os-pill${d.n===0?' hot':d.n>0&&d.n<=7?' soon':''}">${d.n===0?'Hari ini':d.n>0?d.n+' hari lagi':Math.abs(d.n)+' hari lalu'}</span><button class="del" data-act="delDate" data-id="${esc(d.id)}" aria-label="Hapus">${ic('trash',17)}</button></div></div>`;
+  return (items.length?hero+(up.length?`<div class="os-sec">Akan datang</div>`+up.map(row).join(''):'')+(past.length?`<div class="os-sec">Sudah lewat</div>`+past.map(row).join(''):''):`<div class="os-empty">${HEARTS}<b>Belum ada hari spesial</b>Simpan anniversary, rencana date, atau hari penting kalian di sini.</div>`)+`<button class="btn" data-act="addDate">+ Tambah hari spesial</button>`}
+
+// ---- Ngobrol (online/offline, pesan hilang saat berdua offline) ----
+const DUO_CHIPS=['Lagi apa?','Kangen kamu ♡','Udah makan belum?','Hati-hati ya'];
+function duoView(){const p=pName();return `<div class="os-chat"><div class="os-ch"><div class="os-avs">${osAv(p,'p'+(duo.on?' on':''))}</div><div class="os-chm"><b>${esc(p)}</b><span id="duoWho">${duo.on?'online sekarang':'offline'}</span></div><span class="os-ghost">✦ pesan sementara</span></div><div class="duo-log" id="duoLog"></div><div class="os-chips">${DUO_CHIPS.map(t=>`<button type="button" data-act="duoChip" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="duo-form"><input id="duoIn" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Tulis pesan untuk ${esc(p)}…"><button type="button" class="csend" data-act="duoSend" aria-label="Kirim">${ic('send',20)}</button></div><p class="os-note">Pesan hilang otomatis saat kalian berdua offline. Ketuk pesanmu untuk menghapusnya.</p></div>`}
+function duoMsgsHtml(){if(!duo.msgs.length)return `<div class="os-empty">${HEARTS}<b>Belum ada pesan</b>Sapa ${esc(pName())} duluan ♡</div>`;
+  return duo.msgs.map(x=>{const mine=x.by===ME;return `<div class="cmsg ${mine?'me':'bot'}"><div class="cbub duo-b"${mine&&!x.tmp?` data-act="duoDel" data-id="${esc(x.id)}"`:''}>${esc(x.text)}<small>${hhmm(x.t)}${x.tmp?' · mengirim…':''}</small></div></div>`}).join('')}
+function duoPaint(stick){const lg=$('#duoLog');
+  if(lg){const near=lg.scrollHeight-lg.scrollTop-lg.clientHeight<70;lg.innerHTML=duoMsgsHtml();if(stick||near)lg.scrollTop=lg.scrollHeight;
+    const i=$('#duoIn');if(i&&duo.draft&&!i.value)i.value=duo.draft}
+  osPresence()}
+function duoSync(){if(inDuo()){duo.unread=0;duoPaint(true);duoSchedule(0)}osBadges()}
+const duoDelay=()=>!inDuo()?8000:(duo.on?2500:5000);
+function duoSchedule(ms){clearTimeout(duo.t);duo.t=null;if(!duo.run||document.hidden||!loaded)return;duo.t=setTimeout(duoTick,ms===undefined?duoDelay():ms)}
+function duoStart(){if(duo.run)return;duo.run=true;duoSchedule(0)}
+function duoStop(){duo.run=false;clearTimeout(duo.t);duo.t=null}
+async function duoTick(){duo.t=null;if(!duo.run||document.hidden||!loaded)return;
+  try{const r=await call({action:'chatPoll',ver:duo.ver});duoApply(r.chat)}catch(e){if(/passcode/i.test(e.message)){duoStop();return}}
+  duoSchedule()}
+function duoApply(c){if(!c||duo.sending>0)return;const was=duo.on;duo.on=!!c.partnerOnline;duo.partner=c.partner||duo.partner;
+  const changed=c.msgs!==undefined;
+  if(changed){const prev=new Set(duo.msgs.map(x=>x.id));duo.msgs=c.msgs;duo.ver=c.ver;
+    if(!inDuo()){const nw=c.msgs.filter(x=>x.by!==ME&&!prev.has(x.id)).length;if(nw)duo.unread+=nw}}
+  if(inDuo()&&(changed||was!==duo.on))duoPaint(false);else osPresence();
+  osBadges();
+  if(c.nv!==undefined){if(duo.nv===null)duo.nv=c.nv;
+    else if(c.nv!==duo.nv){if(c.nvBy===ME)duo.nv=c.nv;else if(!pend&&!inDuo()&&ov.classList.contains('hide')){duo.nv=c.nv;load()}}}}
+async function duoSend(pre){const i=$('#duoIn'),typed=typeof pre!=='string';
+  const text=(typed?(i?i.value:''):pre).trim();if(!text)return;if(typed&&i){i.value='';duo.draft=''}
+  const tmp={id:'tmp'+Date.now(),by:ME,text,t:Date.now(),tmp:1};duo.msgs.push(tmp);duo.sending++;duoPaint(true);if(typed&&i)i.focus();
+  try{const r=await call({action:'chatSend',text,ver:duo.ver});duo.sending--;duoApply(r.chat)}
+  catch(e){duo.sending--;duo.msgs=duo.msgs.filter(x=>x!==tmp);duoPaint(false);toast('Gagal kirim: '+e.message);const j=$('#duoIn');if(typed&&j&&!j.value){j.value=text;duo.draft=text}}
+  duoSchedule(duo.on?1200:undefined)}
+async function duoDelete(id){duo.msgs=duo.msgs.filter(x=>x.id!==id);if(inDuo())duoPaint(false);
+  try{const r=await call({action:'chatDelete',id,ver:duo.ver});duoApply(r.chat)}catch(e){toast('Gagal menghapus: '+e.message)}
+  duoSchedule(0)}
+// Keluar aplikasi/web: langsung offline (sendBeacon bila bisa); kalau dimatikan paksa, offline otomatis setelah ±20 detik
+function duoLeave(){if(!loaded||!CFG.key||!duo.run)return;
+  try{const p=JSON.stringify({action:'chatLeave',key:CFG.key});
+    if(!inScript&&CFG.url&&navigator.sendBeacon)navigator.sendBeacon(CFG.url,new Blob([p],{type:'text/plain;charset=utf-8'}));
+    else call({action:'chatLeave'}).catch(()=>{})}catch(e){}
+  duo.on=false}
+
+// ---- Sticky Notes ----
+const NCOL=['kuning','pink','biru','hijau','ungu'];
+function notesView(){const l=[...S.notes].sort((a,b)=>(b.pinned-a.pinned)||(b.updated-a.updated));
+  const card=n=>`<button type="button" class="nstk nc-${NCOL.includes(n.color)?n.color:'kuning'}" data-act="noteEdit" data-id="${esc(n.id)}">${n.pinned?`<span class="pin">${ic('pin',16)}</span>`:''}<span class="nt">${esc(n.text)}</span><span class="nf">${osAv(n.by,'s')}<span>${ago(n.updated)}${n.editedBy&&n.editedBy!==n.by?' · diubah '+esc(n.editedBy):''}</span></span></button>`;
+  return `<div class="os-bh"><div><div class="os-bt">Sticky Notes</div><div class="os-bs">Tempelan kecil buat kita berdua</div></div><span class="os-count">${l.length}</span></div><div class="ngrid"><button type="button" class="nstk nadd" data-act="noteEdit">${ic('plus',26)}<span>Tempel catatan</span></button>${l.map(card).join('')}</div>${l.length?'':'<p class="os-note" style="margin-top:18px">Belum ada catatan. Tempel yang pertama ♡</p>'}`}
+function noteSheet(id){const n=id?S.notes.find(x=>x.id===id):null;let col=n&&NCOL.includes(n.color)?n.color:'kuning';
+  sheet(n?'Ubah catatan':'Tempel catatan',`<div class="ntxt nc-${col}" id="n-w"><textarea id="n-t" maxlength="300" rows="5" placeholder="Tulis sesuatu buat kita…">${n?esc(n.text):''}</textarea><small id="n-c"></small></div><div class="err" id="e-nt"></div>
+  <label>Warna</label><div class="ncol">${NCOL.map(c=>`<button type="button" class="nc-${c} ${c===col?'on':''}" data-c="${c}" aria-label="Warna ${c}"></button>`).join('')}</div>
+  <label><input type="checkbox" id="n-p" ${n&&n.pinned?'checked':''} style="width:auto;min-height:0;margin-right:8px">Sematkan di atas</label>
+  <button class="btn" id="n-s">Simpan</button>${n?'<button class="btn dng" id="n-d">Hapus</button>':''}`);
+  const cnt=()=>{$('#n-c').textContent=$('#n-t').value.length+'/300'};cnt();$('#n-t').oninput=cnt;
+  ov.querySelectorAll('.ncol button').forEach(b=>b.onclick=()=>{col=b.dataset.c;$('#n-w').className='ntxt nc-'+col;ov.querySelectorAll('.ncol button').forEach(x=>x.classList.toggle('on',x===b))});
+  $('#n-s').onclick=()=>{const t=$('#n-t').value.trim();setErr('nt',t?'':'Isi catatan wajib diisi');if(!t)return;
+    if(!n&&S.notes.length>=60){setErr('nt','Catatan sudah penuh (maksimal 60). Hapus yang lama dulu.');return}
+    const row={id:n?n.id:uid(),text:t,color:col,pinned:$('#n-p').checked?1:0,by:n?n.by:ME,editedBy:ME,updated:Date.now()};
+    if(n)Object.assign(n,row);else S.notes.push(row);save('Notes',row);closeSheet();render()};
+  if(n)$('#n-d').onclick=()=>confirmBox('Catatan ini akan dihapus untuk berdua.',()=>{S.notes=S.notes.filter(x=>x.id!==n.id);drop('Notes',n.id);render();toast('Catatan dihapus')})}
 
 function depSheet(gid){const g=S.goals.find(x=>x.id===gid);
  sheet('Setor tabungan',`<p class="sub">${esc(g.name)}</p><label for="s-date">Tanggal</label><input type="date" id="s-date" value="${isoL(NOW)}"><div class="err" id="e-sd"></div><label for="s-amt">Nominal (Rp)</label><input id="s-amt" inputmode="numeric" placeholder="0" autocomplete="off"><div class="err" id="e-sa"></div><label for="s-note">Catatan (opsional)</label><input id="s-note" maxlength="60"><button class="btn" id="s-save">Simpan setoran</button>`);
@@ -1576,13 +1836,16 @@ const remSort=(a,b)=>STAT_ORD[a.d.status]-STAT_ORD[b.d.status]||((a.d.daysLeft==
 const remIv=r=>'tiap '+[r.everyKm?fkm(r.everyKm)+' km':'',r.everyMonths?r.everyMonths+' bulan':''].filter(Boolean).join(' / ');
 function remLeft(d){const p=[];if(d.daysLeft!=null)p.push(d.daysLeft<0?'lewat '+(-d.daysLeft)+' hari':d.daysLeft===0?'jatuh tempo hari ini':d.daysLeft+' hari lagi');if(d.kmLeft!=null)p.push(d.kmLeft<0?'lewat '+fkm(-d.kmLeft)+' km':fkm(d.kmLeft)+' km lagi');return p.join(' · ')}
 function remNext(r,d){const a=[];if(d.dueDate)a.push(fdate(d.dueDate));if(d.dueKm)a.push(fkm(d.dueKm)+' km');return a.length?(r.kind==='pajak'?'Bayar lagi: ':'Service lagi: ')+a.join(' atau '):'Isi odometer terakhir supaya jadwal km bisa dihitung'}
-function remRow(x){const r=x.r,d=x.d,l=remLeft(d);
-  return `<div class="vrem"><div class="vm"><div class="vt">${esc(r.name)} <span class="vi">(${esc(remIv(r))})</span></div><div class="vs">Terakhir ${fdate(r.lastDate)}${r.lastKm?' · '+fkm(r.lastKm)+' km':''}${r.lastCost?' · '+rp(r.lastCost):''}</div><div class="vs">${remNext(r,d)}</div>${l?`<div class="vs">${l}</div>`:''}<div class="vbtns"><button class="pri" data-act="remDone" data-id="${r.id}">Sudah dilakukan</button><button data-act="remEdit" data-id="${r.id}">Ubah</button></div></div><span class="vstat ${d.status}">${STAT_LAB[d.status]}</span></div>`}
-function vehCard(v){const rs=S.reminders.filter(r=>r.vehicle===v.id).map(r=>({r,d:remInfo(r)})).sort(remSort);
-  return `<div class="card"><h2><span>${esc(v.name)} <span class="badge">${v.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="vehEdit" data-id="${v.id}" aria-label="Ubah kendaraan">${ic('edit',18)}</button></h2><div class="sub">${v.plate?esc(v.plate)+' · ':''}Odometer ${v.odo?fkm(v.odo)+' km':'belum diisi'}${v.odoDate?' (per '+fdate(v.odoDate)+')':''}</div><div class="vbtns"><button class="pri" data-act="odo" data-id="${v.id}">Update odometer</button><button data-act="remAdd" data-id="${v.id}">+ Pengingat</button></div>${rs.length?rs.map(remRow).join(''):'<p class="sub" style="margin-top:12px">Belum ada pengingat. Tekan + Pengingat untuk mulai.</p>'}</div>`}
-function vehView(){const back='<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>';
-  if(!S.vehicles.length)return back+`<div class="card empty">${ic('veh',34)}<b>Belum ada kendaraan</b>Tambah motor atau mobil, lalu pasang pengingat servis dan pajak.</div><button class="btn" data-act="vehEdit">+ Tambah kendaraan</button>`;
-  return back+S.vehicles.map(vehCard).join('')+`<button class="btn sec" data-act="vehEdit">+ Tambah kendaraan</button><p class="sub" style="margin-top:12px">Kendaraan pribadi hanya terlihat olehmu. Kendaraan bersama terlihat RAMA dan DESY. Status Segera = sisa 30 hari atau 300 km.</p>`}
+function remRow(x){const r=x.r,d=x.d,l=remLeft(d),tn=hxTone(d.status);
+  let u=0;if(d.daysLeft!=null&&r.everyMonths)u=Math.max(u,1-d.daysLeft/(r.everyMonths*30.4));if(d.kmLeft!=null&&r.everyKm)u=Math.max(u,1-d.kmLeft/r.everyKm);u=Math.max(0,Math.min(1,u))*100;
+  return `<div class="hx-rem hx-${tn}"><div class="hx-rt"><b>${esc(r.name)}</b><span class="vstat ${d.status}">${STAT_LAB[d.status]}</span></div><div class="hx-meter" title="Pemakaian jadwal"><i style="width:${u}%"></i></div><div class="hx-rl">${l||remNext(r,d)}</div><div class="hx-rs">${esc(remIv(r))} · terakhir ${fdate(r.lastDate)}${r.lastKm?' · '+fkm(r.lastKm)+' km':''}${r.lastCost?' · '+rp(r.lastCost):''}</div><div class="hx-rs">${l?remNext(r,d):''}</div><div class="vbtns"><button class="pri" data-act="remDone" data-id="${r.id}">Sudah dilakukan</button><button data-act="remEdit" data-id="${r.id}">Ubah</button></div></div>`}
+function vehCard(v){const rs=S.reminders.filter(r=>r.vehicle===v.id).map(r=>({r,d:remInfo(r)})).sort(remSort),tn=rs.length?hxTone(rs[0].d.status):'acc';
+  return `<div class="card hx-card hx-${tn}"><div class="hx-row"><span class="hx-chip">${ic('veh',22)}</span><div class="hx-tt"><h3>${esc(v.name)}</h3>${hxBadge(v.scope)}</div>${v.plate?`<span class="hx-plate">${esc(v.plate)}</span>`:''}<button class="del" data-act="vehEdit" data-id="${v.id}" aria-label="Ubah kendaraan">${ic('edit',18)}</button></div><div class="hx-odo"><b>${v.odo?fkm(v.odo):'–'}</b><span>km${v.odoDate?' · per '+fdate(v.odoDate):' · odometer belum diisi'}</span></div><div class="vbtns"><button class="pri" data-act="odo" data-id="${v.id}">Update odometer</button><button data-act="remAdd" data-id="${v.id}">+ Pengingat</button></div>${rs.length?`<div class="hx-list">${rs.map(remRow).join('')}</div>`:'<p class="sub" style="margin-top:12px">Belum ada pengingat. Tekan + Pengingat untuk mulai.</p>'}</div>`}
+function vehView(){const back='<button class="link hx-back" data-act="tab" data-t="home">← Kembali ke Home</button>';
+  const head=hxHead('Kendaraan &amp; pajak','Jadwal servis, pajak, plat, SIM, dan asuransi.');
+  if(!S.vehicles.length)return back+head+`<div class="card empty">${ic('veh',34)}<b>Belum ada kendaraan</b>Tambah motor atau mobil, lalu pasang pengingat servis dan pajak.</div><button class="btn" data-act="vehEdit">+ Tambah kendaraan</button>`;
+  const c={terlambat:0,segera:0};S.reminders.forEach(r=>{const s=remInfo(r).status;if(c[s]!==undefined)c[s]++});
+  return back+head+hxStats([[S.vehicles.length,'Kendaraan','acc'],[c.terlambat,'Terlambat','out'],[c.segera,'Segera','warn']])+S.vehicles.map(vehCard).join('')+`<button class="btn sec" data-act="vehEdit">+ Tambah kendaraan</button><p class="sub" style="margin-top:12px">Kendaraan pribadi hanya terlihat olehmu. Status Segera = sisa 30 hari atau 300 km.</p>`}
 function vehBanner(){if(!S.vehicles.length||!S.reminders.length)return '';const c={terlambat:0,segera:0};S.reminders.forEach(r=>{const s=remInfo(r).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
   return `<div class="card" data-act="tab" data-t="veh" style="cursor:pointer"><h2>Servis &amp; pajak <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
 function vehSheet(id){const v=id?vehOf(id):null;if(id&&!v)return;const x=v||{name:'',plate:'',odo:0};
@@ -1660,12 +1923,14 @@ const billRow=b=>({id:b.id,name:b.name,amount:b.amount||0,scope:b.scope,owner:b.
 const billRep=b=>b.repeat==='monthly'?'tiap bulan tgl '+(b.dueDay||dueParse_(b.nextDue).d):b.repeat==='yearly'?'tiap tahun':'sekali bayar';
 const billRem=b=>{const r=billRemindParse_(b.remind);return r.length?r.map(x=>(x.d?'H-'+x.d:'Hari-H')+' '+x.t.replace(':','.')).join(' · '):'Belum ada pengingat'};
 function billLeft(i){return i.daysLeft==null?'':i.daysLeft<0?'lewat '+(-i.daysLeft)+' hari':i.daysLeft===0?'jatuh tempo hari ini':i.daysLeft+' hari lagi'}
-function billCard(b){const i=billInfo_(b,todayIso()),l=billLeft(i);
-  return `<div class="card"><h2><span>${esc(b.name)} <span class="badge">${b.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="billEdit" data-id="${b.id}" aria-label="Ubah tagihan">${ic('edit',18)}</button></h2><div class="vrem" style="border-top:0;margin-top:0;padding-top:4px"><div class="vm"><div class="vs">${b.amount?rp(b.amount)+' · ':''}${billRep(b)}</div>${+b.done?`<div class="vs">Lunas${b.lastPaid?' · dibayar '+fdate(b.lastPaid):''}</div>`:`<div class="vs">Jatuh tempo ${fdate(b.nextDue)}${l?' · '+l:''}</div><div class="vs">Pengingat: ${billRem(b)}</div>`}</div><span class="vstat ${i.status}">${BILL_LAB[i.status]}</span></div><div class="vbtns">${+b.done?'':`<button class="pri" data-act="billPay" data-id="${b.id}">Sudah dibayar</button>`}<button data-act="billHist" data-id="${b.id}">Riwayat</button></div></div>`}
-function billView(){const back='<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>',T=todayIso();
-  if(!S.bills.length)return back+`<div class="card empty">${ic('veh',34)}<b>Belum ada tagihan</b>Tambah listrik, internet, cicilan, atau tagihan lain, lalu atur jam pengingatnya sendiri.</div><button class="btn" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button>`;
+function billCard(b){const i=billInfo_(b,todayIso()),l=billLeft(i),tn=hxTone(i.status),dd=b.nextDue||'';
+  return `<div class="card hx-card hx-${tn}"><div class="hx-bill"><div class="hx-date">${+b.done?`<b>${ic('sparkle',20)}</b><span>Lunas</span>`:`<b>${+dd.slice(8,10)||'–'}</b><span>${MON[+dd.slice(5,7)-1]||''}</span>`}</div><div class="hx-bm"><div class="hx-rt"><b class="hx-bn">${esc(b.name)}</b><button class="del" data-act="billEdit" data-id="${b.id}" aria-label="Ubah tagihan">${ic('edit',18)}</button></div><div class="hx-amt" style="margin:2px 0">${b.amount?rp(b.amount):'Nominal belum diisi'}</div><div class="hx-rs">${billRep(b)} · ${hxBadge(b.scope)}</div>${+b.done?`<div class="hx-rs">${b.lastPaid?'Dibayar '+fdate(b.lastPaid):'Sudah lunas'}</div>`:`<div class="hx-rl" style="margin-top:6px">${l||'Jatuh tempo'} <span class="vstat ${i.status}" style="margin-left:4px">${BILL_LAB[i.status]}</span></div><div class="hx-rs">Pengingat: ${billRem(b)}</div>`}</div></div><div class="vbtns">${+b.done?'':`<button class="pri" data-act="billPay" data-id="${b.id}">Sudah dibayar</button>`}<button data-act="billHist" data-id="${b.id}">Riwayat</button></div></div>`}
+function billView(){const back='<button class="link hx-back" data-act="tab" data-t="home">← Kembali ke Home</button>',T=todayIso();
+  const head=hxHead('Tagihan &amp; pengingat','Listrik, internet, cicilan. Alarm sesuai jam pilihanmu.');
+  if(!S.bills.length)return back+head+`<div class="card empty">${ic('receipt',34)}<b>Belum ada tagihan</b>Tambah listrik, internet, cicilan, atau tagihan lain, lalu atur jam pengingatnya sendiri.</div><button class="btn" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button>`;
   const ord={terlambat:0,segera:1,aman:2,lunas:3},rows=S.bills.map(b=>({b,i:billInfo_(b,T)})).sort((x,y)=>ord[x.i.status]-ord[y.i.status]||((x.i.daysLeft==null?1e9:x.i.daysLeft)-(y.i.daysLeft==null?1e9:y.i.daysLeft)));
-  return back+rows.map(x=>billCard(x.b)).join('')+`<button class="btn sec" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button><p class="sub" style="margin-top:12px">Tagihan pribadi hanya terlihat olehmu; tagihan bersama terlihat RAMA dan DESY. Alarm di jam pilihanmu dibunyikan aplikasi Notes Kelimaa (Lainnya › Two Pockets), jadi buka Notes sesekali agar jadwal terbaru terpasang. Status Segera = sisa 7 hari.</p>`}
+  const n=s=>rows.filter(x=>x.i.status===s).length;
+  return back+head+hxStats([[n('terlambat'),'Terlambat','out'],[n('segera'),'Segera','warn'],[rows.length-n('lunas'),'Aktif','acc']])+rows.map(x=>billCard(x.b)).join('')+`<button class="btn sec" data-act="billEdit">+ Tambah tagihan</button><button class="btn sec" data-act="billArc">Riwayat tagihan terhapus</button><p class="sub" style="margin-top:12px">Tagihan pribadi hanya terlihat olehmu; tagihan bersama terlihat RAMA dan DESY. Alarm dibunyikan aplikasi Notes Kelimaa (Lainnya › Two Pockets), jadi buka Notes sesekali agar jadwal terbaru terpasang. Status Segera = sisa 7 hari.</p>`}
 function billBanner(){if(!S.bills.length)return '';const c={terlambat:0,segera:0},T=todayIso();S.bills.forEach(b=>{const s=billInfo_(b,T).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
   return `<div class="card" data-act="tab" data-t="bill" style="cursor:pointer"><h2>Tagihan <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
 function billSheet(id){const b=id?S.bills.find(z=>z.id===id):null;if(id&&!b)return;
@@ -1746,17 +2011,18 @@ function debtInfo(d,T){const paid=debtPaidOf(d.id),left=Math.max(0,(Number(d.amo
   if(+d.closed||left<=0)return{paid,left:0,status:'lunas',daysLeft:null};
   if(!d.due)return{paid,left,status:'aman',daysLeft:null};
   const dl=dueDays_(d.due,T);return{paid,left,status:dl<0?'terlambat':dl<=7?'segera':'aman',daysLeft:dl}}
-function debtCard(d){const T=todayIso(),i=debtInfo(d,T),u=d.kind==='utang',pct=d.amount?Math.min(100,i.paid/d.amount*100):0;
+function debtCard(d){const T=todayIso(),i=debtInfo(d,T),u=d.kind==='utang',pct=d.amount?Math.min(100,i.paid/d.amount*100):0,tn=i.status==='lunas'?'mut':u?'out':'in';
   const dueTxt=i.status==='lunas'?'':(d.due?'Jatuh tempo '+fdate(d.due)+(i.daysLeft==null?'':' · '+billLeft(i)):'Tanpa jatuh tempo');
-  return `<div class="card"><h2><span>${esc(d.person)} <span class="badge">${d.scope==='private'?ic('lock',12)+' Pribadi':'Bersama'}</span></span> <button class="del" data-act="debtEdit" data-id="${d.id}" aria-label="Ubah catatan">${ic('edit',18)}</button></h2><div class="vrem" style="border-top:0;margin-top:0;padding-top:4px"><div class="vm"><div class="vs"><b>${i.status==='lunas'?'Lunas · total '+rp(d.amount):'Sisa '+rp(i.left)+' dari '+rp(d.amount)}</b></div><div class="vs">Dicatat ${fdate(d.date)}${i.paid&&i.status!=='lunas'?' · sudah '+(u?'dibayar ':'diterima ')+rp(i.paid):''}</div>${dueTxt?`<div class="vs">${dueTxt}</div>`:''}${d.note?`<div class="vs">${esc(d.note)}</div>`:''}</div><span class="vstat ${i.status}">${DEBT_LAB[i.status]}</span></div><div class="track" style="margin:8px 0"><div class="fill" style="width:${pct}%;background:var(--pink)"></div></div><div class="vbtns">${i.status==='lunas'?'':`<button class="pri" data-act="debtPay" data-id="${d.id}">${u?'Bayar / cicil':'Terima cicilan'}</button>`}<button data-act="debtHist" data-id="${d.id}">Riwayat</button></div></div>`}
-function debtView(){const back='<button class="link" data-act="tab" data-t="acc">← Kembali ke Accounts</button>',T=todayIso();
+  return `<div class="card hx-card hx-${tn}"><div class="hx-row"><span class="hx-av">${esc((d.person||'?').trim()[0]||'?').toUpperCase()}</span><div class="hx-tt"><h3>${esc(d.person)}</h3>${hxBadge(d.scope)}</div><span class="vstat ${i.status}">${DEBT_LAB[i.status]}</span><button class="del" data-act="debtEdit" data-id="${d.id}" aria-label="Ubah catatan">${ic('edit',18)}</button></div><div class="hx-amt">${i.status==='lunas'?'Lunas · '+rp(d.amount):rp(i.left)}</div><div class="hx-rs">${i.status==='lunas'?'':'sisa dari '+rp(d.amount)+' · '}dicatat ${fdate(d.date)}${i.paid&&i.status!=='lunas'?' · sudah '+(u?'dibayar ':'diterima ')+rp(i.paid):''}</div><div class="hx-meter"><i style="width:${pct}%"></i></div>${dueTxt?`<div class="hx-rl">${dueTxt}</div>`:''}${d.note?`<div class="hx-rs">${esc(d.note)}</div>`:''}<div class="vbtns">${i.status==='lunas'?'':`<button class="pri" data-act="debtPay" data-id="${d.id}">${u?'Bayar / cicil':'Terima cicilan'}</button>`}<button data-act="debtHist" data-id="${d.id}">Riwayat</button></div></div>`}
+function debtView(){const back='<button class="link hx-back" data-act="tab" data-t="home">← Kembali ke Home</button>',T=todayIso();
+  const head=hxHead('Utang &amp; piutang','Pinjaman yang kamu bayar dan yang akan dibayar ke kamu.');
   const addBtn='<button class="btn" data-act="debtEdit">+ Tambah utang / piutang</button>';
-  if(!S.debts.length)return back+`<div class="card empty">${ic('wallet',34)}<b>Belum ada utang atau piutang</b>Catat uang yang kamu pinjam dari orang lain (utang) atau yang kamu pinjamkan (piutang), lalu cicil sampai lunas.</div>`+addBtn;
+  if(!S.debts.length)return back+head+`<div class="card empty">${ic('wallet',34)}<b>Belum ada utang atau piutang</b>Catat uang yang kamu pinjam dari orang lain (utang) atau yang kamu pinjamkan (piutang), lalu cicil sampai lunas.</div>`+addBtn;
   const left=k=>S.debts.filter(d=>d.kind===k).reduce((t,d)=>t+debtInfo(d,T).left,0);
   const ord={terlambat:0,segera:1,aman:2,lunas:3};
   const grp=(k,title,hint)=>{const l=S.debts.filter(d=>d.kind===k).map(d=>({d,i:debtInfo(d,T)})).sort((x,y)=>ord[x.i.status]-ord[y.i.status]||((x.i.daysLeft==null?1e9:x.i.daysLeft)-(y.i.daysLeft==null?1e9:y.i.daysLeft)));
-    return l.length?`<h2 style="margin:14px 4px 4px">${title}</h2><p class="sub" style="margin:0 4px 10px">${hint}</p>`+l.map(x=>debtCard(x.d)).join(''):''};
-  return back+`<div class="row summary-row"><div class="card mini"><div class="lbl">Utang saya</div><div class="v out">${rp(left('utang'))}</div></div><div class="card mini"><div class="lbl">Piutang saya</div><div class="v in">${rp(left('piutang'))}</div></div></div>`+grp('utang','Utang saya','Uang yang harus kamu bayar ke orang lain.')+grp('piutang','Piutang saya','Uang yang orang lain harus bayar ke kamu.')+addBtn+`<p class="sub" style="margin-top:12px">Catatan pribadi hanya terlihat olehmu; catatan bersama terlihat RAMA dan DESY. Angka di atas = total sisa yang belum lunas. Status Segera = sisa 7 hari. Lewat Chat Bot kamu bisa bertanya ("utang saya berapa?"), mencatat ("catat utang ke Budi 100rb", "pinjemin Andi 200rb"), dan mencicil ("bayar utang Budi 50rb", "Andi bayar 100rb").</p>`}
+    return l.length?`<h2 style="margin:16px 4px 4px">${title}</h2><p class="sub" style="margin:0 4px 10px">${hint}</p>`+l.map(x=>debtCard(x.d)).join(''):''};
+  return back+head+`<div class="hx-duo"><div class="hx-st hx-out"><span>Utang saya</span><b>${rp(left('utang'))}</b></div><div class="hx-st hx-in"><span>Piutang saya</span><b>${rp(left('piutang'))}</b></div></div>`+grp('utang','Utang saya','Uang yang harus kamu bayar ke orang lain.')+grp('piutang','Piutang saya','Uang yang orang lain harus bayar ke kamu.')+addBtn+`<p class="sub" style="margin-top:12px">Catatan pribadi hanya terlihat olehmu; catatan bersama terlihat RAMA dan DESY. Lewat Chat Bot kamu bisa bertanya ("utang saya berapa?"), mencatat ("catat utang ke Budi 100rb") dan mencicil ("bayar utang Budi 50rb").</p>`}
 function debtBanner(){if(!S.debts||!S.debts.length)return '';const c={terlambat:0,segera:0},T=todayIso();S.debts.forEach(d=>{const s=debtInfo(d,T).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
   return `<div class="card" data-act="tab" data-t="debt" style="cursor:pointer"><h2>Utang &amp; piutang <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
 function debtSheet(id){const d=id?S.debts.find(z=>z.id===id):null;if(id&&!d)return;
@@ -1793,7 +2059,7 @@ function debtHistSheet(id){const d=S.debts.find(z=>z.id===id);if(!d)return;const
 document.addEventListener('click',e=>{
   if(e.target===ov&&!ov.classList.contains('dlg')){closeSheet();return}
   const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id,v=b.dataset.v;
-  if(a==='tab'){tab=b.dataset.t;pmenu=false;render();window.scrollTo(0,0)}
+  if(a==='tab'){tab=b.dataset.t;pmenu=false;render();window.scrollTo(0,0);osFocusChat()}
   else if(a==='logout')logout();else if(a==='reload'){load().then(r=>{if(r!==true&&/passcode/i.test(r))gate(r)})}else if(a==='add')txSheet();else if(a==='editTx')txSheet(id);else if(a==='close')closeSheet();else if(a==='settings')setSheet();else if(a==='themeToggle')setTheme(currentTheme()==='dark'?'light':'dark');
   else if(a==='ttype')ov.onclick2(v);
   else if(a==='hideToggle'){HIDE=!HIDE;LS.set('tp_hide',HIDE?'1':'0');syncHide();render()}
@@ -1811,9 +2077,13 @@ document.addEventListener('click',e=>{
   else if(a==='freset'){F={type:'all',cat:'',acc:'',q:'',month:'',day:''};P.mode=pDef();P.off=0;pmenu=false;render()}
   else if(a==='del'){const tx0=S.transactions.find(t=>t.id===id),ng=tx0?negCheck([{acc:tx0.acc,delta:-eff(tx0)}]):'';if(ng){toast(ng);return}confirmBox('Transaksi ini akan dihapus dari daftar.',()=>{S.transactions=S.transactions.filter(t=>t.id!==id);drop('Transactions',id);render();toast('Transaksi dihapus')})}
   else if(a==='editAcc')accSheet(id);else if(a==='addDate')dateSheet();
+  else if(a==='dtab'){DT=v;render();window.scrollTo(0,0);osFocusChat()}
+  else if(a==='noteEdit')noteSheet(id);
+  else if(a==='duoSend')duoSend();else if(a==='duoChip')duoSend(v);
+  else if(a==='duoDel')confirmBox('Pesan ini akan dihapus untuk berdua.',()=>duoDelete(id));
   else if(a==='editGoal')goalSheet(id);else if(a==='addDep')depSheet(id);else if(a==='vehEdit')vehSheet(id);else if(a==='odo')odoSheet(id);else if(a==='remAdd')remSheet(id,'');else if(a==='remEdit')remSheet('',id);else if(a==='remDone')doneSheet(id);else if(a==='billEdit')billSheet(id);else if(a==='billPay')billPaySheet(id);else if(a==='billHist')billHistSheet(id);else if(a==='billArc')billArcSheet();else if(a==='debtEdit')debtSheet(id);else if(a==='debtPay')debtPaySheet(id);else if(a==='debtHist')debtHistSheet(id);
   else if(a==='delDep')confirmBox('Setoran ini akan dihapus.',()=>{const g=S.goals.find(x=>x.id===id);g.deps=g.deps.filter(d=>d.id!==b.dataset.d);drop('Deposits',b.dataset.d);render()});
-  else if(a==='delDate')confirmBox('Tanggal spesial ini akan dihapus.',()=>{S.dates=S.dates.filter(d=>d.id!==id);drop('Dates',id);render()});
+  else if(a==='delDate')confirmBox('Hari spesial ini akan dihapus.',()=>{S.dates=S.dates.filter(d=>d.id!==id);drop('Dates',id);render()});
   else if(a==='delCat'){if(S.transactions.some(t=>t.cat===id)){toast('Kategori masih dipakai transaksi');return}S.categories=S.categories.filter(c=>c.id!==id);drop('Categories',id);setSheet();render()}
   else if(a==='cSend')chatSend();
   else if(a==='cChip'){const i=$('#chatIn');if(i){i.value=v;i.focus()}}
@@ -1846,6 +2116,10 @@ document.addEventListener('change',e=>{if(e.target.id==='pacc'){F.acc=e.target.v
 window.__booted=1;$('#gear').innerHTML=ic('gear',22);syncHide();syncThemeButton();$('#fab').innerHTML=ic('plus',28);
 render();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&!pend&&ov.classList.contains('hide'))load()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){duoLeave();clearTimeout(duo.t);duo.t=null}else if(duo.run&&loaded)duoSchedule(0)});
+window.addEventListener('pagehide',()=>duoLeave());
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='duoIn'&&!e.isComposing){e.preventDefault();duoSend()}});
+document.addEventListener('input',e=>{if(e.target.id==='duoIn')duo.draft=e.target.value});
 /* Keyboard HP V11 CLEAN
    Alur tunggal: pensil -> tampilkan composer -> focus input -> keyboard.
    Posisi composer mengikuti visualViewport saat keyboard mengubah area terlihat. */
