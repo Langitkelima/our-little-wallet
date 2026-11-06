@@ -1194,6 +1194,7 @@ function chatHtml(){
     else if(m.k==='dcard')h+=dCard(m,i);
     else if(m.k==='ucard')h+=chatEditCard(m,i);
     else if(m.k==='bcard')h+=chatBillCard(m,i);
+    else if(m.k==='dbtcard')h+=chatDebtCard(m,i);
     else if(m.k==='acard')h+=aCard(m,i);
     else if(m.k==='all'){const n=CHAT.filter(x=>x.k==='card'&&x.g===m.g&&x.st==='new').length;if(n>1)h+=`<div class="callrow"><button type="button" class="cb pri" data-act="cAll" data-g="${m.g}">Simpan semua (${n})</button></div>`}
   });
@@ -1205,7 +1206,7 @@ function chatSync(){const has=$('#chatbar');
   if(tab!=='chat'||!loaded){if(has)has.remove();return}
   if(has){chatDraw();return}
   const d=document.createElement('div');d.id='chatbar';d.className='chatbar';
-  d.innerHTML=`<div class="chatbar-in"><div class="cchips">${['Makan bakso 15rb','Bensin 50000','Gaji bulanan 8jt','Summary minggu ini'].map(t=>`<button type="button" class="cchip" data-act="cChip" data-v="${esc(t)}">${esc(t)}</button>`).join('')+`<button type="button" class="cchip" data-act="cTrf">⇄ Transfer</button>`}</div><div class="cform"><input id="chatIn" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Ketik transaksi, tagihan, atau tanya…"><button type="button" class="csend" id="chatBtn" data-act="cSend" aria-label="Kirim">${ic('send',20)}</button></div></div>`;
+  d.innerHTML=`<div class="chatbar-in"><div class="cchips">${['Makan bakso 15rb','Bensin 50000','Gaji bulanan 8jt','Summary minggu ini'].map(t=>`<button type="button" class="cchip" data-act="cChip" data-v="${esc(t)}">${esc(t)}</button>`).join('')+`<button type="button" class="cchip" data-act="cTrf">⇄ Transfer</button>`}</div><div class="cform"><input id="chatIn" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="Ketik transaksi, tagihan, utang, atau tanya…"><button type="button" class="csend" id="chatBtn" data-act="cSend" aria-label="Kirim">${ic('send',20)}</button></div></div>`;
   document.body.appendChild(d);chatDraw()}
 const chatOk=it=>it&&S.categories.some(c=>c.id===it.cat)&&S.accounts.some(a=>a.id===it.acc)&&Number(it.amount)>0&&/^\d{4}-\d{2}-\d{2}$/.test(String(it.date||''));
 function chatTxEqual(a,b){
@@ -1232,7 +1233,7 @@ function chatUpdateOk(u){
 }
 async function chatSend(){
   if(chatBusy)return;const inp=$('#chatIn');if(!inp)return;const text=inp.value.trim();if(!text)return;
-  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.priv?'(info saldo ditampilkan)':m.text}));
+  const history=CHAT.filter(m=>m.k==='me'||(m.k==='bot'&&!m.err)).slice(-6).map(m=>({r:m.k==='me'?'me':'bot',t:m.priv?(m.k==='me'?'(pesan pribadi)':'(info pribadi ditampilkan)'):m.text}));
   inp.value='';chatBusy=true;CHAT.push({k:'me',text});CHAT.push({k:'typing'});chatDraw();
   try{
     const r=await call({action:'parseChat',text,history});
@@ -1241,6 +1242,8 @@ async function chatSend(){
     const summary=chatSummaryOk(res.summary)?res.summary:null;
     const updates=(res.updates||[]).filter(chatUpdateOk);
     const billActions=Array.isArray(res.billActions)?res.billActions:[];
+    const debtActions=Array.isArray(res.debtActions)?res.debtActions:[];
+    if(res.privateReply){const mm=CHAT.filter(x=>x.k==='me').pop();if(mm)mm.priv=true}
     const visibleGoalIds=new Set(S.goals.map(x=>String(x.id)));
     const deposits=(res.deposits||[]).filter(d=>d&&visibleGoalIds.has(String(d.goal))&&Math.round(Number(d.amount))>0&&Math.round(Number(d.amount))<=999999999999&&/^\d{4}-\d{2}-\d{2}$/.test(String(d.date||''))).map(d=>({goal:String(d.goal),amount:Math.round(Number(d.amount)),date:String(d.date),note:String(d.note||'').trim().slice(0,60)}));
     const hasAcc=id=>S.accounts.some(a=>a.id===id);
@@ -1256,8 +1259,9 @@ async function chatSend(){
     dels.forEach(t=>CHAT.push({k:'dcard',st:'new',tx:{id:t.id,date:t.date,type:t.type,amount:t.amount,desc:t.desc,acc:t.acc,cat:t.cat,note:t.note||''}}));
     updates.forEach(u=>CHAT.push({k:'ucard',st:'new',old:u.old,next:u.next,linked:u.linked||[],transfer:!!u.transfer}));
     billActions.forEach(a=>CHAT.push({k:'bcard',st:['view','history'].includes(a.op)?'done':'new',...a}));
+    debtActions.filter(a=>a&&(a.op==='add'||a.op==='pay')&&Number(a.amount)>0).forEach(a=>CHAT.push({k:'dbtcard',st:'new',acc:'',...a}));
     if(items.length+trfs.length>1)CHAT.push({k:'all',g});
-    if(!res.reply&&!summary&&!deposits.length&&!items.length&&!trfs.length&&!dels.length&&!updates.length&&!accs.length&&!billActions.length)CHAT.push({k:'bot',text:'Aku belum nangkap maksudnya. Coba tulis transaksi seperti "Makan bakso 15rb", edit seperti "Ubah transaksi bakso jadi 20rb", setoran seperti "Nabung 100rb ke Liburan", atau ringkasan seperti "summary minggu ini".'});
+    if(!res.reply&&!summary&&!deposits.length&&!items.length&&!trfs.length&&!dels.length&&!updates.length&&!accs.length&&!billActions.length&&!debtActions.length)CHAT.push({k:'bot',text:'Aku belum nangkap maksudnya. Coba tulis transaksi seperti "Makan bakso 15rb", edit seperti "Ubah transaksi bakso jadi 20rb", setoran seperti "Nabung 100rb ke Liburan", atau ringkasan seperti "summary minggu ini".'});
   }catch(e){
     CHAT=CHAT.filter(m=>m.k!=='typing');CHAT.push({k:'bot',err:1,text:'Gagal: '+e.message});
     if(/passcode/i.test(e.message))resync(e.message);
@@ -1354,6 +1358,41 @@ async function chatBillSave(i){
   chatDraw();
 }
 function chatBillNo(i){const m=CHAT[i];if(!m||m.k!=='bcard'||m.st!=='new')return;m.st='cancel';chatDraw()}
+
+// ===== Kartu utang/piutang di chatbot (draf dari server; baru tersimpan setelah dikonfirmasi) =====
+const DKL={utang:'Utang saya',piutang:'Piutang saya'};
+function chatDebtCard(m,i){const st=m.st||'new',u=m.kind==='utang';
+  const foot=st==='new'?`<div class="cact"><button type="button" class="cb pri" data-act="cDebtSave" data-i="${i}">${m.op==='pay'?'Konfirmasi cicilan':'Simpan catatan'}</button><button type="button" class="cb gh" data-act="cDebtNo" data-i="${i}">Batal</button></div>`:st==='saving'?'<div class="cst">Menyimpan…</div>':st==='saved'?'<div class="cst ok">✓ Tersimpan</div>':'<div class="cst">Dibatalkan</div>';
+  const accSel=st==='new'?`<label style="display:block;margin:8px 0 4px">Catat ke akun (opsional)</label><select class="dbsel" data-i="${i}" data-f="acc" style="width:100%"><option value="">Tidak dicatat ke akun</option>${S.accounts.map(a=>`<option value="${a.id}" ${m.acc===a.id?'selected':''}>${esc(a.name)}</option>`).join('')}</select><div class="cnote">${m.op==='pay'?'Utang: uang keluar dari akun. Piutang: uang masuk ke akun.':'Utang: uang masuk ke akun. Piutang: uang keluar dari akun.'}</div>`:'';
+  if(m.op==='pay'){const after=Math.max(0,m.left-m.amount);
+    return `<div class="ccard ${st}" data-dbi="${i}"><div class="ct"><span class="cn">${esc(m.person)}</span><span class="ca">${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill">${u?'Bayar utang':'Terima cicilan'}</span><span>${fdate(m.date)}</span><span>Sisa ${rpRaw(m.left)} → ${m.lunas?'Lunas':rpRaw(after)}</span><span>${m.scope==='shared'?'Bersama':'Pribadi'}</span></div>${accSel}${foot}</div>`}
+  const sels=st==='new'?`<label style="display:block;margin:8px 0 4px">Jenis</label><select class="dbsel" data-i="${i}" data-f="kind" style="width:100%"><option value="utang" ${m.kind==='utang'?'selected':''}>Utang saya (aku meminjam, nanti aku bayar)</option><option value="piutang" ${m.kind==='piutang'?'selected':''}>Piutang saya (aku meminjamkan)</option></select><label style="display:block;margin:8px 0 4px">Siapa yang bisa melihat</label><select class="dbsel" data-i="${i}" data-f="scope" style="width:100%"><option value="private" ${m.scope!=='shared'?'selected':''}>Pribadi (hanya aku)</option><option value="shared" ${m.scope==='shared'?'selected':''}>Bersama (RAMA dan DESY)</option></select>`:'';
+  return `<div class="ccard ${st}" data-dbi="${i}"><div class="ct"><span class="cn">${esc(m.person)}</span><span class="ca">${rpRaw(m.amount)}</span></div><div class="cm"><span class="cpill" data-dbk>${DKL[m.kind]||''}</span><span>${fdate(m.date)}</span>${m.due?`<span>Jatuh tempo ${fdate(m.due)}</span>`:''}<span data-dbs>${m.scope==='shared'?'Bersama':'Pribadi'}</span></div>${sels}${accSel}${foot}</div>`}
+async function chatDebtSave(i){
+  const m=CHAT[i];if(!m||m.k!=='dbtcard'||m.st!=='new')return;
+  const acc=m.acc||'';
+  if(acc&&((m.op==='add'&&m.kind==='piutang')||(m.op==='pay'&&m.kind==='utang'))){const ng=negCheck([{acc,delta:-m.amount}]);if(ng){toast(ng);return}}
+  m.st='saving';chatDraw();
+  try{
+    if(m.op==='add'){
+      m.rowId=m.rowId||uid();
+      await call({action:'debtAdd',acc,row:{id:m.rowId,kind:m.kind,person:m.person,amount:m.amount,date:m.date,due:m.due||'',note:'',scope:m.scope==='shared'?'shared':'private',closed:0}});
+    }else{
+      m.paymentId=m.paymentId||uid();
+      await call({action:'debtPaid',debt:m.debt,paymentId:m.paymentId,date:m.date,amount:m.amount,payAcc:acc,note:''});
+    }
+    m.st='saved';
+    await load();
+    toast(m.op==='pay'?(m.lunas?'Lunas ♡':'Cicilan tercatat'):'Catatan tersimpan');
+  }catch(e){m.st='new';toast('Gagal: '+e.message)}
+  chatDraw();
+}
+function chatDebtNo(i){const m=CHAT[i];if(!m||m.k!=='dbtcard'||m.st!=='new')return;m.st='cancel';chatDraw()}
+document.addEventListener('change',e=>{const t=e.target;if(!t.classList||!t.classList.contains('dbsel'))return;
+  const m=CHAT[+t.dataset.i];if(!m||m.k!=='dbtcard'||m.st!=='new')return;m[t.dataset.f]=t.value;
+  const c=t.closest('.ccard');if(!c)return;
+  if(t.dataset.f==='kind'){const p=c.querySelector('[data-dbk]');if(p)p.textContent=DKL[m.kind]||''}
+  if(t.dataset.f==='scope'){const p=c.querySelector('[data-dbs]');if(p)p.textContent=m.scope==='shared'?'Bersama':'Pribadi'}});
 
 function chatUpdateNo(i){const m=CHAT[i];if(!m||m.k!=='ucard'||m.st!=='new')return;m.st='cancel';chatDraw()}
 function chatSaveAll(g){let n=0;CHAT.forEach(m=>{if(m.k==='card'&&m.g===g&&m.st==='new'){if(m.type==='trf'){const ng=negCheck([{acc:m.from,delta:-m.amount},{acc:m.to,delta:m.amount}]);if(ng){toast(ng);return}m.st='saved';putTrf(m);n++}else if(chatPut(m)!==false)n++}});chatDraw();if(n)toast(n+' transaksi ditambahkan')}
@@ -1658,11 +1697,44 @@ function billPayRows(list,showName){return list.map(p=>`<div style="padding:10px
 function billHistSheet(id){const b=S.bills.find(z=>z.id===id);if(!b)return;
   const list=(S.billpay||[]).filter(p=>p.bill===id).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:0),total=list.reduce((t,p)=>t+(Number(p.amount)||0),0);
   sheet('Riwayat pembayaran',`<p class="sub">${esc(b.name)}${list.length?' · '+list.length+' pembayaran · total '+rp(total):''}</p>${list.length?billPayRows(list,false):'<p class="sub">Belum ada pembayaran yang tercatat. Pembayaran lewat tombol Sudah dibayar atau chatbot akan muncul di sini. Pembayaran sebelum fitur riwayat dipasang tidak tercatat.</p>'}`)}
+// ----- Ekspor CSV (titik-koma, UTF-8 + BOM; terbuka rapi di Excel Indonesia dan Google Sheets) -----
+const csvCell=v=>{let t=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(t))t="'"+t;return /[";\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t};
+const csvText=rows=>'\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n');
+function arcCsvRows(list){return [['Tagihan','Tanggal bayar','Periode jatuh tempo','Nominal','Akun','Dibayar oleh','Cakupan','Catatan','ID tagihan','ID pembayaran']].concat(list.map(p=>[p.billName||'',p.date||'',p.periodDue||'',Math.round(Number(p.amount)||0),p.accountName||'',p.by||'',p.scope==='shared'?'Bersama':p.scope==='private'?'Pribadi':'Pribadi (data lama)',p.note||'',p.bill||'',p.id||'']))}
+async function csvShare(name,text){
+  const blob=new Blob([text],{type:'text/csv;charset=utf-8'});
+  try{if(typeof File==='function'&&navigator.canShare&&navigator.share){const f=new File([blob],name,{type:'text/csv'});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return 'share'}}}catch(e){if(e&&e.name==='AbortError')return 'abort'}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{try{URL.revokeObjectURL(a.href)}catch(_){}a.remove()},4000);return 'download'}catch(e){}
+  return 'fail'}
+async function csvCopy(text){
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text.replace(/^\uFEFF/,''));return true}}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=text.replace(/^\uFEFF/,'');ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand('copy');ta.remove();return !!ok}catch(e){return false}}
+async function arcFull(){const r=await call({action:'billArchive',all:true});return r.history||[]}
+function arcStamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())}
 async function billArcSheet(){
   sheet('Riwayat tagihan terhapus','<p class="sub">Memuat riwayat…</p>');
   try{const r=await call({action:'billArchive'}),list=r.history||[];
     if(!ov.innerHTML.includes('Memuat riwayat'))return;
-    sheet('Riwayat tagihan terhapus',`<p class="sub">Pembayaran dari tagihan yang sudah dihapus. Tagihan bersama terlihat RAMA dan DESY; tagihan pribadi hanya terlihat oleh yang membayar. Riwayat lama yang cakupannya belum diketahui hanya tampil untuk yang membayar.${list.length?' '+list.length+' pembayaran.':''}</p>${list.length?billPayRows(list,true):'<p class="sub">Belum ada riwayat dari tagihan yang sudah dihapus.</p>'}`)}
+    const names={};list.forEach(p=>{names[p.bill]=p.billName||'Tagihan'});
+    const opts=Object.keys(names).map(id=>`<option value="${esc(id)}">${esc(names[id])} (${list.filter(p=>p.bill===id).length})</option>`).join('');
+    const tools=list.length?`<button class="btn" id="arc-dl">Unduh CSV</button><button class="btn sec" id="arc-cp">Salin CSV</button><div class="err" id="e-arc"></div><label for="arc-sel" style="margin-top:14px">Hapus riwayat satu tagihan</label><select id="arc-sel"><option value="">Pilih tagihan…</option>${opts}</select><button class="btn sec" id="arc-del1">Hapus riwayat tagihan ini</button><button class="btn dng" id="arc-delall">Hapus semua riwayat terhapus</button><p class="sub">Penghapusan permanen dan tidak bisa dibatalkan. Riwayat bersama terhapus untuk RAMA dan DESY; riwayat pribadi hanya milik pembayarnya. Unduh atau salin CSV dulu kalau ingin disimpan. Kalau unduhan tidak muncul di aplikasi, pakai Salin CSV lalu tempel di Google Sheets.</p>`:'';
+    sheet('Riwayat tagihan terhapus',`<p class="sub">Pembayaran dari tagihan yang sudah dihapus. Tagihan bersama terlihat RAMA dan DESY; tagihan pribadi hanya terlihat oleh yang membayar. Riwayat lama yang cakupannya belum diketahui hanya tampil untuk yang membayar.${list.length?' '+list.length+' pembayaran'+(list.length>=200?' (menampilkan 200 terbaru; CSV memuat semuanya)':'')+'.':''}</p>${list.length?billPayRows(list,true):'<p class="sub">Belum ada riwayat dari tagihan yang sudah dihapus.</p>'}${tools}`);
+    if(!list.length)return;
+    const busy=(id,on,txt)=>{const b=$('#'+id);if(b){b.disabled=on;if(txt)b.textContent=txt}};
+    $('#arc-dl').onclick=async()=>{busy('arc-dl',true,'Menyiapkan…');setErr('arc','');
+      try{const all=await arcFull(),res=await csvShare('riwayat-tagihan-terhapus-'+arcStamp()+'.csv',csvText(arcCsvRows(all)));
+        if(res==='fail'){setErr('arc','Unduhan tidak didukung di sini. Pakai Salin CSV lalu tempel di Google Sheets.')}
+        else if(res==='download')toast('Unduhan dimulai. Kalau tidak muncul, pakai Salin CSV')}
+      catch(e){setErr('arc','Gagal: '+e.message)}
+      busy('arc-dl',false,'Unduh CSV')};
+    $('#arc-cp').onclick=async()=>{busy('arc-cp',true,'Menyiapkan…');setErr('arc','');
+      try{const all=await arcFull(),ok=await csvCopy(csvText(arcCsvRows(all)));if(ok)toast('CSV disalin ('+all.length+' baris)');else setErr('arc','Gagal menyalin. Coba Unduh CSV.')}
+      catch(e){setErr('arc','Gagal: '+e.message)}
+      busy('arc-cp',false,'Salin CSV')};
+    const del=async(payload,msg)=>{confirmBox(msg,async()=>{try{const rr=await call({action:'billArchiveDelete',...payload});toast((rr.result&&rr.result.deleted||0)+' riwayat dihapus')}catch(e){toast('Gagal: '+e.message)}billArcSheet()})};
+    $('#arc-del1').onclick=()=>{const id=$('#arc-sel').value;if(!id){setErr('arc','Pilih tagihannya dulu');return}const n=list.filter(p=>p.bill===id).length;
+      del({bill:id},`${n} riwayat pembayaran dari tagihan ${esc(names[id])} akan dihapus permanen. Riwayat bersama ikut hilang untuk pasanganmu. Disarankan unduh CSV dulu.`)};
+    $('#arc-delall').onclick=()=>del({all:true},`Semua riwayat tagihan terhapus yang bisa kamu lihat (${list.length>=200?'200+':list.length} pembayaran) akan dihapus permanen. Riwayat bersama ikut hilang untuk pasanganmu. Disarankan unduh CSV dulu.`)}
   catch(e){if(!ov.innerHTML.includes('Memuat riwayat'))return;sheet('Riwayat tagihan terhapus',`<p class="sub">Gagal memuat: ${esc(e.message)}</p>`)}}
 
 // ===== Utang & piutang =====
@@ -1684,7 +1756,7 @@ function debtView(){const back='<button class="link" data-act="tab" data-t="acc"
   const ord={terlambat:0,segera:1,aman:2,lunas:3};
   const grp=(k,title,hint)=>{const l=S.debts.filter(d=>d.kind===k).map(d=>({d,i:debtInfo(d,T)})).sort((x,y)=>ord[x.i.status]-ord[y.i.status]||((x.i.daysLeft==null?1e9:x.i.daysLeft)-(y.i.daysLeft==null?1e9:y.i.daysLeft)));
     return l.length?`<h2 style="margin:14px 4px 4px">${title}</h2><p class="sub" style="margin:0 4px 10px">${hint}</p>`+l.map(x=>debtCard(x.d)).join(''):''};
-  return back+`<div class="row summary-row"><div class="card mini"><div class="lbl">Utang saya</div><div class="v out">${rp(left('utang'))}</div></div><div class="card mini"><div class="lbl">Piutang saya</div><div class="v in">${rp(left('piutang'))}</div></div></div>`+grp('utang','Utang saya','Uang yang harus kamu bayar ke orang lain.')+grp('piutang','Piutang saya','Uang yang orang lain harus bayar ke kamu.')+addBtn+`<p class="sub" style="margin-top:12px">Catatan pribadi hanya terlihat olehmu; catatan bersama terlihat RAMA dan DESY. Angka di atas = total sisa yang belum lunas. Status Segera = sisa 7 hari. Kamu juga bisa bertanya lewat Chat Bot, mis. "utang saya berapa?".</p>`}
+  return back+`<div class="row summary-row"><div class="card mini"><div class="lbl">Utang saya</div><div class="v out">${rp(left('utang'))}</div></div><div class="card mini"><div class="lbl">Piutang saya</div><div class="v in">${rp(left('piutang'))}</div></div></div>`+grp('utang','Utang saya','Uang yang harus kamu bayar ke orang lain.')+grp('piutang','Piutang saya','Uang yang orang lain harus bayar ke kamu.')+addBtn+`<p class="sub" style="margin-top:12px">Catatan pribadi hanya terlihat olehmu; catatan bersama terlihat RAMA dan DESY. Angka di atas = total sisa yang belum lunas. Status Segera = sisa 7 hari. Lewat Chat Bot kamu bisa bertanya ("utang saya berapa?"), mencatat ("catat utang ke Budi 100rb", "pinjemin Andi 200rb"), dan mencicil ("bayar utang Budi 50rb", "Andi bayar 100rb").</p>`}
 function debtBanner(){if(!S.debts||!S.debts.length)return '';const c={terlambat:0,segera:0},T=todayIso();S.debts.forEach(d=>{const s=debtInfo(d,T).status;if(c[s]!==undefined)c[s]++});if(!c.terlambat&&!c.segera)return '';
   return `<div class="card" data-act="tab" data-t="debt" style="cursor:pointer"><h2>Utang &amp; piutang <span class="badge">Lihat</span></h2><div class="vbtns" style="margin-top:0">${c.terlambat?`<span class="vstat terlambat">${c.terlambat} terlambat</span>`:''}${c.segera?`<span class="vstat segera">${c.segera} segera</span>`:''}</div></div>`}
 function debtSheet(id){const d=id?S.debts.find(z=>z.id===id):null;if(id&&!d)return;
@@ -1763,6 +1835,8 @@ document.addEventListener('click',e=>{
   else if(a==='cUpNo')chatUpdateNo(+b.dataset.i);
    else if(a==='cBillSave')chatBillSave(+b.dataset.i);
    else if(a==='cBillNo')chatBillNo(+b.dataset.i);
+  else if(a==='cDebtSave')chatDebtSave(+b.dataset.i);
+  else if(a==='cDebtNo')chatDebtNo(+b.dataset.i);
   else if(a==='model')setModel(v);
   else if(a==='theme'){setTheme(v);ov.querySelectorAll('[data-act="theme"]').forEach(x=>x.classList.toggle('on',x.dataset.v===v))}
 });
