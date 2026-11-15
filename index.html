@@ -2344,7 +2344,7 @@ function wishDetail(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
 function wishDone(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;w.status=w.status==='bought'?'want':'bought';save('Wishlist',wishRow(w));closeSheet();render();toast(w.status==='bought'?'Impian terwujud ♡':'Dikembalikan ke daftar')}
 function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wishPhoto||wSafeImg(($('#w-i').value||'').trim());b.innerHTML=u?`<img data-wi="1" referrerpolicy="no-referrer" src="${esc(u)}" alt=""><span class="wx-emo" hidden>🖼️</span>`:'<span class="wx-emo">🖼️</span>'}
 function wishPhotoFrom(file){return new Promise((res,rej)=>{
-  if(!file||!/^image\//.test(file.type))return rej(new Error('File bukan gambar'));
+  if(!file||String(file.type).indexOf('image/')!==0)return rej(new Error('File bukan gambar'));
   if(file.size>18*1024*1024)return rej(new Error('Maksimum foto 18 MB'));
   const url=URL.createObjectURL(file),img=new Image();
   img.onload=()=>{URL.revokeObjectURL(url);let side=420,q=.7,out='';
@@ -2397,7 +2397,7 @@ function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)ret
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.dataset&&t.dataset.wi){t.hidden=true;const f=t.nextElementSibling;if(f)f.hidden=false}},true);
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wx-q'){WQ=t.value;wishUpdate()}});
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='wx-s'){WSORT=t.value;wishUpdate()}else if(t.id==='w-l')wishAuto(false);else if(t.id==='w-file'){const f=t.files&&t.files[0];t.value='';if(f)wishSetPhoto(f)}});
-document.addEventListener('paste',e=>{if(!$('#w-file'))return;const fs=e.clipboardData&&[...e.clipboardData.files].filter(f=>/^image\//.test(f.type));if(fs&&fs.length){e.preventDefault();wishSetPhoto(fs[0]);return}if(e.target&&e.target.id==='w-l')setTimeout(()=>wishAuto(false),60)});
+document.addEventListener('paste',e=>{if(!$('#w-file'))return;const fs=e.clipboardData&&[...e.clipboardData.files].filter(f=>String(f.type).indexOf('image/')===0);if(fs&&fs.length){e.preventDefault();wishSetPhoto(fs[0]);return}if(e.target&&e.target.id==='w-l')setTimeout(()=>wishAuto(false),60)});
 
 
 // ===== Events =====
