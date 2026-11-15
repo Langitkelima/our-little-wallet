@@ -1348,7 +1348,7 @@ function saveObj(table,row){save(table,row);return row}
 const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope:g.scope,owner:g.owner});
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
-  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];S.wishes=(d.Wishlist||[]).map(x=>({...x,amount:Number(x.amount)||0,added:Number(x.added)||0}));S.notes=(d.Notes||[]).map(x=>({...x,pinned:Number(x.pinned)||0,updated:Number(x.updated)||0}));loaded=true}
+  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];S.wishes=(d.Wishlist||[]).map(x=>({...x,amount:Number(x.amount)||0,added:Number(x.added)||0,photo:x.photo||''}));S.notes=(d.Notes||[]).map(x=>({...x,pinned:Number(x.pinned)||0,updated:Number(x.updated)||0}));loaded=true}
 async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();duoStart();return true}catch(e){setSync('err',e.message);return e.message}}
 
 // ===== Layar masuk: keypad angka (bisa pindah ke keyboard biasa) =====
@@ -2309,18 +2309,18 @@ function debtHistSheet(id){const d=S.debts.find(z=>z.id===id);if(!d)return;const
 const WCAT=[['aksesoris','💻','Aksesoris'],['fashion','👕','Fashion'],['sepatu','👟','Sepatu'],['peralatan','🔧','Peralatan'],['makanan','🍜','Makanan & Minuman'],['elektronik','📱','Elektronik'],['furniture','🏠','Furniture'],['buku','📚','Buku & Edukasi'],['perawatan','🧴','Perawatan'],['lainnya','🎁','Lainnya']];
 const WPRIO=[['penting','🔴','Penting'],['biasa','🟡','Ga terlalu'],['pingin','🟢','Pingin']];
 const WSTAT=[['want','🛒','Mau beli'],['later','🙏','Belum'],['bought','✅','Sudah dibeli'],['cancel','❌','Batal']];
-let WF='all',WQ='',WSORT='new',wishSeq=0,wishLast='';
+let WF='all',WQ='',WSORT='new',wishSeq=0,wishLast='',wishPhoto='';
 const wopt=(L,k)=>L.find(x=>x[0]===k)||(L===WCAT?L[L.length-1]:L[0]);
 const wSafeImg=u=>/^https:\/\/[^\s"'<>]+$/i.test(u||'')&&String(u).length<=500?u:'';
 const wSafeLink=u=>/^https?:\/\/[^\s"'<>]+$/i.test(u||'')&&String(u).length<=500?u:'';
-const wishRow=w=>({id:w.id,name:w.name,amount:w.amount,cat:w.cat,prio:w.prio,status:w.status,link:w.link,img:w.img,specs:w.specs,note:w.note,scope:w.scope,owner:w.owner,added:w.added});
+const wishRow=w=>({id:w.id,name:w.name,amount:w.amount,cat:w.cat,prio:w.prio,status:w.status,link:w.link,img:w.img,specs:w.specs,note:w.note,scope:w.scope,owner:w.owner,added:w.added,photo:w.photo||''});
 const wOpen=w=>w.status==='want'||w.status==='later';
 function wishItems(){const q=WQ.trim().toLowerCase();
   const a=S.wishes.filter(w=>{const okF=WF==='all'||(WF==='urgent'&&w.prio==='penting'&&wOpen(w))||(WF==='want'&&wOpen(w))||(WF==='bought'&&w.status==='bought');
     return okF&&(!q||[w.name,wopt(WCAT,w.cat)[2],w.specs,w.note].join(' ').toLowerCase().includes(q))});
   const by={new:(x,y)=>(y.added||0)-(x.added||0),old:(x,y)=>(x.added||0)-(y.added||0),hi:(x,y)=>y.amount-x.amount,lo:(x,y)=>x.amount-y.amount,name:(x,y)=>String(x.name).localeCompare(String(y.name),'id')};
   return a.sort(by[WSORT]||by.new)}
-function wishImgBox(w,cls){const c=wopt(WCAT,w.cat),im=wSafeImg(w.img);
+function wishImgBox(w,cls){const c=wopt(WCAT,w.cat),im=w.photo||wSafeImg(w.img);
   return `${im?`<img data-wi="1" loading="lazy" referrerpolicy="no-referrer" src="${esc(im)}" alt="">`:''}<span class="wx-emo"${im?' hidden':''}>${c[1]}</span>`}
 function wishCard(w){const c=wopt(WCAT,w.cat),p=wopt(WPRIO,w.prio),st=wopt(WSTAT,w.status);
   return `<button type="button" class="wx-card ${w.status==='bought'?'done':w.status==='cancel'?'cancel':''}" data-act="wishOpen" data-id="${esc(w.id)}"><span class="wx-img">${wishImgBox(w)}<span class="wx-pr">${p[1]} ${p[2]}</span></span><span class="wx-in"><span class="wx-cat">${esc(c[2])}</span><span class="wx-nm">${esc(w.name)}</span><span class="wx-bt"><b>${w.amount?rp(w.amount):'—'}</b><span class="wx-st">${st[1]} ${st[2]}${w.scope==='private'?' · '+ic('lock',11):''}</span></span></span></button>`}
@@ -2342,8 +2342,20 @@ function wishDetail(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
   let host='';try{host=lk?new URL(lk).hostname.replace(/^www\./,''):''}catch(e){}
   sheet('Detail wishlist',`<div class="wx-big">${wishImgBox(w)}</div><div class="wx-cat" style="margin-top:12px">${esc(c[2])}</div><h2 style="margin:4px 0 6px;overflow-wrap:anywhere">${esc(w.name)}</h2><div style="font:700 22px/1.2 var(--f-disp,inherit)">${w.amount?rp(w.amount):'Harga belum diisi'}</div><div class="wx-badges"><span class="badge">${p[1]} ${p[2]}</span><span class="badge">${st[1]} ${st[2]}</span>${hxBadge(w.scope)}</div>${lk?`<a class="btn wx-a" href="${esc(lk)}" target="_blank" rel="noopener noreferrer">Buka link produk${host?' · '+esc(host):''}</a>`:''}${blk('Spesifikasi',w.specs)}${blk('Keterangan',w.note)}<button class="btn sec" data-act="wishDone" data-id="${esc(w.id)}">${w.status==='bought'?'Kembalikan ke daftar ingin':'✅ Tandai sudah dibeli'}</button><button class="btn sec" data-act="wishEdit" data-id="${esc(w.id)}">Ubah</button>`)}
 function wishDone(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;w.status=w.status==='bought'?'want':'bought';save('Wishlist',wishRow(w));closeSheet();render();toast(w.status==='bought'?'Impian terwujud ♡':'Dikembalikan ke daftar')}
-function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wSafeImg(($('#w-i').value||'').trim());b.innerHTML=u?`<img data-wi="1" referrerpolicy="no-referrer" src="${esc(u)}" alt=""><span class="wx-emo" hidden>🖼️</span>`:'<span class="wx-emo">🖼️</span>'}
-async function wishAuto(manual){const li=$('#w-l');if(!li)return;const u=li.value.trim(),st=$('#w-st'),bt=$('#w-auto');
+function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wishPhoto||wSafeImg(($('#w-i').value||'').trim());b.innerHTML=u?`<img data-wi="1" referrerpolicy="no-referrer" src="${esc(u)}" alt=""><span class="wx-emo" hidden>🖼️</span>`:'<span class="wx-emo">🖼️</span>'}
+function wishPhotoFrom(file){return new Promise((res,rej)=>{
+  if(!file||!/^image\//.test(file.type))return rej(new Error('File bukan gambar'));
+  if(file.size>18*1024*1024)return rej(new Error('Maksimum foto 18 MB'));
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{URL.revokeObjectURL(url);let side=420,q=.7,out='';
+    for(let i=0;i<8;i++){const k=Math.min(1,side/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<=30000)break;if(q>.5)q-=.1;else side=Math.round(side*.8)}
+    out.length<=45000?res(out):rej(new Error('Foto terlalu rumit, coba foto lain'))};
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('Foto tidak bisa dibaca'))};img.src=url})}
+async function wishSetPhoto(file){const ps=$('#w-ps');if(!ps)return;ps.textContent='Memproses foto…';
+  try{wishPhoto=await wishPhotoFrom(file);wishPreview();ps.textContent='Foto terpasang ✓ ('+Math.round(wishPhoto.length/1024)+' KB)'}catch(e){ps.textContent='Gagal: '+e.message}}
+async function wishAuto(manual){const li=$('#w-l');if(!li)return;const raw=li.value.trim(),um=raw.match(/https?:\/\/[^\s]+/i),u=um?um[0]:raw,st=$('#w-st'),bt=$('#w-auto');
+  if(um&&raw!==um[0]){let rest=raw.replace(um[0],' ').replace(/\s+/g,' ').trim().replace(/\s*[-–|:!,]*\s*(di|on)\s+shopee.*$/i,'').replace(/^(cek|lihat|check out|yuk beli|beli)\s+/i,'').replace(/^["“]+|["”]+$/g,'').replace(/[!.\s]+$/,'').slice(0,120);
+    li.value=um[0];if(rest.length>=3&&!$('#w-n').value.trim())$('#w-n').value=rest}
   if(!/^https?:\/\/\S+$/i.test(u)){if(manual)setErr('wl','Tempel link yang diawali https://');return}
   if(!manual&&u===wishLast)return;wishLast=u;setErr('wl','');const seq=++wishSeq;if(bt)bt.disabled=true;st.textContent='Mencari gambar dan nama barang…';
   try{const r=await Promise.race([call({action:'wishMeta',url:u}),new Promise((_,rj)=>setTimeout(()=>rj(new Error('terlalu lama, coba lagi')),45000))]);if(seq!==wishSeq||!$('#w-l'))return;const m=r.meta||{};
@@ -2351,8 +2363,8 @@ async function wishAuto(manual){const li=$('#w-l');if(!li)return;const u=li.valu
     if(m.title&&!$('#w-n').value.trim())$('#w-n').value=m.title;
     if(m.image&&!$('#w-i').value.trim()){$('#w-i').value=m.image;wishPreview()}
     if(m.price&&!$('#w-p').value.trim())$('#w-p').value=fkm(m.price);
-    st.textContent=m.image?'Gambar ditemukan ✓ Cek lagi nama dan harganya.':(m.title?'Nama ditemukan, tapi gambar tidak ada.':'Shopee tidak memberi info produk dari link ini.')+' Isi manual: tahan gambar produk di Shopee > Salin alamat gambar, tempel di URL gambar.'+(m.diag?' ['+m.diag+']':'');
-  }catch(e){if(seq===wishSeq&&$('#w-st'))st.textContent='Gagal mengambil info: '+e.message+'. Isi manual: salin alamat gambar produk lalu tempel di URL gambar.'}
+    st.textContent=m.image?'Gambar ditemukan ✓ Cek lagi nama dan harganya.':(m.title?'Nama ditemukan, tapi gambar tidak ada.':'Shopee memblokir pembacaan link dari server.')+' Tambahkan foto: tombol Pilih foto, atau tempel (Ctrl+V) screenshot produk.'+'';
+  }catch(e){if(seq===wishSeq&&$('#w-st'))st.textContent='Gagal mengambil info: '+e.message+'. Tambahkan foto lewat tombol Pilih foto.'}
   finally{const b2=$('#w-auto');if(b2&&seq===wishSeq)b2.disabled=false}}
 function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)return;
   const x=w||{name:'',amount:0,cat:'lainnya',prio:'pingin',status:'want',link:'',img:'',specs:'',note:''};
@@ -2363,27 +2375,29 @@ function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)ret
   <label for="w-c">Kategori</label><select id="w-c">${opts(WCAT,x.cat)}</select>
   <label for="w-r">Prioritas</label><select id="w-r">${opts(WPRIO,x.prio)}</select>
   <label for="w-t">Status</label><select id="w-t">${opts(WSTAT,x.status)}</select>
-  <label for="w-i">URL gambar (opsional)</label><div style="display:flex;gap:10px;align-items:center"><div class="wx-pv" id="w-pvb"></div><input id="w-i" type="url" inputmode="url" value="${esc(x.img)}" placeholder="https://..." style="flex:1;min-width:0;margin:0"></div><div class="err" id="e-wi"></div>
+  <label>Foto barang (opsional)</label><div style="display:flex;gap:10px;align-items:center"><div class="wx-pv" id="w-pvb"></div><div style="flex:1;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec" type="button" id="w-pick" style="width:auto;margin:0;padding:0 14px">Pilih foto</button><button class="btn sec" type="button" id="w-unpick" style="width:auto;margin:0;padding:0 14px">Hapus</button></div></div><input type="file" id="w-file" accept="image/*" hidden><p class="sub" id="w-ps" style="margin:6px 0 0">Atau tempel (Ctrl+V) gambar/screenshot. Foto dikecilkan otomatis.</p>
+  <label for="w-i">Atau URL gambar (opsional)</label><input id="w-i" type="url" inputmode="url" value="${esc(x.img)}" placeholder="https://..."><div class="err" id="e-wi"></div>
   <label for="w-sp">Spesifikasi (opsional)</label><textarea id="w-sp" maxlength="500" rows="2" placeholder="Warna, ukuran, varian yang diinginkan">${esc(x.specs)}</textarea>
   <label for="w-nt">Keterangan (opsional)</label><textarea id="w-nt" maxlength="500" rows="2" placeholder="Catatan kecil">${esc(x.note)}</textarea>
   ${id?'':'<label for="w-s">Siapa yang bisa melihat</label><select id="w-s"><option value="private">Pribadi (hanya aku)</option><option value="shared">Bersama (RAMA dan DESY)</option></select>'}
   <button class="btn" id="w-save">Simpan</button>${id?'<button class="btn sec" id="w-x">Hapus dari wishlist</button>':''}`);
-  wishPreview();$('#w-p').oninput=fmtIn;$('#w-i').oninput=wishPreview;
+  wishPhoto=x.photo||'';wishPreview();$('#w-p').oninput=fmtIn;$('#w-i').oninput=wishPreview;
+  $('#w-pick').onclick=()=>$('#w-file').click();$('#w-unpick').onclick=()=>{wishPhoto='';$('#w-i').value='';wishPreview();$('#w-ps').textContent='Foto dihapus.'};
   $('#w-save').onclick=()=>{const n=$('#w-n').value.trim(),am=parseInt($('#w-p').value.replace(/\D/g,'')||'0',10),lk=$('#w-l').value.trim(),im=$('#w-i').value.trim();
     const eN=n?'':'Nama wajib diisi',eP=am>999999999999?'Nominal terlalu besar':'';
     const eL=lk&&!wSafeLink(lk)?(lk.length>500?'Link terlalu panjang (maksimal 500 karakter)':'Link harus diawali http:// atau https://'):'';
     const eI=im&&!wSafeImg(im)?(im.length>500?'URL gambar terlalu panjang':'URL gambar harus diawali https://'):'';
     setErr('wn',eN);setErr('wp',eP);setErr('wl',eL);setErr('wi',eI);if(eN||eP||eL||eI)return;
     const pick=(L,sel)=>{const v=$(sel).value;return L.some(o=>o[0]===v)?v:L[0][0]};
-    const o={name:n,amount:am,cat:pick(WCAT,'#w-c'),prio:pick(WPRIO,'#w-r'),status:pick(WSTAT,'#w-t'),link:lk,img:im,specs:$('#w-sp').value.trim(),note:$('#w-nt').value.trim()};
+    const o={name:n,amount:am,cat:pick(WCAT,'#w-c'),prio:pick(WPRIO,'#w-r'),status:pick(WSTAT,'#w-t'),link:lk,img:im,photo:wishPhoto,specs:$('#w-sp').value.trim(),note:$('#w-nt').value.trim()};
     if(w){Object.assign(w,o);save('Wishlist',wishRow(w))}else{const sc=$('#w-s').value==='shared'?'shared':'private',nw={id:uid(),scope:sc,owner:sc==='private'?ME:'',added:Date.now(),...o};S.wishes.unshift(nw);save('Wishlist',wishRow(nw))}
     closeSheet();render();toast('Wishlist disimpan')};
   if(id)$('#w-x').onclick=()=>confirmBox(`${esc(w.name)} akan dihapus dari wishlist.`,()=>{S.wishes=S.wishes.filter(z=>z.id!==id);drop('Wishlist',id);render()})}
 // Gambar gagal dimuat -> tampilkan emoji kategori. 'error' tidak menggelembung, jadi pakai fase capture.
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.dataset&&t.dataset.wi){t.hidden=true;const f=t.nextElementSibling;if(f)f.hidden=false}},true);
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wx-q'){WQ=t.value;wishUpdate()}});
-document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='wx-s'){WSORT=t.value;wishUpdate()}else if(t.id==='w-l')wishAuto(false)});
-document.addEventListener('paste',e=>{if(e.target&&e.target.id==='w-l')setTimeout(()=>wishAuto(false),60)});
+document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='wx-s'){WSORT=t.value;wishUpdate()}else if(t.id==='w-l')wishAuto(false);else if(t.id==='w-file'){const f=t.files&&t.files[0];t.value='';if(f)wishSetPhoto(f)}});
+document.addEventListener('paste',e=>{if(!$('#w-file'))return;const fs=e.clipboardData&&[...e.clipboardData.files].filter(f=>/^image\//.test(f.type));if(fs&&fs.length){e.preventDefault();wishSetPhoto(fs[0]);return}if(e.target&&e.target.id==='w-l')setTimeout(()=>wishAuto(false),60)});
 
 
 // ===== Events =====
