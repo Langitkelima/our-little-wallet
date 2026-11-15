@@ -2346,13 +2346,13 @@ function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wSafeImg(($('#w-
 async function wishAuto(manual){const li=$('#w-l');if(!li)return;const u=li.value.trim(),st=$('#w-st'),bt=$('#w-auto');
   if(!/^https?:\/\/\S+$/i.test(u)){if(manual)setErr('wl','Tempel link yang diawali https://');return}
   if(!manual&&u===wishLast)return;wishLast=u;setErr('wl','');const seq=++wishSeq;if(bt)bt.disabled=true;st.textContent='Mencari gambar dan nama barang…';
-  try{const r=await call({action:'wishMeta',url:u});if(seq!==wishSeq||!$('#w-l'))return;const m=r.meta||{};
-    if(m.link&&wSafeLink(m.link)&&m.link!==u)li.value=m.link;wishLast=li.value.trim();
+  try{const r=await Promise.race([call({action:'wishMeta',url:u}),new Promise((_,rj)=>setTimeout(()=>rj(new Error('terlalu lama, coba lagi')),45000))]);if(seq!==wishSeq||!$('#w-l'))return;const m=r.meta||{};
+    if(u.length>480&&m.link&&wSafeLink(m.link)&&m.link!==u)li.value=m.link;wishLast=li.value.trim();
     if(m.title&&!$('#w-n').value.trim())$('#w-n').value=m.title;
     if(m.image&&!$('#w-i').value.trim()){$('#w-i').value=m.image;wishPreview()}
     if(m.price&&!$('#w-p').value.trim())$('#w-p').value=fkm(m.price);
-    st.textContent=m.image?'Gambar ditemukan ✓ Cek lagi nama dan harganya.':m.title?'Nama ditemukan, tapi gambar tidak ada. Isi URL gambar di bawah.':'Tidak ada info dari link ini. Isi manual saja.';
-  }catch(e){if(seq===wishSeq&&$('#w-st'))st.textContent='Gagal mengambil info: '+e.message+'. Isi manual saja.'}
+    st.textContent=m.image?'Gambar ditemukan ✓ Cek lagi nama dan harganya.':(m.title?'Nama ditemukan, tapi gambar tidak ada.':'Shopee tidak memberi info produk dari link ini.')+' Isi manual: tahan gambar produk di Shopee > Salin alamat gambar, tempel di URL gambar.'+(m.diag?' ['+m.diag+']':'');
+  }catch(e){if(seq===wishSeq&&$('#w-st'))st.textContent='Gagal mengambil info: '+e.message+'. Isi manual: salin alamat gambar produk lalu tempel di URL gambar.'}
   finally{const b2=$('#w-auto');if(b2&&seq===wishSeq)b2.disabled=false}}
 function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)return;
   const x=w||{name:'',amount:0,cat:'lainnya',prio:'pingin',status:'want',link:'',img:'',specs:'',note:''};
