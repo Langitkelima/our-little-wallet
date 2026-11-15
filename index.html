@@ -1178,7 +1178,7 @@ CAT_NAME.hadiah='gift';
 function catKey(c){let k=CAT_ALIAS[c.icon]||c.icon;if(CAT_IMG[k]&&k!=='tag')return k;const n=String(c.name||'').toLowerCase();for(const w in CAT_NAME){if(n.includes(w))return CAT_NAME[w]}return CAT_IMG[k]?k:'tag'}
 const catIc=(c,s=22)=>{const o=CAT_IMG[catKey(c)];return `<span class="cico" style="--c1:${o.c};width:${s}px;height:${s}px"><svg viewBox="0 0 64 64" aria-hidden="true">${o.g}</svg></span>`};
 const TPI={savings:'tp-tabungan',vehicleTax:'tp-kendaraan',billStack:'tp-tagihan',veh:'tp-motor'},TPS={edit:'tp-edit',send:'tp-kirim-putih'};
-const ic=(n,s=22)=>TPI[n]?`<svg class="tp-il" width="${s>=30?64:s}" height="${s>=30?64:s}" viewBox="0 0 64 64" aria-hidden="true"><use href="#${TPI[n]}"/></svg>`:TPS[n]?`<svg class="tp-ic" width="${s}" height="${s}" viewBox="0 0 ${n==='edit'||n==='send'?48:24} ${n==='edit'||n==='send'?48:24}" aria-hidden="true"><use href="#${TPS[n]}"/></svg>`:`<svg width=""${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]||ICON.tag}</svg>`;
+const ic=(n,s=22)=>TPI[n]?`<svg class="tp-il" width="${s>=30?64:s}" height="${s>=30?64:s}" viewBox="0 0 64 64" aria-hidden="true"><use href="#${TPI[n]}"/></svg>`:TPS[n]?`<svg class="tp-ic" width="${s}" height="${s}" viewBox="0 0 ${n==='edit'||n==='send'?48:24} ${n==='edit'||n==='send'?48:24}" aria-hidden="true"><use href="#${TPS[n]}"/></svg>`:`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]||ICON.tag}</svg>`;
 
 // ===== Data layer =====
 const PEOPLE=['RAMA','DESY'];
