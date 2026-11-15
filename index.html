@@ -2305,7 +2305,7 @@ function debtHistSheet(id){const d=S.debts.find(z=>z.id===id);if(!d)return;const
   const list=(S.debtpay||[]).filter(p=>p.debt===id).sort((x,y)=>x.date<y.date?1:x.date>y.date?-1:0);
   sheet('Riwayat cicilan',`<p class="sub">${esc(d.person)} · total ${rp(d.amount)} · ${u?'dibayar ':'diterima '}${rp(i.paid)} · sisa ${rp(i.left)}</p>${list.length?list.map(p=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px"><b>${fdate(p.date)}</b><b>${rp(p.amount)}</b></div><div class="vs">${esc(p.accountName||'Tidak dicatat ke akun')} · ${esc(p.by||'')}${p.note?' · '+esc(p.note):''}</div></div>`).join(''):'<p class="sub">Belum ada cicilan yang tercatat.</p>'}`)}
 
-// ===== Wishlist: barang yang mau dibeli (link produk + gambar otomatis) =====
+/* ===== Wishlist: barang yang mau dibeli (link produk + gambar otomatis) ===== */
 const WCAT=[['aksesoris','💻','Aksesoris'],['fashion','👕','Fashion'],['sepatu','👟','Sepatu'],['peralatan','🔧','Peralatan'],['makanan','🍜','Makanan & Minuman'],['elektronik','📱','Elektronik'],['furniture','🏠','Furniture'],['buku','📚','Buku & Edukasi'],['perawatan','🧴','Perawatan'],['lainnya','🎁','Lainnya']];
 const WPRIO=[['penting','🔴','Penting'],['biasa','🟡','Ga terlalu'],['pingin','🟢','Pingin']];
 const WSTAT=[['want','🛒','Mau beli'],['later','🙏','Belum'],['bought','✅','Sudah dibeli'],['cancel','❌','Batal']];
@@ -2356,7 +2356,7 @@ async function wishSetPhoto(file){const ps=$('#w-ps');if(!ps)return;ps.textConte
 async function wishAuto(manual){const li=$('#w-l');if(!li)return;const raw=li.value.trim(),um=raw.match(/https?:\/\/[^\s]+/i),u=um?um[0]:raw,st=$('#w-st'),bt=$('#w-auto');
   if(um&&raw!==um[0]){let rest=raw.replace(um[0],' ').replace(/\s+/g,' ').trim().replace(/\s*[-–|:!,]*\s*(di|on)\s+shopee.*$/i,'').replace(/^(cek|lihat|check out|yuk beli|beli)\s+/i,'').replace(/^["“]+|["”]+$/g,'').replace(/[!.\s]+$/,'').slice(0,120);
     li.value=um[0];if(rest.length>=3&&!$('#w-n').value.trim())$('#w-n').value=rest}
-  if(!/^https?:\/\/\S+$/i.test(u)){if(manual)setErr('wl','Tempel link yang diawali https://');return}
+  if(!/^https?:\/\/\S+$/i.test(u)){if(manual)setErr('wl','Tempel link yang diawali https:\/\/');return}
   if(!manual&&u===wishLast)return;wishLast=u;setErr('wl','');const seq=++wishSeq;if(bt)bt.disabled=true;st.textContent='Mencari gambar dan nama barang…';
   try{const r=await Promise.race([call({action:'wishMeta',url:u}),new Promise((_,rj)=>setTimeout(()=>rj(new Error('terlalu lama, coba lagi')),45000))]);if(seq!==wishSeq||!$('#w-l'))return;const m=r.meta||{};
     if(u.length>480&&m.link&&wSafeLink(m.link)&&m.link!==u)li.value=m.link;wishLast=li.value.trim();
@@ -2369,14 +2369,14 @@ async function wishAuto(manual){const li=$('#w-l');if(!li)return;const raw=li.va
 function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)return;
   const x=w||{name:'',amount:0,cat:'lainnya',prio:'pingin',status:'want',link:'',img:'',specs:'',note:''};
   const opts=(L,k)=>L.map(o=>`<option value="${o[0]}"${o[0]===k?' selected':''}>${o[1]} ${esc(o[2])}</option>`).join('');
-  sheet(id?'Ubah wishlist':'Wishlist baru',`<label for="w-l">Link produk (opsional)</label><div style="display:flex;gap:8px"><input id="w-l" type="url" inputmode="url" value="${esc(x.link)}" placeholder="https://shopee.co.id/..." style="flex:1;min-width:0;margin:0"><button class="btn sec" id="w-auto" type="button" data-act="wishAuto" style="width:auto;margin:0;padding:0 14px">Ambil</button></div><div class="err" id="e-wl"></div><p class="sub" id="w-st" style="margin:6px 0 0">Tempel link Shopee/Tokopedia, nama dan gambar diisi otomatis.</p>
+  sheet(id?'Ubah wishlist':'Wishlist baru',`<label for="w-l">Link produk (opsional)</label><div style="display:flex;gap:8px"><input id="w-l" type="url" inputmode="url" value="${esc(x.link)}" placeholder="https:&#47;&#47;shopee.co.id/..." style="flex:1;min-width:0;margin:0"><button class="btn sec" id="w-auto" type="button" data-act="wishAuto" style="width:auto;margin:0;padding:0 14px">Ambil</button></div><div class="err" id="e-wl"></div><p class="sub" id="w-st" style="margin:6px 0 0">Tempel link Shopee/Tokopedia, nama dan gambar diisi otomatis.</p>
   <label for="w-n">Nama barang</label><input id="w-n" maxlength="120" value="${esc(x.name)}" placeholder="mis. New Balance 530"><div class="err" id="e-wn"></div>
   <label for="w-p">Estimasi harga (Rp, boleh kosong)</label><input id="w-p" inputmode="numeric" value="${x.amount?fkm(x.amount):''}" placeholder="0"><div class="err" id="e-wp"></div>
   <label for="w-c">Kategori</label><select id="w-c">${opts(WCAT,x.cat)}</select>
   <label for="w-r">Prioritas</label><select id="w-r">${opts(WPRIO,x.prio)}</select>
   <label for="w-t">Status</label><select id="w-t">${opts(WSTAT,x.status)}</select>
   <label>Foto barang (opsional)</label><div style="display:flex;gap:10px;align-items:center"><div class="wx-pv" id="w-pvb"></div><div style="flex:1;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sec" type="button" id="w-pick" style="width:auto;margin:0;padding:0 14px">Pilih foto</button><button class="btn sec" type="button" id="w-unpick" style="width:auto;margin:0;padding:0 14px">Hapus</button></div></div><input type="file" id="w-file" accept="image/*" hidden><p class="sub" id="w-ps" style="margin:6px 0 0">Atau tempel (Ctrl+V) gambar/screenshot. Foto dikecilkan otomatis.</p>
-  <label for="w-i">Atau URL gambar (opsional)</label><input id="w-i" type="url" inputmode="url" value="${esc(x.img)}" placeholder="https://..."><div class="err" id="e-wi"></div>
+  <label for="w-i">Atau URL gambar (opsional)</label><input id="w-i" type="url" inputmode="url" value="${esc(x.img)}" placeholder="https:&#47;&#47;..."><div class="err" id="e-wi"></div>
   <label for="w-sp">Spesifikasi (opsional)</label><textarea id="w-sp" maxlength="500" rows="2" placeholder="Warna, ukuran, varian yang diinginkan">${esc(x.specs)}</textarea>
   <label for="w-nt">Keterangan (opsional)</label><textarea id="w-nt" maxlength="500" rows="2" placeholder="Catatan kecil">${esc(x.note)}</textarea>
   ${id?'':'<label for="w-s">Siapa yang bisa melihat</label><select id="w-s"><option value="private">Pribadi (hanya aku)</option><option value="shared">Bersama (RAMA dan DESY)</option></select>'}
@@ -2385,15 +2385,15 @@ function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)ret
   $('#w-pick').onclick=()=>$('#w-file').click();$('#w-unpick').onclick=()=>{wishPhoto='';$('#w-i').value='';wishPreview();$('#w-ps').textContent='Foto dihapus.'};
   $('#w-save').onclick=()=>{const n=$('#w-n').value.trim(),am=parseInt($('#w-p').value.replace(/\D/g,'')||'0',10),lk=$('#w-l').value.trim(),im=$('#w-i').value.trim();
     const eN=n?'':'Nama wajib diisi',eP=am>999999999999?'Nominal terlalu besar':'';
-    const eL=lk&&!wSafeLink(lk)?(lk.length>500?'Link terlalu panjang (maksimal 500 karakter)':'Link harus diawali http:// atau https://'):'';
-    const eI=im&&!wSafeImg(im)?(im.length>500?'URL gambar terlalu panjang':'URL gambar harus diawali https://'):'';
+    const eL=lk&&!wSafeLink(lk)?(lk.length>500?'Link terlalu panjang (maksimal 500 karakter)':'Link harus diawali http:\/\/ atau https:\/\/'):'';
+    const eI=im&&!wSafeImg(im)?(im.length>500?'URL gambar terlalu panjang':'URL gambar harus diawali https:\/\/'):'';
     setErr('wn',eN);setErr('wp',eP);setErr('wl',eL);setErr('wi',eI);if(eN||eP||eL||eI)return;
     const pick=(L,sel)=>{const v=$(sel).value;return L.some(o=>o[0]===v)?v:L[0][0]};
     const o={name:n,amount:am,cat:pick(WCAT,'#w-c'),prio:pick(WPRIO,'#w-r'),status:pick(WSTAT,'#w-t'),link:lk,img:im,photo:wishPhoto,specs:$('#w-sp').value.trim(),note:$('#w-nt').value.trim()};
     if(w){Object.assign(w,o);save('Wishlist',wishRow(w))}else{const sc=$('#w-s').value==='shared'?'shared':'private',nw={id:uid(),scope:sc,owner:sc==='private'?ME:'',added:Date.now(),...o};S.wishes.unshift(nw);save('Wishlist',wishRow(nw))}
     closeSheet();render();toast('Wishlist disimpan')};
   if(id)$('#w-x').onclick=()=>confirmBox(`${esc(w.name)} akan dihapus dari wishlist.`,()=>{S.wishes=S.wishes.filter(z=>z.id!==id);drop('Wishlist',id);render()})}
-// Gambar gagal dimuat -> tampilkan emoji kategori. 'error' tidak menggelembung, jadi pakai fase capture.
+/* Gambar gagal dimuat -> tampilkan emoji kategori. 'error' tidak menggelembung, jadi pakai fase capture. */
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.dataset&&t.dataset.wi){t.hidden=true;const f=t.nextElementSibling;if(f)f.hidden=false}},true);
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wx-q'){WQ=t.value;wishUpdate()}});
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;if(t.id==='wx-s'){WSORT=t.value;wishUpdate()}else if(t.id==='w-l')wishAuto(false);else if(t.id==='w-file'){const f=t.files&&t.files[0];t.value='';if(f)wishSetPhoto(f)}});
