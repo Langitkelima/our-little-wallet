@@ -1085,10 +1085,11 @@ html[data-model="1"] #view.view-home>.latest-overview{grid-area:latest;margin:0;
 }
 
 /* Kolom tanggal: ikon kalender di lingkaran lembut, sama seperti panah dropdown */
-html[data-model] input[type=date]{padding-right:9px}
-html[data-model] input[type=date]::-webkit-calendar-picker-indicator{width:30px;height:30px;margin:0;padding:0;border-radius:50%;opacity:1;cursor:pointer;background-repeat:no-repeat,no-repeat;background-size:16px 16px,30px 30px;background-position:center,center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233F63A0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}
-@media (prefers-color-scheme:dark){html[data-model]:not([data-theme="light"]) input[type=date]::-webkit-calendar-picker-indicator{background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239DBBFA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}}
-html[data-model][data-theme="dark"] input[type=date]::-webkit-calendar-picker-indicator{background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239DBBFA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}
+html[data-model] input[type=date]{-webkit-appearance:none;appearance:none;padding-right:50px;min-height:46px;box-sizing:border-box;text-align:left;background-repeat:no-repeat,no-repeat;background-size:16px 16px,30px 30px;background-position:right 17px center,right 9px center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233F63A0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}
+html[data-model] input[type=date]::-webkit-calendar-picker-indicator{opacity:0;width:40px;height:32px;margin:0;padding:0;cursor:pointer}
+html[data-model] input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.2em}
+@media (prefers-color-scheme:dark){html[data-model]:not([data-theme="light"]) input[type=date]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239DBBFA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}}
+html[data-model][data-theme="dark"] input[type=date]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239DBBFA' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M4 11h16'/%3E%3C/svg%3E"),radial-gradient(circle,var(--accent-soft) 0 14.5px,transparent 15px)}
 
 /* Home model 2 di desktop: semua bagian punya area, tidak lagi terlempar */
 @media (min-width:980px){
@@ -1113,7 +1114,7 @@ html[data-model] .sb-r1 .sb-nm{flex:1 1 0;width:auto}html[data-model] .sb-r1 .sb
 .sb-who{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .sb-w{appearance:none;font:inherit;font-size:12px;font-weight:800;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:99px;padding:6px 12px}
 .sb-w.on{background:var(--btn,var(--accent));color:var(--btn-ink,#fff);border-color:transparent}
-.sb-fees{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}html[data-model] .sb-fees input{margin:0;text-align:right;width:100%;box-sizing:border-box}.sb-fees label{margin-top:0;font-size:12px}
+.sb-fees{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}html[data-model] .sb-fees input{margin:0;text-align:right;width:100%;box-sizing:border-box}.sb-fees label{margin-top:0;font-size:12px}.sb-fh{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:0 0 6px}.sb-fh label{margin:0}.sb-u{min-width:36px;height:26px;padding:0 8px;border-radius:13px;border:1px solid var(--line);background:var(--accent-soft);color:var(--accent-strong);font-weight:800;font-size:12px;cursor:pointer}.sb-u.pc{background:var(--btn);color:var(--btn-ink);border-color:transparent}.sb-eq{display:block;min-height:14px;margin-top:4px;text-align:right;font-size:11px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-rs{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
 .sb-rs:last-of-type{border-bottom:0}.sb-rs small{display:block;color:var(--mut);font-size:11.5px;margin-top:2px}.sb-am{font-size:16px;white-space:nowrap}
 .sb-wr{background:var(--accent-soft);border-radius:14px;padding:10px 12px;margin:8px 0;font-size:12.5px}
@@ -2552,19 +2553,25 @@ document.addEventListener('paste',e=>{if(!$('#w-file'))return;const fs=e.clipboa
 
 
 
-const SB0=()=>({items:[],people:[],place:'',date:'',payer:'',tax:0,service:0,discount:0,total:0,warn:[],via:'',busy:false,msg:'',scope:'private',ids:{},logged:false,logging:false});
+const SB0=()=>({items:[],people:[],place:'',date:'',payer:'',tax:0,service:0,discount:0,pm:{tax:0,service:0,discount:0},pv:{tax:0,service:0,discount:0},total:0,warn:[],via:'',busy:false,msg:'',scope:'private',ids:{},logged:false,logging:false});
 let SB=SB0();
 const sbUp=s=>String(s==null?'':s).replace(/\s+/g,' ').trim().toUpperCase().slice(0,30);
 const sbNum=v=>parseInt(String(v==null?'':v).replace(/\D/g,'')||'0',10)||0;
 const sbRp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
 const sbNew=()=>({id:uid(),name:'',qty:1,price:0,who:[]});
 const sbBack='<button class="hx-back bk-btn" data-act="tab" data-t="home" aria-label="Kembali ke Home"><span class="bk-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></span><span class="bk-tx">Kembali ke Home</span></button>';
+function sbPct(s){s=String(s==null?'':s).replace(',','.').replace(/[^0-9.]/g,'');const k=s.indexOf('.');if(k>=0)s=s.slice(0,k+1)+s.slice(k+1).replace(/\./g,'');const q=s.indexOf('.');if(q>=0)s=s.slice(0,q+3);if(parseFloat(s)>100)s='100';return s}
+function sbAmts(){const sub=SB.items.reduce((t,it)=>t+sbNum(it.price),0),g=k=>parseFloat(SB.pv[k])||0;
+  const svc=SB.pm.service?Math.round(sub*g('service')/100):sbNum(SB.service);
+  const tax=SB.pm.tax?Math.round((sub+svc)*g('tax')/100):sbNum(SB.tax);
+  const dsc=SB.pm.discount?Math.round(sub*g('discount')/100):sbNum(SB.discount);
+  return {sub:sub,tax:tax,service:svc,discount:dsc}}
 function sbCalc(){const P=SB.people,share={},names={},fs={};P.forEach(p=>{share[p]=0;fs[p]=0;names[p]=[]});let unassigned=0;
   SB.items.forEach((it,k)=>{const w=it.who.filter(n=>P.indexOf(n)>=0),pr=sbNum(it.price);
     if(!w.length){unassigned+=pr;return}
     const base=Math.floor(pr/w.length),rem=pr-base*w.length,off=k%w.length;
     w.forEach((n,j)=>{share[n]+=base+(((j-off+w.length)%w.length)<rem?1:0);if(it.name)names[n].push(it.name)})});
-  const fee=sbNum(SB.tax)+sbNum(SB.service)-sbNum(SB.discount),tot=P.reduce((t,p)=>t+share[p],0);
+  const am=sbAmts(),fee=am.tax+am.service-am.discount,tot=P.reduce((t,p)=>t+share[p],0);
   if(tot>0&&fee!==0){const ex=P.map(p=>{let v=fee*share[p]/tot;if(Math.abs(v-Math.round(v))<1e-9)v=Math.round(v);return {p:p,v:v,b:Math.floor(v)}});
     let left=fee-ex.reduce((t,e)=>t+e.b,0);
     ex.slice().sort((a,b)=>(b.v-b.b)-(a.v-a.b)).forEach(e=>{if(left>0){e.b++;left--}});
@@ -2605,7 +2612,11 @@ async function sbLogDebts(){if(SB.logging||SB.logged)return;const p=sbDebtPlan()
       await call({action:'debtAdd',acc:'',row:{id:SB.ids[k],kind:x.kind,person:x.person,amount:x.amount,date:SB.date||todayIso(),due:'',note:('SPLIT BILL'+(SB.place?' · '+SB.place:'')).slice(0,100),scope:SB.scope==='shared'?'shared':'private',closed:0}})}
     SB.logged=true;SB.logging=false;await load();toast('Tercatat ke Utang & piutang');if(tab==='split')render()}
   catch(e){SB.logging=false;sbUpd();const r=$('#e-sbd');if(r)r.textContent='Gagal: '+e.message}}
-function sbUpd(){const r=$('#sbRes');if(r)r.innerHTML=sbResHtml();const d=$('#sbDebt');if(d)d.innerHTML=sbDebtHtml()}
+function sbFeeHtml(k,lb,id){const pc=!!SB.pm[k],v=pc?SB.pv[k]:SB[k];
+  return `<div><div class="sb-fh"><label for="${id}">${lb}</label><button type="button" class="sb-u${pc?' pc':''}" data-act="sbUnit" data-v="${k}" aria-label="Ganti satuan ${lb}">${pc?'%':'Rp'}</button></div><input id="${id}" inputmode="${pc?'decimal':'numeric'}" value="${v?(pc?String(v):fkm(v)):''}" placeholder="0"><small class="sb-eq" id="${id}-eq"></small></div>`}
+const SBF={tax:'sb-tax',service:'sb-svc',discount:'sb-dsc'};
+function sbEq(){const am=sbAmts();['tax','service','discount'].forEach(k=>{const e=$('#'+SBF[k]+'-eq');if(e)e.textContent=SB.pm[k]?'= '+sbRp(am[k]):''})}
+function sbUpd(){sbEq();const r=$('#sbRes');if(r)r.innerHTML=sbResHtml();const d=$('#sbDebt');if(d)d.innerHTML=sbDebtHtml()}
 function sbParts(){const a=$('#sbPeople'),b=$('#sbItems');if(a)a.innerHTML=sbPeopleHtml();if(b)b.innerHTML=sbItemsHtml();sbUpd()}
 function sbMsg(){const m=$('#sb-st');if(m)m.textContent=SB.msg||'';document.querySelectorAll('[data-act="sbPick"],[data-act="sbManual"]').forEach(x=>{x.disabled=!!SB.busy})}
 function splitView(){
@@ -2615,7 +2626,7 @@ function splitView(){
   (SB.warn&&SB.warn.length?`<div class="sb-wr">${SB.warn.map(esc).join('<br>')}</div>`:'')+
   `<div class="card sb-sec"><h3>Peserta</h3><div class="sb-add"><input id="sb-pn" maxlength="30" placeholder="Ketik nama peserta" autocomplete="off"><button class="btn" type="button" data-act="sbPAdd">Tambah</button></div><div class="sb-pcs" id="sbPeople">${sbPeopleHtml()}</div></div>`+
   `<div class="card sb-sec"><h3>Item nota</h3><div id="sbItems">${sbItemsHtml()}</div><div class="sb-btns"><button class="btn sec" type="button" data-act="sbIAdd">+ Tambah item</button><button class="btn sec" type="button" data-act="sbAll">Bagi rata semua</button></div></div>`+
-  `<div class="card sb-sec"><h3>Pajak, service, diskon</h3><div class="sb-fees"><div><label for="sb-tax">Pajak</label><input id="sb-tax" inputmode="numeric" value="${SB.tax?fkm(SB.tax):''}" placeholder="0"></div><div><label for="sb-svc">Service</label><input id="sb-svc" inputmode="numeric" value="${SB.service?fkm(SB.service):''}" placeholder="0"></div><div><label for="sb-dsc">Diskon</label><input id="sb-dsc" inputmode="numeric" value="${SB.discount?fkm(SB.discount):''}" placeholder="0"></div></div><p class="sub" style="margin:8px 2px 0">Dibagi sesuai porsi tiap orang.${SB.total?' Total di nota: '+rp(SB.total)+'.':''}</p></div>`+
+  `<div class="card sb-sec"><h3>Pajak, service, diskon</h3><div class="sb-fees">${[['tax','Pajak','sb-tax'],['service','Service','sb-svc'],['discount','Diskon','sb-dsc']].map(f=>sbFeeHtml(f[0],f[1],f[2])).join('')}</div><p class="sub" style="margin:8px 2px 0">Pilih Rp atau % di tiap kolom. Persen service dan diskon dihitung dari jumlah item; persen pajak dari item + service. Dibagi sesuai porsi tiap orang.${SB.total?' Total di nota: '+rp(SB.total)+'.':''}</p></div>`+
   `<div class="card sb-sec"><h3>Hasil pembagian</h3><div id="sbRes">${sbResHtml()}</div></div>`+
   `<div class="card sb-sec"><h3>Catat ke Utang &amp; piutang</h3><div id="sbDebt">${sbDebtHtml()}</div></div>`+
   `<div class="sb-btns"><button class="btn" type="button" data-act="sbCopy">Salin teks</button><button class="btn sec" type="button" data-act="sbReset">Mulai ulang</button></div><p class="sub" style="margin-top:12px">Hasil ini hanya ada di layar. Menutup aplikasi akan menghapusnya.</p>`}
@@ -2632,13 +2643,16 @@ async function sbScan(file){if(SB.busy)return;SB.busy=true;SB.msg='Memproses fot
     const r=await Promise.race([call({action:'scanNota',image:img}),new Promise((_,rj)=>setTimeout(()=>rj(new Error('terlalu lama, coba lagi')),90000))]);
     const n=r.nota||{};
     SB.items=(n.items||[]).map(x=>({id:uid(),name:String(x.name||'').toUpperCase().slice(0,60),qty:Math.max(1,+x.qty||1),price:sbNum(x.price),who:[]}));
-    SB.place=String(n.place||'').toUpperCase().slice(0,60);SB.date=n.date||todayIso();SB.tax=sbNum(n.tax);SB.service=sbNum(n.service);SB.discount=sbNum(n.discount);SB.total=sbNum(n.total);SB.warn=n.warn||[];SB.via=n.via||'';
+    SB.place=String(n.place||'').toUpperCase().slice(0,60);SB.date=n.date||todayIso();SB.tax=sbNum(n.tax);SB.service=sbNum(n.service);SB.discount=sbNum(n.discount);SB.pm={tax:0,service:0,discount:0};SB.pv={tax:0,service:0,discount:0};SB.total=sbNum(n.total);SB.warn=n.warn||[];SB.via=n.via||'';
     SB.busy=false;SB.msg=SB.items.length?'':'Item tidak terbaca. Coba foto ulang lebih jelas, atau isi manual.';
     if(tab==='split')render()}
   catch(e){SB.busy=false;SB.msg='Gagal: '+e.message;sbMsg()}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act^="sb"]');if(!b)return;const a=b.dataset.act,id=b.dataset.id,v=b.dataset.v;
   if(a==='sbPick'){const f=$('#sb-file');if(f&&!SB.busy)f.click()}
   else if(a==='sbManual'){SB.items=[sbNew()];SB.date=SB.date||todayIso();render()}
+  else if(a==='sbUnit'){const k=v;if(!SB.pm.hasOwnProperty(k))return;SB.pm[k]=SB.pm[k]?0:1;const id=SBF[k],i=$('#'+id);
+    if(i){const pc=!!SB.pm[k],x=pc?SB.pv[k]:SB[k];i.setAttribute('inputmode',pc?'decimal':'numeric');i.value=x?(pc?String(x):fkm(x)):'';i.focus()}
+    b.textContent=SB.pm[k]?'%':'Rp';b.classList.toggle('pc',!!SB.pm[k]);sbUpd()}
   else if(a==='sbPAdd')sbAddP();
   else if(a==='sbPDel'){SB.people=SB.people.filter(n=>n!==v);SB.items.forEach(it=>{it.who=it.who.filter(n=>n!==v)});sbParts()}
   else if(a==='sbTog'){const it=SB.items.find(z=>z.id===id);if(!it)return;const k=it.who.indexOf(v);if(k>=0)it.who.splice(k,1);else it.who.push(v);b.classList.toggle('on',k<0);sbUpd()}
@@ -2655,7 +2669,9 @@ function sbAddP(){const i=$('#sb-pn');if(!i)return;const n=sbUp(i.value);if(!n)r
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='sb-pn'&&!e.isComposing){e.preventDefault();sbAddP()}});
 document.addEventListener('input',e=>{const t=e.target;if(!t)return;
   if(t.dataset&&t.dataset.sb){const it=SB.items.find(z=>z.id===t.dataset.id);if(!it)return;if(t.dataset.sb==='n')it.name=t.value.slice(0,60);else{fmtIn(e);it.price=sbNum(t.value)}sbUpd();return}
-  if(t.id==='sb-tax'||t.id==='sb-svc'||t.id==='sb-dsc'){fmtIn(e);const n=sbNum(t.value);if(t.id==='sb-tax')SB.tax=n;else if(t.id==='sb-svc')SB.service=n;else SB.discount=n;sbUpd();return}
+  if(t.id==='sb-tax'||t.id==='sb-svc'||t.id==='sb-dsc'){const k=t.id==='sb-tax'?'tax':t.id==='sb-svc'?'service':'discount';
+    if(SB.pm[k]){const s=sbPct(t.value);if(s!==t.value)t.value=s;SB.pv[k]=s}else{fmtIn(e);SB[k]=sbNum(t.value)}
+    sbUpd();return}
   if(t.id==='sb-place')SB.place=t.value.slice(0,60);
   else if(t.id==='sb-payer')SB.payer=sbUp(t.value)});
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;
