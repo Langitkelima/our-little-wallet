@@ -1342,6 +1342,29 @@ html[data-model="2"] #view .card:not(.card .card){border:2.5px solid var(--c2o)!
 html[data-model="2"] #view .card.hero{overflow:hidden}
 
 </style>
+<style id="fix-light-dock-close">
+/* ===== FIX 17 Nov 2026: (1) tombol silang/ikon .ib di sheet Model 1 tema terang, (2) dock bawah ikut tema terang/gelap ===== */
+/* (1) .ib Model 1 di header bergaya kaca putih; di dalam sheet/dialog harus pakai warna tema */
+html[data-model="1"] .ov .ib{width:36px;height:36px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--line);color:var(--ink);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-model="1"] .ov .ib:hover{border-color:var(--accent);transform:none}
+html[data-model="1"] .ov .ib svg{stroke:currentColor}
+/* (2) dock: variabel warna, default = gelap (seperti sebelumnya) */
+html[data-model] #nav{--nv-bg:#000;--nv-sh:0 14px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.07);--nv-txt:#B8C3DC;--nv-on:#fff;--nv-hole:#000;--nv-trk:#2B3142;--nv-ring:#7FA6F0;--nv-glow:rgba(127,166,240,.35);--nv-gbg:#fff;--nv-gic:#000;--nv-gsh:0 4px 12px rgba(0,0,0,.4)}
+html[data-theme="light"] #nav{--nv-bg:#FFFFFF;--nv-sh:0 12px 28px rgba(40,60,110,.20),0 0 0 1px rgba(40,60,110,.10);--nv-txt:#5E6A86;--nv-on:#1B2A4A;--nv-hole:#FFFFFF;--nv-trk:#DDE4F2;--nv-ring:#4A74CC;--nv-glow:rgba(74,116,204,.30);--nv-gbg:#1B2A4A;--nv-gic:#fff;--nv-gsh:0 4px 12px rgba(40,60,110,.25)}
+@media (prefers-color-scheme:light){html:not([data-theme]) #nav{--nv-bg:#FFFFFF;--nv-sh:0 12px 28px rgba(40,60,110,.20),0 0 0 1px rgba(40,60,110,.10);--nv-txt:#5E6A86;--nv-on:#1B2A4A;--nv-hole:#FFFFFF;--nv-trk:#DDE4F2;--nv-ring:#4A74CC;--nv-glow:rgba(74,116,204,.30);--nv-gbg:#1B2A4A;--nv-gic:#fff;--nv-gsh:0 4px 12px rgba(40,60,110,.25)}}
+html[data-model] #nav{background:var(--nv-bg);box-shadow:var(--nv-sh);transition:background-color .25s,box-shadow .25s}
+html[data-model] #nav button{color:var(--nv-txt)}
+html[data-model] #nav button.on,html[data-model] #nav button:hover:not(.on){color:var(--nv-on)}
+html[data-model] #nav button svg,html[data-model] #nav button.chatb .nbub{background:radial-gradient(circle,var(--nv-hole) 0 calc(var(--rg)/2 - 6px),transparent calc(var(--rg)/2 - 5px)),var(--nv-trk)}
+html[data-model] #nav button.on svg,html[data-model] #nav button.chatb.on .nbub{background:radial-gradient(circle,var(--nv-hole) 0 calc(var(--rg)/2 - 6px),transparent calc(var(--rg)/2 - 5px)),conic-gradient(var(--nv-ring) 0 var(--ring),var(--nv-trk) 0);box-shadow:0 0 16px var(--nv-glow)}
+html[data-model] #nav button.ngear{background:var(--nv-gbg);color:var(--nv-gic);box-shadow:var(--nv-gsh)}
+html[data-model] #nav button.ngear:hover{background:var(--nv-gbg);color:var(--nv-gic)}
+html[data-model] #nav button.ngear svg{color:var(--nv-gic)}
+/* logo Chat Bot di dock: versi terang saat tema terang */
+html[data-theme="light"] #nav .nbub .bl-l{display:block}
+html[data-theme="light"] #nav .nbub .bl-d{display:none}
+@media (prefers-color-scheme:light){html:not([data-theme]) #nav .nbub .bl-l{display:block}html:not([data-theme]) #nav .nbub .bl-d{display:none}}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
