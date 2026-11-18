@@ -1032,7 +1032,18 @@ html[data-model="1"] nav button.chatb.on::after{display:none}
 html[data-model="1"] nav button.chatb::before{content:"";position:absolute;left:50%;top:-31px;width:84px;height:84px;margin-left:-42px;border-radius:50%;background:var(--card);clip-path:inset(0 0 52% 0);box-shadow:0 -6px 14px rgba(60,82,125,.10)}
 html[data-model="1"] nav .nbub{top:-34px;width:76px;height:76px;margin-left:-38px}
 }
-</style><style id="wx-css">
+</style><style id="ad-css">
+.ad-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid color-mix(in srgb,currentColor 12%,transparent)}.ad-row:first-child{border-top:0}
+.ad-main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer}
+.ad-main b{display:block;overflow-wrap:anywhere}.ad-main span{display:block;font-size:12.5px;opacity:.7}
+.ad-sw{flex:none;width:44px;height:26px;border-radius:13px;border:0;background:color-mix(in srgb,currentColor 22%,transparent);position:relative;cursor:pointer}
+.ad-sw:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.ad-sw.on{background:#1E9473}.ad-sw.on:after{left:21px}
+.ad-p{flex:none;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600}
+.ad-ok{background:color-mix(in srgb,#1E9473 18%,transparent);color:#1E9473}.ad-er{background:color-mix(in srgb,#C8374F 18%,transparent);color:#C8374F}
+.ad-chk{display:flex;align-items:center;gap:8px;margin:12px 0}.ad-chk input{width:auto}
+</style>
+<style id="wx-css">
 .wx-chips{display:flex;gap:8px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px;scrollbar-width:none}.wx-chips::-webkit-scrollbar{display:none}
 .wx-chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:99px;padding:8px 13px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
 .wx-chip.on{background:var(--btn,var(--accent));color:var(--btn-ink,#fff);border-color:transparent}
@@ -1365,6 +1376,7 @@ html[data-theme="light"] #nav .nbub .bl-l{display:block}
 html[data-theme="light"] #nav .nbub .bl-d{display:none}
 @media (prefers-color-scheme:light){html:not([data-theme]) #nav .nbub .bl-l{display:block}html:not([data-theme]) #nav .nbub .bl-d{display:none}}
 </style>
+<style id="wp-css">.wp-bar{display:flex;align-items:center;gap:6px;margin-top:6px}.wp-tr{flex:1;height:5px;border-radius:99px;background:var(--line);overflow:hidden}.wp-tr i{display:block;height:100%;border-radius:99px;background:var(--accent,#3F63A0)}.wp-tx{font-size:10.5px;font-weight:800;color:var(--ink);opacity:.75;white-space:nowrap}</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -1534,7 +1546,7 @@ const ic=(n,s=22)=>TPI[n]?`<svg class="tp-il" width="${s>=30?64:s}" height="${s>
 
 const PEOPLE=['RAMA','DESY'];
 const COLORS=['#E4673A','#3C7BD9','#B94AA8','#8059D8','#B8730A','#1E9473','#E8609B','#D43F5E','#667189'];
-const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[],billpay:[],debts:[],debtpay:[],notes:[],wishes:[],budgets:[]};
+const S={accounts:[],categories:[],transactions:[],goals:[],dates:[],vehicles:[],reminders:[],servicelog:[],bills:[],billpay:[],debts:[],debtpay:[],notes:[],wishes:[],budgets:[],adminFees:[],adminLog:[]};
 const myCats=()=>S.categories.filter(c=>!c.owner||c.owner===ME);
 const cat=id=>myCats().find(c=>c.id===id)||{name:'(dihapus)',color:'#999',icon:'tag'};
 const acct=id=>S.accounts.find(a=>a.id===id)||{name:'(dihapus)'};
@@ -1674,8 +1686,8 @@ function saveObj(table,row){save(table,row);return row}
 const goalRow=g=>({id:g.id,name:g.name,target:g.target,deadline:g.deadline,scope:g.scope,owner:g.owner});
 function hydrate(d){S.accounts=d.Accounts;S.categories=d.Categories;S.transactions=d.Transactions;
   S.goals=d.Goals.map(g=>({...g,deps:d.Deposits.filter(x=>x.goal===g.id).map(x=>({id:x.id,date:x.date,by:x.by,amount:x.amount,note:x.note}))}));
-  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];S.budgets=(d.Budgets||[]).map(x=>({...x,amount:Number(x.amount)||0}));S.wishes=(d.Wishlist||[]).map(x=>({...x,amount:Number(x.amount)||0,added:Number(x.added)||0,photo:x.photo||''}));S.notes=(d.Notes||[]).map(x=>({...x,pinned:Number(x.pinned)||0,updated:Number(x.updated)||0}));loaded=true}
-async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();duoStart();return true}catch(e){setSync('err',e.message);return e.message}}
+  S.dates=d.Dates.map(x=>({...x,yearly:x.yearly===true||x.yearly==='TRUE'}));S.vehicles=d.Vehicles||[];S.reminders=d.Reminders||[];S.servicelog=d.ServiceLog||[];S.bills=d.Bills||[];S.billpay=d.BillPayments||[];S.debts=d.Debts||[];S.debtpay=d.DebtPayments||[];S.budgets=(d.Budgets||[]).map(x=>({...x,amount:Number(x.amount)||0}));S.wishes=(d.Wishlist||[]).map(x=>({...x,amount:Number(x.amount)||0,added:Number(x.added)||0,photo:x.photo||'',goal:x.goal||'',fid:x.fid||''}));S.adminFees=(d.AdminFees||[]).map(x=>({...x,amount:Number(x.amount)||0,day:Number(x.day)||1,active:Number(x.active)?1:0}));S.adminLog=(d.AdminLog||[]).map(x=>({...x,amount:Number(x.amount)||0,period:Number(x.period)||0}));S.notes=(d.Notes||[]).map(x=>({...x,pinned:Number(x.pinned)||0,updated:Number(x.updated)||0}));loaded=true}
+async function load(){setSync('load');try{const r=await call({action:'getAll'});ME=r.me||'';hydrate(r.data);setSync('ok');render();duoStart();adminAuto();return true}catch(e){setSync('err',e.message);return e.message}}
 
 
 let gateKb=false,gateRem=true;
@@ -1818,6 +1830,7 @@ veh(){return vehView()},
 bill(){return billView()},
 wish(){return wishView()},
 budget(){return budgetView()},
+admin(){return adminView()},
 recap(){return recapView()},
 split(){return splitView()},
 debt(){return debtView()},
@@ -1891,7 +1904,7 @@ function hxHub(){const T=todayIso();
   const split=`<button type="button" class="hx-tile wide hx-warn" data-act="tab" data-t="split"><div class="hx-tw"><div class="hx-tm"><span class="hx-chip">${ic('receipt',22)}</span><span class="hx-l">Split Bill</span><b class="hx-v">${SB.items.length?SB.items.length+' item sedang dibagi':'Bagi nota'}</b><span class="hx-s">Foto nota, bagi per orang</span></div></div></button>`;
   const bi=S.budgets.map(bgInfo),bw=bi.filter(x=>x.st!=='ok').length,bud=`<button type="button" class="hx-tile wide hx-acc" data-act="tab" data-t="budget">${bw?`<i class="hx-dot hx-${bi.some(x=>x.st==='over')?'out':'warn'}"></i>`:''}<div class="hx-tw"><div class="hx-tm"><span class="hx-chip">${ic('chart',22)}</span><span class="hx-l">Anggaran bulanan</span><b class="hx-v">${S.budgets.length?S.budgets.length+' kategori diatur':'Belum ada'}</b><span class="hx-s">${S.budgets.length?(bw?bw+' perlu perhatian':'Semua masih aman'):'Atur batas pengeluaran per kategori'}</span></div></div></button>`;
   const rcf=rcFacts('cur'),rcTile=`<button type="button" class="hx-tile wide hx-in" data-act="tab" data-t="recap"><div class="hx-tw"><div class="hx-tm"><span class="hx-chip">${ic('receipt',22)}</span><span class="hx-l">Rekap bulanan</span><b class="hx-v">${rcf.empty?'Belum ada data':'Pengeluaran '+rp(rcf.expense)}</b><span class="hx-s">Ringkasan santai, bisa dibagikan</span></div></div></button>`;
-  return `<div class="hx-top"><div class="hx-hub">${sav}${veh}${bill}${debt}${wish}${split}${bud}${rcTile}</div>${hxAgenda()}</div>`}
+  return `<div class="hx-top"><div class="hx-hub">${sav}${veh}${bill}${debt}${wish}${split}${bud}${adTile()}${rcTile}</div>${hxAgenda()}</div>`}
 function hxAgenda(){const T=todayIso(),it=[],hot=s=>s==='terlambat'||s==='segera';
   S.reminders.forEach(r=>{const d=remInfo(r),v=vehOf(r.vehicle);if(hot(d.status))it.push({s:d.status,n:d.daysLeft==null?(d.kmLeft<0?-1:999):d.daysLeft,t:r.name+(v?' · '+v.name:''),sub:remLeft(d),tab:'veh',lab:STAT_LAB[d.status]})});
   S.bills.forEach(b=>{const i=billInfo_(b,T);if(hot(i.status))it.push({s:i.status,n:i.daysLeft,t:b.name,sub:(b.amount?rp(b.amount)+' · ':'')+billLeft(i),tab:'bill',lab:BILL_LAB[i.status]})});
@@ -1917,7 +1930,7 @@ function listTx(){const _r=pRange();let l=S.transactions.filter(t=>(F.type==='al
   const ti=sum(l,'in'),to=sum(l,'out');
   $('#trxList').innerHTML=`<div class="sub" style="margin-bottom:2px">${l.length} transaksi${ti?` · Masuk <span class="in">+${rp(ti)}</span>`:''}${to?` · Keluar <span class="out">−${rp(to)}</span>`:''}</div><div class="sub" style="margin-bottom:2px;font-size:11.5px">Ketuk transaksi untuk mengubahnya.</div>`+h}
 function render(){const me=$('#me');if(me)me.textContent=ME?'Masuk sebagai '+ME:'';$('#view').className='view view-'+tab;$('#view').innerHTML=loaded?VIEWS[tab]():'<div class="empty"><b>Memuat data…</b></div>';if(loaded&&tab==='trx')listTx();
-  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||((tab==='sav'||tab==='veh'||tab==='bill'||tab==='debt'||tab==='wish'||tab==='split'||tab==='budget'||tab==='recap')&&t[0]==='home'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('')+`<button type="button" class="ngear" data-act="settings" aria-label="Pengaturan">${ic('gear',20)}</button>`;
+  $('#nav').innerHTML=TABS.map(t=>{const on=(tab===t[0]||((tab==='sav'||tab==='veh'||tab==='bill'||tab==='debt'||tab==='wish'||tab==='split'||tab==='budget'||tab==='admin'||tab==='recap')&&t[0]==='home'))?'on':'';return t[0]==='chat'?`<button class="chatb ${on}" data-act="tab" data-t="chat" aria-label="Chat Bot"><span class="nbub">${botLogo()}</span><span class="cgap"></span><span class="clab">${t[1]}</span></button>`:`<button class="${on}" data-act="tab" data-t="${t[0]}">${ic(t[2],22)}${t[1]}</button>`}).join('')+`<button type="button" class="ngear" data-act="settings" aria-label="Pengaturan">${ic('gear',20)}</button>`;
   $('#fab').style.display=(tab==='home'||tab==='trx')?'grid':'none';document.body.classList.toggle('tchat',tab==='chat');if(tab!=='chat')document.body.classList.remove('kbf');chatSync();duoSync();hx1()}
 
 
@@ -2040,6 +2053,7 @@ function chatHtml(){
     else if(m.k==='bcard')h+=chatBillCard(m,i);
     else if(m.k==='dbtcard')h+=chatDebtCard(m,i);
     else if(m.k==='acard')h+=aCard(m,i);
+    else if(m.k==='sbcard')h+='<div class="callrow"><button type="button" class="cb pri" data-act="sbOpen">Buka Split Bill</button><button type="button" class="cb" data-act="sbCopy">Salin teks</button></div>';
     else if(m.k==='all'){const n=CHAT.filter(x=>x.k==='card'&&x.g===m.g&&x.st==='new').length;if(n>1)h+=`<div class="callrow"><button type="button" class="cb pri" data-act="cAll" data-g="${m.g}">Simpan semua (${n})</button></div>`}
   });
   return h}
@@ -2765,21 +2779,24 @@ function debtHistSheet(id){const d=S.debts.find(z=>z.id===id);if(!d)return;const
 const WCAT=[['aksesoris','💻','Aksesoris'],['fashion','👕','Fashion'],['sepatu','👟','Sepatu'],['peralatan','🔧','Peralatan'],['makanan','🍜','Makanan & Minuman'],['elektronik','📱','Elektronik'],['furniture','🏠','Furniture'],['buku','📚','Buku & Edukasi'],['perawatan','🧴','Perawatan'],['lainnya','🎁','Lainnya']];
 const WPRIO=[['penting','🔴','Penting'],['biasa','🟡','Ga terlalu'],['pingin','🟢','Pingin']];
 const WSTAT=[['want','🛒','Mau beli'],['later','🙏','Belum'],['bought','✅','Sudah dibeli'],['cancel','❌','Batal']];
-let WF='all',WQ='',WSORT='new',wishSeq=0,wishLast='',wishPhoto='';
+let WF='all',WQ='',WSORT='new',wishSeq=0,wishLast='',wishPhoto='',wishFid='';
 const wopt=(L,k)=>L.find(x=>x[0]===k)||(L===WCAT?L[L.length-1]:L[0]);
+const wFidUrl=f=>/^[A-Za-z0-9_-]{10,80}$/.test(f||'')?'https:\/\/drive.google.com\/thumbnail?id='+f+'&sz=w800':'';
 const wSafeImg=u=>/^https:\/\/[^\s"'<>]+$/i.test(u||'')&&String(u).length<=500?u:'';
 const wSafeLink=u=>/^https?:\/\/[^\s"'<>]+$/i.test(u||'')&&String(u).length<=500?u:'';
-const wishRow=w=>({id:w.id,name:w.name,amount:w.amount,cat:w.cat,prio:w.prio,status:w.status,link:w.link,img:w.img,specs:w.specs,note:w.note,scope:w.scope,owner:w.owner,added:w.added,photo:w.photo||''});
+const wishRow=w=>({id:w.id,name:w.name,amount:w.amount,cat:w.cat,prio:w.prio,status:w.status,link:w.link,img:w.img,specs:w.specs,note:w.note,scope:w.scope,owner:w.owner,added:w.added,photo:w.photo||'',spent:w.spent||0,goal:w.goal||'',fid:w.fid||''});
 const wOpen=w=>w.status==='want'||w.status==='later';
 function wishItems(){const q=WQ.trim().toLowerCase();
   const a=S.wishes.filter(w=>{const okF=WF==='all'||(WF==='urgent'&&w.prio==='penting'&&wOpen(w))||(WF==='want'&&wOpen(w))||(WF==='bought'&&w.status==='bought');
     return okF&&(!q||[w.name,wopt(WCAT,w.cat)[2],w.specs,w.note].join(' ').toLowerCase().includes(q))});
   const by={new:(x,y)=>(y.added||0)-(x.added||0),old:(x,y)=>(x.added||0)-(y.added||0),hi:(x,y)=>y.amount-x.amount,lo:(x,y)=>x.amount-y.amount,name:(x,y)=>String(x.name).localeCompare(String(y.name),'id')};
   return a.sort(by[WSORT]||by.new)}
-function wishImgBox(w,cls){const c=wopt(WCAT,w.cat),im=w.photo||wSafeImg(w.img);
+function wishImgBox(w,cls){const c=wopt(WCAT,w.cat),im=w.photo||wFidUrl(w.fid)||wSafeImg(w.img);
   return `${im?`<img data-wi="1" loading="lazy" referrerpolicy="no-referrer" src="${esc(im)}" alt="">`:''}<span class="wx-emo"${im?' hidden':''}>${c[1]}</span>`}
 function wishCard(w){const c=wopt(WCAT,w.cat),p=wopt(WPRIO,w.prio),st=wopt(WSTAT,w.status);
-  return `<button type="button" class="wx-card ${w.status==='bought'?'done':w.status==='cancel'?'cancel':''}" data-act="wishOpen" data-id="${esc(w.id)}"><span class="wx-img">${wishImgBox(w)}<span class="wx-pr">${p[1]} ${p[2]}</span></span><span class="wx-in"><span class="wx-cat">${esc(c[2])}</span><span class="wx-nm">${esc(w.name)}</span><span class="wx-bt"><b>${w.amount?rp(w.amount):'—'}</b><span class="wx-st">${st[1]} ${st[2]}${w.scope==='private'?' · '+ic('lock',11):''}</span></span></span></button>`}
+  return `<button type="button" class="wx-card ${w.status==='bought'?'done':w.status==='cancel'?'cancel':''}" data-act="wishOpen" data-id="${esc(w.id)}"><span class="wx-img">${wishImgBox(w)}<span class="wx-pr">${p[1]} ${p[2]}</span></span><span class="wx-in"><span class="wx-cat">${esc(c[2])}</span><span class="wx-nm">${esc(w.name)}</span><span class="wx-bt"><b>${w.amount?rp(w.amount):'—'}</b><span class="wx-st">${st[1]} ${st[2]}${w.scope==='private'?' · '+ic('lock',11):''}</span></span>${wishBar(w)}</span></button>`}
+function wishBar(w){if(!wOpen(w))return '';const g=wishGoal(w);if(!g||!(g.target>0))return '';const sm=gSum(g),pc=Math.min(100,Math.round(sm/g.target*100));
+  return `<span class="wp-bar" title="Tabungan ${pc}%"><span class="wp-tr"><i style="width:${pc}%"></i></span><span class="wp-tx">Nabung ${pc}%</span></span>`}
 function wishGridHtml(){const l=wishItems();return l.length?l.map(wishCard).join(''):`<div class="card empty" style="grid-column:1/-1">Tidak ada barang yang cocok.</div>`}
 function wishSumText(){const l=wishItems();return l.length+' dari '+S.wishes.length+' barang · '+rp(l.reduce((t,w)=>t+(+w.amount||0),0))}
 function wishUpdate(){const g=$('#wxGrid');if(g)g.innerHTML=wishGridHtml();const m=$('#wxSum');if(m)m.textContent=wishSumText()}
@@ -2796,19 +2813,19 @@ function wishDetail(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
   const c=wopt(WCAT,w.cat),p=wopt(WPRIO,w.prio),st=wopt(WSTAT,w.status),lk=wSafeLink(w.link);
   const blk=(t,v)=>v?`<div class="wx-blk"><small>${t}</small><p>${esc(v)}</p></div>`:'';
   let host='';try{host=lk?new URL(lk).hostname.replace(/^www\./,''):''}catch(e){}
-  sheet('Detail wishlist',`<div class="wx-big">${wishImgBox(w)}</div><div class="wx-cat" style="margin-top:12px">${esc(c[2])}</div><h2 style="margin:4px 0 6px;overflow-wrap:anywhere">${esc(w.name)}</h2><div style="font:700 22px/1.2 var(--f-disp,inherit)">${w.amount?rp(w.amount):'Harga belum diisi'}</div><div class="wx-badges"><span class="badge">${p[1]} ${p[2]}</span><span class="badge">${st[1]} ${st[2]}</span>${hxBadge(w.scope)}</div>${lk?`<a class="btn wx-a" href="${esc(lk)}" target="_blank" rel="noopener noreferrer">Buka link produk${host?' · '+esc(host):''}</a>`:''}${blk('Spesifikasi',w.specs)}${blk('Keterangan',w.note)}${wishGoalBlk(w)}${w.status==='bought'?`<button class="btn sec" data-act="wxSpend" data-id="${esc(w.id)}">Catat sebagai pengeluaran</button>`:''}<button class="btn sec" data-act="wishDone" data-id="${esc(w.id)}">${w.status==='bought'?'Kembalikan ke daftar ingin':'✅ Tandai sudah dibeli'}</button><button class="btn sec" data-act="wishEdit" data-id="${esc(w.id)}">Ubah</button>`)}
-function wishDone(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;w.status=w.status==='bought'?'want':'bought';save('Wishlist',wishRow(w));closeSheet();render();toast(w.status==='bought'?'Impian terwujud ♡':'Dikembalikan ke daftar');if(w.status==='bought'&&S.accounts.length)wishAsk(id)}
-function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wishPhoto||wSafeImg(($('#w-i').value||'').trim());b.innerHTML=u?`<img data-wi="1" referrerpolicy="no-referrer" src="${esc(u)}" alt=""><span class="wx-emo" hidden>🖼️</span>`:'<span class="wx-emo">🖼️</span>'}
+  sheet('Detail wishlist',`<div class="wx-big">${wishImgBox(w)}</div><div class="wx-cat" style="margin-top:12px">${esc(c[2])}</div><h2 style="margin:4px 0 6px;overflow-wrap:anywhere">${esc(w.name)}</h2><div style="font:700 22px/1.2 var(--f-disp,inherit)">${w.amount?rp(w.amount):'Harga belum diisi'}</div><div class="wx-badges"><span class="badge">${p[1]} ${p[2]}</span><span class="badge">${st[1]} ${st[2]}</span>${hxBadge(w.scope)}</div>${lk?`<a class="btn wx-a" href="${esc(lk)}" target="_blank" rel="noopener noreferrer">Buka link produk${host?' · '+esc(host):''}</a>`:''}${blk('Spesifikasi',w.specs)}${blk('Keterangan',w.note)}${wishGoalBlk(w)}${w.status==='bought'?(w.spent?`<div class="wx-blk"><small>Pengeluaran</small><p>✓ Sudah dicatat (${esc(isoL(new Date(w.spent)))})</p></div><button class="btn sec" data-act="wxSpend" data-id="${esc(w.id)}">Catat lagi</button>`:`<button class="btn sec" data-act="wxSpend" data-id="${esc(w.id)}">Catat sebagai pengeluaran</button>`):''}<button class="btn sec" data-act="wishDone" data-id="${esc(w.id)}">${w.status==='bought'?'Kembalikan ke daftar ingin':'✅ Tandai sudah dibeli'}</button><button class="btn sec" data-act="wishEdit" data-id="${esc(w.id)}">Ubah</button>`)}
+function wishDone(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;w.status=w.status==='bought'?'want':'bought';if(w.status!=='bought')w.spent=0;save('Wishlist',wishRow(w));closeSheet();render();toast(w.status==='bought'?'Impian terwujud ♡':'Dikembalikan ke daftar');if(w.status==='bought'&&S.accounts.length&&!w.spent)wishAsk(id)}
+function wishPreview(){const b=$('#w-pvb');if(!b)return;const u=wishPhoto||wFidUrl(wishFid)||wSafeImg(($('#w-i').value||'').trim());b.innerHTML=u?`<img data-wi="1" referrerpolicy="no-referrer" src="${esc(u)}" alt=""><span class="wx-emo" hidden>🖼️</span>`:'<span class="wx-emo">🖼️</span>'}
 function wishPhotoFrom(file){return new Promise((res,rej)=>{
   if(!file||String(file.type).indexOf('image/')!==0)return rej(new Error('File bukan gambar'));
   if(file.size>18*1024*1024)return rej(new Error('Maksimum foto 18 MB'));
   const url=URL.createObjectURL(file),img=new Image();
-  img.onload=()=>{URL.revokeObjectURL(url);let side=420,q=.7,out='';
-    for(let i=0;i<8;i++){const k=Math.min(1,side/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<=30000)break;if(q>.5)q-=.1;else side=Math.round(side*.8)}
-    out.length<=45000?res(out):rej(new Error('Foto terlalu rumit, coba foto lain'))};
+  img.onload=()=>{URL.revokeObjectURL(url);let side=1000,q=.82,out='';
+    for(let i=0;i<8;i++){const k=Math.min(1,side/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);out=c.toDataURL('image/jpeg',q);if(out.length<=450000)break;if(q>.55)q-=.08;else side=Math.round(side*.85)}
+    out.length<=900000?res(out):rej(new Error('Foto terlalu rumit, coba foto lain'))};
   img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('Foto tidak bisa dibaca'))};img.src=url})}
 async function wishSetPhoto(file){const ps=$('#w-ps');if(!ps)return;ps.textContent='Memproses foto…';
-  try{wishPhoto=await wishPhotoFrom(file);wishPreview();ps.textContent='Foto terpasang ✓ ('+Math.round(wishPhoto.length/1024)+' KB)'}catch(e){ps.textContent='Gagal: '+e.message}}
+  try{wishPhoto=await wishPhotoFrom(file);wishPreview();ps.textContent='Foto siap diunggah ke Drive ✓ (±'+Math.round(wishPhoto.length*.75/1024)+' KB)'}catch(e){ps.textContent='Gagal: '+e.message}}
 async function wishAuto(manual){const li=$('#w-l');if(!li)return;const raw=li.value.trim(),um=raw.match(/https?:\/\/[^\s]+/i),u=um?um[0]:raw,st=$('#w-st'),bt=$('#w-auto');
   if(um&&raw!==um[0]){let rest=raw.replace(um[0],' ').replace(/\s+/g,' ').trim().replace(/\s*[-–|:!,]*\s*(di|on)\s+shopee.*$/i,'').replace(/^(cek|lihat|check out|yuk beli|beli)\s+/i,'').replace(/^["“]+|["”]+$/g,'').replace(/[!.\s]+$/,'').slice(0,120);
     li.value=um[0];if(rest.length>=3&&!$('#w-n').value.trim())$('#w-n').value=rest}
@@ -2837,15 +2854,19 @@ function wishSheet(id){const w=id?S.wishes.find(z=>z.id===id):null;if(id&&!w)ret
   <label for="w-nt">Keterangan (opsional)</label><textarea id="w-nt" maxlength="500" rows="2" placeholder="Catatan kecil">${esc(x.note)}</textarea>
   ${id?'':'<label for="w-s">Siapa yang bisa melihat</label><select id="w-s"><option value="private">Pribadi (hanya aku)</option><option value="shared">Bersama (RAMA dan DESY)</option></select>'}
   <button class="btn" id="w-save">Simpan</button>${id?'<button class="btn sec" id="w-x">Hapus dari wishlist</button>':''}`);
-  wishPhoto=x.photo||'';wishPreview();$('#w-p').oninput=fmtIn;$('#w-i').oninput=wishPreview;
-  $('#w-pick').onclick=()=>$('#w-file').click();$('#w-unpick').onclick=()=>{wishPhoto='';$('#w-i').value='';wishPreview();$('#w-ps').textContent='Foto dihapus.'};
-  $('#w-save').onclick=()=>{const n=$('#w-n').value.trim(),am=parseInt($('#w-p').value.replace(/\D/g,'')||'0',10),lk=$('#w-l').value.trim(),im=$('#w-i').value.trim();
+  wishPhoto='';wishFid=x.fid||'';if(!wishFid)wishPhoto=x.photo||'';wishPreview();$('#w-p').oninput=fmtIn;$('#w-i').oninput=wishPreview;
+  $('#w-pick').onclick=()=>$('#w-file').click();$('#w-unpick').onclick=()=>{wishPhoto='';wishFid='';$('#w-i').value='';wishPreview();$('#w-ps').textContent='Foto dihapus.'};
+  $('#w-save').onclick=async()=>{const n=$('#w-n').value.trim(),am=parseInt($('#w-p').value.replace(/\D/g,'')||'0',10),lk=$('#w-l').value.trim(),im=$('#w-i').value.trim();
     const eN=n?'':'Nama wajib diisi',eP=am>999999999999?'Nominal terlalu besar':'';
     const eL=lk&&!wSafeLink(lk)?(lk.length>500?'Link terlalu panjang (maksimal 500 karakter)':'Link harus diawali http:\/\/ atau https:\/\/'):'';
     const eI=im&&!wSafeImg(im)?(im.length>500?'URL gambar terlalu panjang':'URL gambar harus diawali https:\/\/'):'';
     setErr('wn',eN);setErr('wp',eP);setErr('wl',eL);setErr('wi',eI);if(eN||eP||eL||eI)return;
     const pick=(L,sel)=>{const v=$(sel).value;return L.some(o=>o[0]===v)?v:L[0][0]};
-    const o={name:n,amount:am,cat:pick(WCAT,'#w-c'),prio:pick(WPRIO,'#w-r'),status:pick(WSTAT,'#w-t'),link:lk,img:im,photo:wishPhoto,specs:$('#w-sp').value.trim(),note:$('#w-nt').value.trim()};
+    const o={name:n,amount:am,cat:pick(WCAT,'#w-c'),prio:pick(WPRIO,'#w-r'),status:pick(WSTAT,'#w-t'),link:lk,img:im,photo:wishPhoto,fid:wishFid,specs:$('#w-sp').value.trim(),note:$('#w-nt').value.trim()};
+    const sc0=w?w.scope:($('#w-s').value==='shared'?'shared':'private');
+    if(o.photo&&o.photo.indexOf('data:image/jpeg')===0){const bt=$('#w-save');bt.disabled=true;bt.textContent='Mengunggah foto…';
+      try{const r=await call({action:'wishPhoto',image:o.photo,scope:sc0,name:n});o.fid=r.photo.fid;o.photo=''}
+      catch(e){bt.disabled=false;bt.textContent='Simpan';toast('Foto gagal diunggah: '+e.message);return}}
     if(w){Object.assign(w,o);save('Wishlist',wishRow(w))}else{const sc=$('#w-s').value==='shared'?'shared':'private',nw={id:uid(),scope:sc,owner:sc==='private'?ME:'',added:Date.now(),...o};S.wishes.unshift(nw);save('Wishlist',wishRow(nw))}
     closeSheet();render();toast('Wishlist disimpan')};
   if(id)$('#w-x').onclick=()=>confirmBox(`${esc(w.name)} akan dihapus dari wishlist.`,()=>{S.wishes=S.wishes.filter(z=>z.id!==id);drop('Wishlist',id);render()})}
@@ -3041,18 +3062,28 @@ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.c
   const r=await csvShare(R.name,text);toast(r==='share'?'Siap dibagikan':r==='download'?'Mengunduh '+R.name:r==='abort'?'Dibatalkan':'Gagal. Coba Salin CSV')});
 
 
-function wishGoal(w){const nm=String(w.name).toUpperCase().slice(0,40);return S.goals.find(g=>g.name===nm)}
-function wishGoalBlk(w){if(!wOpen(w))return '';const g=wishGoal(w);
-  if(!g)return `<button class="btn sec" data-act="wxSave" data-id="${esc(w.id)}">Nabung untuk barang ini</button>`;
+function wishGoal(w){if(w.goal)return S.goals.find(g=>g.id===w.goal);const nm=String(w.name).toUpperCase().slice(0,40);return S.goals.find(g=>g.name===nm)}
+function wishLegacyLink(w){if(w.goal)return;const g=wishGoal(w);if(g){w.goal=g.id;save('Wishlist',wishRow(w))}}
+function wishGoalBlk(w){if(!wOpen(w))return '';wishLegacyLink(w);const g=wishGoal(w);
+  if(!g){const pick=S.goals.some(x=>!S.wishes.some(z=>z.id!==w.id&&z.goal===x.id&&wOpen(z)))?`<button class="btn sec" data-act="wxLink" data-id="${esc(w.id)}">Hubungkan ke target yang ada</button>`:'';
+    return `<button class="btn sec" data-act="wxSave" data-id="${esc(w.id)}">Nabung untuk barang ini</button>${pick}`}
   const sm=gSum(g),pc=g.target>0?Math.min(100,Math.round(sm/g.target*100)):0;
-  return `<div class="wx-blk"><small>Tabungan</small><p>${rp(sm)} dari ${rp(g.target)} · ${pc}%</p></div><button class="btn sec" data-act="wxGoalGo">Buka tabungan</button>`}
+  return `<div class="wx-blk"><small>Tabungan · ${esc(g.name)}</small><p>${rp(sm)} dari ${rp(g.target)} · ${pc}%</p></div><button class="btn sec" data-act="wxGoalGo">Buka tabungan</button><button class="btn sec" data-act="wxUnlink" data-id="${esc(w.id)}">Lepas tautan tabungan</button>`}
+function wishLinkSheet(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
+  const ops=S.goals.filter(x=>!S.wishes.some(z=>z.id!==w.id&&z.goal===x.id&&wOpen(z))).map(x=>`<option value="${esc(x.id)}">${esc(x.name)} (${rp(gSum(x))} dari ${rp(x.target)})</option>`).join('');
+  if(!ops){toast('Belum ada target tabungan yang bisa dihubungkan');return}
+  sheet('Hubungkan ke target tabungan',`<p style="margin:0 0 4px;overflow-wrap:anywhere"><b>${esc(w.name)}</b></p><p class="sub" style="margin:0 0 6px">Tautan tetap walau nama barang atau nama target diubah.</p><label for="wl-g">Target tabungan</label><select id="wl-g">${ops}</select><button class="btn" id="wl-save">Hubungkan</button>`);
+  $('#wl-save').onclick=()=>{w.goal=$('#wl-g').value;save('Wishlist',wishRow(w));closeSheet();render();toast('Tabungan terhubung')}}
 function wishSaveSheet(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;const nm=String(w.name).toUpperCase().slice(0,40);
   if(wishGoal(w)){closeSheet();tab='sav';render();window.scrollTo(0,0);toast('Target tabungan untuk barang ini sudah ada');return}
   sheet('Nabung untuk barang ini',`<p style="margin:0 0 4px;overflow-wrap:anywhere"><b>${esc(w.name)}</b></p><p class="sub" style="margin:0 0 6px">Dibuat sebagai target di menu Tabungan. Setor sedikit demi sedikit di sana.</p><label for="ws-t">Target dana (Rp)</label><input id="ws-t" inputmode="numeric" value="${w.amount?fkm(w.amount):''}" placeholder="0"><div class="err" id="e-wst"></div><label for="ws-s">Jenis tabungan</label><select id="ws-s"><option value="shared"${w.scope==='private'?'':' selected'}>Bersama (RAMA dan DESY bisa lihat)</option><option value="private"${w.scope==='private'?' selected':''}>Pribadi (hanya aku)</option></select><label for="ws-d">Target tanggal (opsional)</label><input type="date" id="ws-d"><button class="btn" id="ws-save">Buat target tabungan</button>`);
   $('#ws-t').oninput=fmtIn;
   $('#ws-save').onclick=()=>{const t=parseInt($('#ws-t').value.replace(/\D/g,'')||'0',10),ok=t>0&&t<=999999999999;setErr('wst',ok?'':'Masukkan target lebih dari 0');if(!ok)return;
     const sc=$('#ws-s').value==='private'?'private':'shared',g1={id:uid(),name:nm,target:t,deadline:$('#ws-d').value||'',scope:sc,owner:sc==='private'?ME:'',deps:[]};
-    S.goals.push(g1);save('Goals',goalRow(g1));closeSheet();tab='sav';render();window.scrollTo(0,0);toast('Target tabungan dibuat')}}
+    S.goals.push(g1);save('Goals',goalRow(g1));w.goal=g1.id;save('Wishlist',wishRow(w));closeSheet();tab='sav';render();window.scrollTo(0,0);toast('Target tabungan dibuat')}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="wxLink"],[data-act="wxUnlink"]');if(!b)return;
+  if(b.dataset.act==='wxLink'){wishLinkSheet(b.dataset.id);return}
+  const w=S.wishes.find(z=>z.id===b.dataset.id);if(!w)return;w.goal='';save('Wishlist',wishRow(w));closeSheet();render();toast('Tautan dilepas')});
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="wxSave"],[data-act="wxGoalGo"]');if(!b)return;
   if(b.dataset.act==='wxSave')wishSaveSheet(b.dataset.id);else{closeSheet();tab='sav';render();window.scrollTo(0,0)}});
 
@@ -3062,7 +3093,7 @@ function wishCatId(w){const nm=WMAP[w.cat]||'',c=S.categories.find(x=>x.id!=='ct
 function wishAsk(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
   sheet('Catat sebagai pengeluaran?',`<p style="margin:0 0 6px;overflow-wrap:anywhere"><b>${esc(w.name)}</b></p><p class="sub" style="margin:0 0 14px">${w.amount?'Harga '+rp(w.amount)+'. ':'Harga belum diisi, kamu bisa mengisinya di form. '}Form transaksi dibuka dengan data barang ini. Kamu tinggal pilih akun lalu simpan.</p><button class="btn" data-act="wxSpend" data-id="${esc(w.id)}">Ya, buka form transaksi</button><button class="btn sec" data-act="close">Nanti saja</button>`)}
 function wishSpend(id){const w=S.wishes.find(z=>z.id===id);if(!w)return;
-  txSheet(null,{type:'out',date:isoL(NOW),cat:wishCatId(w),desc:String(w.name).toUpperCase().slice(0,60),amount:w.amount||0,acc:'',note:'DARI WISHLIST'})}
+  txSheet(null,{type:'out',date:isoL(NOW),cat:wishCatId(w),desc:String(w.name).toUpperCase().slice(0,60),amount:w.amount||0,acc:'',note:'DARI WISHLIST',_cb:()=>{w.spent=Date.now();save('Wishlist',wishRow(w));if(tab==='wish')render()}})}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="wxSpend"]');if(!b)return;wishSpend(b.dataset.id)});
 
 
@@ -3088,6 +3119,46 @@ function bgSheet(id){const b=id?S.budgets.find(z=>z.id===id):null;if(id&&!b)retu
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="bgAdd"],[data-act="bgEdit"]');if(!b)return;if(b.dataset.act==='bgAdd')bgSheet('');else bgSheet(b.dataset.id)});
 
 
+const adPer=()=>NOW.getFullYear()*100+NOW.getMonth()+1;
+const adDue=(y,m,d)=>{const l=new Date(y,m,0).getDate(),x=Math.min(Math.max(1,d),l);return y+'-'+pad(m)+'-'+pad(x)};
+const adAcc=id=>(S.accounts.find(a=>a.id===id)||{name:'(dihapus)'}).name;
+function adNext(f){const y=NOW.getFullYear(),m=NOW.getMonth()+1,t=isoL(NOW),P=adPer(),ok=S.adminLog.some(l=>l.fee===f.id&&l.period===P&&l.status==='ok');let d=adDue(y,m,f.day);if(ok||d<t||d<f.start){const n=m===12?[y+1,1]:[y,m+1];d=adDue(n[0],n[1],f.day)}return d}
+function adPill(l){return l.status==='ok'?'<span class="ad-p ad-ok">Berhasil</span>':'<span class="ad-p ad-er">Gagal</span>'}
+function adLogRow(l){return `<div class="ad-row"><div class="ad-main"><b>${esc(l.feeName)} · ${rp(l.amount)}</b><span>${esc(adAcc(l.acc))} · ${fdate(l.date)}${l.status==='ok'?'':' · '+esc(l.note)}</span></div>${adPill(l)}</div>`}
+function adTile(){const a=S.adminFees.filter(f=>f.active),bad=S.adminLog.filter(l=>l.period===adPer()&&l.status==='failed').length,nx=a.map(adNext).sort()[0];
+  return `<button type="button" class="hx-tile wide hx-acc" data-act="tab" data-t="admin">${bad?'<i class="hx-dot hx-out"></i>':''}<div class="hx-tw"><div class="hx-tm"><span class="hx-chip">${ic('receipt',22)}</span><span class="hx-l">Biaya admin bulanan</span><b class="hx-v">${a.length?a.length+' rekening aktif':'Belum ada'}</b><span class="hx-s">${a.length?(bad?bad+' gagal bulan ini':'Potong berikutnya '+fdate(nx)):'Catat potongan admin bank otomatis'}</span></div></div></button>`}
+function adminView(){const back='<button class="hx-back bk-btn" data-act="tab" data-t="home" aria-label="Kembali ke Home"><span class="bk-ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></span><span class="bk-tx">Kembali ke Home</span></button>';
+  const head=hxHead('Biaya admin bulanan','Potongan admin bank dicatat otomatis sebagai pengeluaran saat aplikasi dibuka. Ini catatan di aplikasi, bukan penarikan dari bank.');
+  if(!S.adminFees.length)return back+head+`<div class="card empty">${ic('receipt',34)}<b>Belum ada biaya admin</b>Tambahkan tiap rekening yang kena biaya admin bulanan, misalnya BCA Xpresi Rp 10.000 tiap tanggal 1.</div><button class="btn" data-act="adAdd">+ Tambah biaya admin</button>`;
+  const P=adPer(),act=S.adminFees.filter(f=>f.active),tot=act.reduce((s,f)=>s+f.amount,0),nx=act.map(adNext).sort()[0],
+  cur=S.adminLog.filter(l=>l.period===P).sort((a,b)=>a.date<b.date?1:-1),old=S.adminLog.filter(l=>l.period!==P).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,10);
+  return back+head+`<div class="card"><div class="sub" style="margin:0">Total admin bulanan (aktif)</div><div style="font-size:24px;font-weight:700">${rp(tot)}</div><div class="sub" style="margin:6px 0 0">${act.length} dari ${S.adminFees.length} rekening aktif${nx?' · berikutnya '+fdate(nx):''}</div></div>`
+  +(cur.length?`<div class="card"><b>Bulan ini (${MON[NOW.getMonth()]} ${NOW.getFullYear()})</b>${cur.map(adLogRow).join('')}</div>`:'')
+  +`<div class="card"><b>Rekening &amp; biaya</b>${S.adminFees.map(f=>`<div class="ad-row"><button type="button" class="ad-main" data-act="adEdit" data-id="${esc(f.id)}"><b>${esc(f.name)}</b><span>${esc(adAcc(f.acc))} · ${rp(f.amount)} · tiap tgl ${f.day}${f.active?'':' · nonaktif'}</span></button><button type="button" class="ad-sw${f.active?' on':''}" data-act="adTog" data-id="${esc(f.id)}" aria-label="Aktif atau nonaktif"></button></div>`).join('')}</div>`
+  +`<button class="btn" data-act="adAdd">+ Tambah biaya admin</button>`
+  +(old.length?`<div class="card" style="margin-top:12px"><b>Riwayat sebelumnya</b>${old.map(adLogRow).join('')}</div>`:'')
+  +`<p class="sub" style="margin-top:12px">Hanya bulan berjalan yang dicatat; bulan yang terlewat tidak dikejar. Tanggal 29 sampai 31 dipotong di hari terakhir bulan yang lebih pendek. Biaya ini pribadi dan tidak muncul di Bersama.</p>`}
+function adSheet(id){const f=id?S.adminFees.find(z=>z.id===id):null;if(id&&!f)return;if(!S.accounts.length){toast('Tambah rekening dulu');return}
+  const hist=f?S.adminLog.filter(l=>l.fee===f.id).sort((a,b)=>a.date<b.date?1:-1).slice(0,6):[];
+  sheet(f?'Ubah biaya admin':'Biaya admin baru',`<label for="ad-a">Rekening</label><select id="ad-a">${S.accounts.map(a=>`<option value="${esc(a.id)}"${f&&f.acc===a.id?' selected':''}>${esc(a.name)}</option>`).join('')}</select><label for="ad-n">Nama / jenis tabungan</label><input id="ad-n" maxlength="40" value="${f?esc(f.name):''}" placeholder="mis. BCA XPRESI"><div class="err" id="e-adn"></div><label for="ad-m">Nominal (Rp)</label><input id="ad-m" inputmode="numeric" value="${f?fkm(f.amount):''}" placeholder="mis. 10.000"><div class="err" id="e-adm"></div><label for="ad-d">Tanggal potong tiap bulan (1 sampai 31)</label><input id="ad-d" inputmode="numeric" maxlength="2" value="${f?f.day:'1'}"><div class="err" id="e-add"></div><p class="sub" style="margin:6px 0 0">Tanggal 29 sampai 31 dipotong di hari terakhir bulan yang lebih pendek. Jadwal baru mulai berlaku dari tanggal potong yang belum lewat bulan ini.</p><label class="ad-chk"><input type="checkbox" id="ad-on"${!f||f.active?' checked':''}> Aktif</label>${hist.length?'<div class="card" style="margin:8px 0">'+hist.map(adLogRow).join('')+'</div>':''}<button class="btn" id="ad-save">Simpan</button>${f?'<button class="btn sec" id="ad-x">Hapus</button>':''}`);
+  $('#ad-m').oninput=fmtIn;
+  $('#ad-save').onclick=()=>{const nm=$('#ad-n').value.trim().toUpperCase(),am=parseInt($('#ad-m').value.replace(/\D/g,'')||'0',10),dy=parseInt($('#ad-d').value.replace(/\D/g,'')||'0',10);
+    const e1=nm?'':'Isi nama',e2=am<1?'Isi nominal lebih dari 0':am>999999999999?'Nominal terlalu besar':'',e3=(dy<1||dy>31)?'Isi tanggal 1 sampai 31':'';setErr('adn',e1);setErr('adm',e2);setErr('add',e3);if(e1||e2||e3)return;
+    const o={id:f?f.id:uid(),acc:$('#ad-a').value,name:nm,amount:am,day:dy,start:f?f.start:isoL(NOW),active:$('#ad-on').checked?1:0,owner:ME};
+    if(f)Object.assign(f,o);else S.adminFees.push(o);
+    const p=save('AdminFees',o);closeSheet();render();toast('Biaya admin disimpan');p.then(r=>{if(r)adminAuto()})};
+  if(f)$('#ad-x').onclick=()=>confirmBox(`Biaya admin ${esc(f.name)} akan dihapus. Transaksi yang sudah tercatat tetap ada.`,()=>{S.adminFees=S.adminFees.filter(z=>z.id!==id);drop('AdminFees',id);render()})}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="adAdd"],[data-act="adEdit"],[data-act="adTog"]');if(!b)return;
+  if(b.dataset.act==='adAdd'){adSheet('');return}
+  if(b.dataset.act==='adEdit'){adSheet(b.dataset.id);return}
+  const f=S.adminFees.find(z=>z.id===b.dataset.id);if(!f)return;f.active=f.active?0:1;const p=save('AdminFees',{id:f.id,acc:f.acc,name:f.name,amount:f.amount,day:f.day,start:f.start,active:f.active,owner:ME});render();p.then(r=>{if(r&&f.active)adminAuto()})});
+let adBusy=false;
+async function adminAuto(){if(adBusy||!S.adminFees.some(f=>f.active))return;adBusy=true;
+  try{const r=await call({action:'adminRun'}),o=r.result||{},nd=(o.done||[]).length,nf=(o.failed||[]).length;
+    (o.txs||[]).forEach(t=>{if(!S.categories.some(c=>c.id===t.cat))S.categories.push({id:t.cat,name:'Biaya Administrasi Bank',kind:'out',icon:'receipt',color:'#5B6B8A',owner:''});if(!S.transactions.some(z=>z.id===t.id))S.transactions.push({...t,amount:Number(t.amount)||0})});
+    (o.logs||[]).forEach(l=>{l.amount=Number(l.amount)||0;l.period=Number(l.period)||0;const i=S.adminLog.findIndex(z=>z.id===l.id);if(i>=0)S.adminLog[i]=l;else S.adminLog.push(l)});
+    if(nd||nf){render();toast(nd?(nd+' biaya admin dicatat'+(nf?', '+nf+' gagal':'')):nf+' biaya admin gagal: saldo tidak cukup')}}
+  catch(e){}finally{adBusy=false}}
 function chMoney(t){let m=/(\d+(?:[.,]\d+)?)\s*(juta|jt|ribu|rb|k)\b/i.exec(t);if(m){const u=m[2].toLowerCase(),mul=(u==='juta'||u==='jt')?1000000:1000;return {n:Math.round(parseFloat(m[1].replace(',','.'))*mul),t:m[0]}}
   m=/\b\d{1,3}(?:\.\d{3})+\b/.exec(t);if(m)return {n:parseInt(m[0].replace(/\./g,''),10),t:m[0]};return {n:0,t:''}}
 function chBudgetText(low){if(!S.budgets.length)return 'Kamu belum punya anggaran bulanan. Atur dulu lewat Home, menu Anggaran bulanan.';
@@ -3105,11 +3176,27 @@ function chBudgetAdd(text,low){CHAT.push({k:'me',text:text,priv:true});const mo=
   bot('Aku buka form anggaran'+(hit?' '+hit.name:'')+(mo.n?' '+rp(mo.n):'')+'. '+(hit?'':'Kategori belum kutemukan dari pesanmu, pilih dulu di form. ')+'Cek dulu, lalu tekan Simpan.');
   bgSheet('');const c=$('#bg-c'),a=$('#bg-a');if(c&&hit)c.value=hit.id;if(a&&mo.n)a.value=fkm(mo.n);return true}
 function chSplit(text){CHAT.push({k:'me',text:text,priv:true});
-  const m=/\b(?:sama|dengan|bareng|bersama|sm)\s+(.+)$/i.exec(text),raw=m?m[1]:'',
-  nm=raw.split(/\s*(?:,|&|\bdan\b|\bsama\b|\bdgn\b)\s{0,}/i).map(x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,20)).filter(x=>x);
+  const me=String(ME||'').toUpperCase(),cl=x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,20),fx=n=>(n==='AKU'||n==='SAYA'||n==='GUE'||n==='GW')&&me?me:n;
+  let t=text;const pm=/\b(?:dibayar|ditalangi|ditalangin|dibayarin)(?:\s+oleh)?\s+([A-Za-z]+)/i.exec(t),py=pm?fx(cl(pm[1])):'';if(pm)t=t.replace(pm[0],' ');
+  let mo=chMoney(t);if(!mo.n){const q=/\b\d{4,9}\b/.exec(t);if(q)mo={n:parseInt(q[0],10),t:q[0]}}
+  if(mo.t)t=t.replace(mo.t,' ');
+  const cm=/\b(\d{1,2})\s*orang\b/i.exec(t),cnt=cm?parseInt(cm[1],10):0;if(cm)t=t.replace(cm[0],' ');
+  const m=/\b(?:sama|dengan|bareng|bersama|sm)\s+(.+)$/i.exec(t),raw=m?m[1]:'',
+  nm=raw.split(/\s*(?:,|&|\bdan\b|\bsama\b|\bdgn\b)\s{0,}/i).map(x=>fx(cl(x))).filter(x=>x);
+  if(mo.n>0&&mo.n<=999999999){
+    const P=[];const add=n=>{if(n&&P.indexOf(n)<0&&P.length<20)P.push(n)};
+    if(me)add(me);nm.forEach(add);add(py);let k=1;while(P.length<Math.min(cnt,20)){add('TEMAN '+k);k++}
+    if(P.length<2){CHAT.push({k:'bot',text:'Dibagi sama siapa saja? Contoh: "bagi bill makan 300rb sama desy dan budi" atau "bagi bill 300rb 3 orang".',priv:true});chatDraw();return true}
+    const lab=t.slice(0,m?m.index:t.length).replace(/\b(split ?bill|bagi bill|bagi nota|patungan|tolong|dong|ya|nih|tadi)\b/gi,' ').replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,30),had=SB.items.length>0;
+    SB=SB0();SB.people=P;SB.payer=py||me;SB.date=isoL(NOW);SB.total=mo.n;SB.items=[{id:uid(),name:lab||'TOTAL NOTA',qty:1,price:mo.n,who:P.slice()}];
+    const c=sbCalc();
+    CHAT.push({k:'bot',text:(had?'Sesi Split Bill sebelumnya diganti. ':'')+(lab?lab+' ':'Nota ')+rp(mo.n)+', dibagi rata '+P.length+' orang:\n'+c.rows.map(r=>r.name+': '+rp(r.total)).join('\n')+(SB.payer?'\n'+SB.payer+' bayar lebih dulu, yang lain mengganti.':'')+'\nPajak atau item beda-beda? Buka Split Bill untuk mengubahnya, lalu catat ke Utang & piutang.',priv:true});
+    CHAT.push({k:'sbcard'});chatDraw();return true}
   let add=0;nm.forEach(n=>{if(SB.people.indexOf(n)<0&&SB.people.length<20){SB.people.push(n);add++}});
-  const msg=add?'Aku buka Split Bill dengan peserta '+SB.people.join(', ')+'. Foto nota atau isi item manual, lalu tandai siapa makan apa.':'Aku buka Split Bill. Tambah pesertanya di sana, lalu foto nota atau isi item manual.';
+  const msg=add?'Aku buka Split Bill dengan peserta '+SB.people.join(', ')+'. Foto nota atau isi item manual, lalu tandai siapa makan apa. Tip: ketik "bagi bill makan 300rb sama desy dan budi" untuk bagi rata langsung.':'Aku buka Split Bill. Tambah pesertanya di sana, lalu foto nota atau isi item manual.';
   CHAT.push({k:'bot',text:(SB.items.length?'Split Bill yang sedang berjalan dilanjutkan. ':'')+msg,priv:true});chatDraw();tab='split';pmenu=false;render();window.scrollTo(0,0);return true}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="sbOpen"],[data-act="sbCopy"]');if(!b)return;
+  if(b.dataset.act==='sbOpen'){tab='split';pmenu=false;render();window.scrollTo(0,0)}else csvCopy(sbText())});
 function chatLocal(text){const low=text.toLowerCase();
   if(/\b(split ?bill|bagi bill|bagi nota|patungan)\b/.test(low)&&!/\b(sisa|hapus|batal)\b/.test(low))return chSplit(text);
   const bq=/\b(budget|anggaran)\b/.test(low)&&/\b(sisa|tersisa|berapa|aman|habis|status|cek|lihat)\b/.test(low)&&!/\b(tambah|tambahin|tambahkan|buat|bikin|atur|ubah|hapus)\b/.test(low);
