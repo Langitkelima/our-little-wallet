@@ -3175,25 +3175,43 @@ function chBudgetAdd(text,low){CHAT.push({k:'me',text:text,priv:true});const mo=
   if(!all.some(c=>!S.budgets.some(b=>b.cat===c.id)))return bot('Semua kategori pengeluaran sudah punya anggaran.');
   bot('Aku buka form anggaran'+(hit?' '+hit.name:'')+(mo.n?' '+rp(mo.n):'')+'. '+(hit?'':'Kategori belum kutemukan dari pesanmu, pilih dulu di form. ')+'Cek dulu, lalu tekan Simpan.');
   bgSheet('');const c=$('#bg-c'),a=$('#bg-a');if(c&&hit)c.value=hit.id;if(a&&mo.n)a.value=fkm(mo.n);return true}
+function chSplitFees(t){const out={tax:null,service:null,discount:null};let s=t;
+  [['tax','pajak|ppn|tax|pb1'],['service','service|servis|svc'],['discount','diskon|potongan|promo']].forEach(d=>{
+    const r1=new RegExp('\\b(?:'+d[1]+')\\s*(\\d{1,3}(?:[.,]\\d+)?)\\s*%','i'),m1=r1.exec(s);
+    if(m1){out[d[0]]={pct:true,v:parseFloat(m1[1].replace(',','.'))};s=s.replace(m1[0],' ');return}
+    const r2=new RegExp('\\b(?:'+d[1]+')\\s*(?:rp\\.?\\s*)?((?:\\d+(?:[.,]\\d+)?\\s*(?:juta|jt|ribu|rb|k)\\b)|(?:\\d{1,3}(?:\\.\\d{3})+)|(?:\\d{4,9}))','i'),m2=r2.exec(s);
+    if(m2){let q=chMoney(m2[1]);if(!q.n){const z=/\d{4,9}/.exec(m2[1]);q={n:z?parseInt(z[0],10):0}}if(q.n>0){out[d[0]]={pct:false,v:q.n};s=s.replace(m2[0],' ')}}});
+  return {f:out,t:s}}
 function chSplit(text){CHAT.push({k:'me',text:text,priv:true});
-  const me=String(ME||'').toUpperCase(),cl=x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,20),fx=n=>(n==='AKU'||n==='SAYA'||n==='GUE'||n==='GW')&&me?me:n;
+  const me=String(ME||'').toUpperCase(),cl=x=>x.replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,20),fx=n=>(n==='AKU'||n==='SAYA'||n==='GUE'||n==='GW')&&me?me:n,bot=x=>{CHAT.push({k:'bot',text:x,priv:true});chatDraw();return true};
   let t=text;const pm=/\b(?:dibayar|ditalangi|ditalangin|dibayarin)(?:\s+oleh)?\s+([A-Za-z]+)/i.exec(t),py=pm?fx(cl(pm[1])):'';if(pm)t=t.replace(pm[0],' ');
-  let mo=chMoney(t);if(!mo.n){const q=/\b\d{4,9}\b/.exec(t);if(q)mo={n:parseInt(q[0],10),t:q[0]}}
-  if(mo.t)t=t.replace(mo.t,' ');
+  const sf=chSplitFees(t);t=sf.t;const F=sf.f,hasF=!!(F.tax||F.service||F.discount);
   const cm=/\b(\d{1,2})\s*orang\b/i.exec(t),cnt=cm?parseInt(cm[1],10):0;if(cm)t=t.replace(cm[0],' ');
-  const m=/\b(?:sama|dengan|bareng|bersama|sm)\s+(.+)$/i.exec(t),raw=m?m[1]:'',
-  nm=raw.split(/\s*(?:,|&|\bdan\b|\bsama\b|\bdgn\b)\s{0,}/i).map(x=>fx(cl(x))).filter(x=>x);
-  if(mo.n>0&&mo.n<=999999999){
+  const m=/(?:\b(?:sama|dengan|bareng|bersama|sm)\s+|:\s*)(.+)$/i.exec(t),head=m?t.slice(0,m.index):t,raw=m?m[1]:'';
+  let mo=chMoney(head);if(!mo.n){const q=/\b\d{4,9}\b/.exec(head);if(q)mo={n:parseInt(q[0],10),t:q[0]}}
+  const ent=[];raw.split(/\s*(?:,|&|\bdan\b|\bsama\b|\bdgn\b)\s*/i).forEach(tok=>{if(!tok.trim())return;let a=chMoney(tok);if(!a.n){const q=/\b\d{4,9}\b/.exec(tok);if(q)a={n:parseInt(q[0],10),t:q[0]}}
+    const nx=fx(cl(a.t?tok.replace(a.t,' '):tok));if(!nx||nx==='SISANYA'||nx==='SISA')return;const o=ent.find(e=>e.n===nx);if(o)o.a+=a.n||0;else ent.push({n:nx,a:a.n||0})});
+  const anyAmt=ent.some(e=>e.a>0);
+  if((mo.n>0||anyAmt)&&mo.n<=999999999){
     const P=[];const add=n=>{if(n&&P.indexOf(n)<0&&P.length<20)P.push(n)};
-    if(me)add(me);nm.forEach(add);add(py);let k=1;while(P.length<Math.min(cnt,20)){add('TEMAN '+k);k++}
-    if(P.length<2){CHAT.push({k:'bot',text:'Dibagi sama siapa saja? Contoh: "bagi bill makan 300rb sama desy dan budi" atau "bagi bill 300rb 3 orang".',priv:true});chatDraw();return true}
-    const lab=t.slice(0,m?m.index:t.length).replace(/\b(split ?bill|bagi bill|bagi nota|patungan|tolong|dong|ya|nih|tadi)\b/gi,' ').replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,30),had=SB.items.length>0;
-    SB=SB0();SB.people=P;SB.payer=py||me;SB.date=isoL(NOW);SB.total=mo.n;SB.items=[{id:uid(),name:lab||'TOTAL NOTA',qty:1,price:mo.n,who:P.slice()}];
-    const c=sbCalc();
-    CHAT.push({k:'bot',text:(had?'Sesi Split Bill sebelumnya diganti. ':'')+(lab?lab+' ':'Nota ')+rp(mo.n)+', dibagi rata '+P.length+' orang:\n'+c.rows.map(r=>r.name+': '+rp(r.total)).join('\n')+(SB.payer?'\n'+SB.payer+' bayar lebih dulu, yang lain mengganti.':'')+'\nPajak atau item beda-beda? Buka Split Bill untuk mengubahnya, lalu catat ke Utang & piutang.',priv:true});
+    if(me)add(me);ent.forEach(e=>add(e.n));add(py);let k=1;while(!anyAmt&&P.length<Math.min(cnt,20)){add('TEMAN '+k);k++}
+    if(P.length<2){return bot('Dibagi sama siapa saja? Contoh: "bagi bill makan 300rb sama desy dan budi", "bagi bill 300rb 3 orang", atau "bagi bill: aku 50rb, desy 80rb pajak 10%".')}
+    const lab=head.replace(/\b(split ?bill|bagi bill|bagi nota|patungan|tolong|dong|ya|nih|tadi)\b/gi,' ').replace(mo.t||'#',' ').replace(/[^A-Za-z ]/g,' ').replace(/\s+/g,' ').trim().toUpperCase().slice(0,30),had=SB.items.length>0;
+    const fixed={};ent.forEach(e=>{if(e.a>0)fixed[e.n]=e.a});const fixN=Object.keys(fixed),fixSum=fixN.reduce((s,n)=>s+fixed[n],0),free=P.filter(p=>fixed[p]===undefined);
+    const total=mo.n>0?mo.n:fixSum;
+    if(fixSum>total)return bot('Jumlah porsi ('+rp(fixSum)+') lebih besar dari total nota ('+rp(total)+'). Cek lagi nominalnya.');
+    const rem=total-fixSum;
+    if(rem>0&&!free.length)return bot('Masih ada sisa '+rp(rem)+' yang belum ada penanggungnya. Tambahkan nama yang menanggung sisa, atau sesuaikan nominalnya.');
+    SB=SB0();SB.people=P;SB.payer=py||me;SB.date=isoL(NOW);
+    if(anyAmt){fixN.forEach(n=>SB.items.push({id:uid(),name:'PORSI '+n,qty:1,price:fixed[n],who:[n]}));if(rem>0)SB.items.push({id:uid(),name:lab||'SISA',qty:1,price:rem,who:free.slice()})}
+    else SB.items.push({id:uid(),name:lab||'TOTAL NOTA',qty:1,price:total,who:P.slice()});
+    ['tax','service','discount'].forEach(q=>{const f=F[q];if(!f)return;if(f.pct){SB.pm[q]=1;SB.pv[q]=String(f.v)}else SB[q]=f.v});
+    const am=sbAmts(),gt=am.sub+am.service+am.tax-am.discount;SB.total=gt;const c=sbCalc();
+    const fl=[];if(am.service)fl.push('service '+rp(am.service));if(am.tax)fl.push('pajak '+rp(am.tax));if(am.discount)fl.push('diskon -'+rp(am.discount));
+    CHAT.push({k:'bot',text:(had?'Sesi Split Bill sebelumnya diganti. ':'')+(lab?lab+' ':'Nota ')+rp(am.sub)+(fl.length?' + '+fl.join(' + ')+' = '+rp(gt):'')+', '+(anyAmt?'dibagi sesuai porsi':'dibagi rata '+P.length+' orang')+':\n'+c.rows.map(r=>r.name+': '+rp(r.total)).join('\n')+(SB.payer?'\n'+SB.payer+' bayar lebih dulu, yang lain mengganti.':'')+(hasF?'\nNominal nota dianggap SEBELUM pajak dan service.':'')+'\nMau ubah item? Buka Split Bill, lalu catat ke Utang & piutang.',priv:true});
     CHAT.push({k:'sbcard'});chatDraw();return true}
-  let add=0;nm.forEach(n=>{if(SB.people.indexOf(n)<0&&SB.people.length<20){SB.people.push(n);add++}});
-  const msg=add?'Aku buka Split Bill dengan peserta '+SB.people.join(', ')+'. Foto nota atau isi item manual, lalu tandai siapa makan apa. Tip: ketik "bagi bill makan 300rb sama desy dan budi" untuk bagi rata langsung.':'Aku buka Split Bill. Tambah pesertanya di sana, lalu foto nota atau isi item manual.';
+  let add=0;ent.forEach(e=>{if(SB.people.indexOf(e.n)<0&&SB.people.length<20){SB.people.push(e.n);add++}});
+  const msg=add?'Aku buka Split Bill dengan peserta '+SB.people.join(', ')+'. Foto nota atau isi item manual, lalu tandai siapa makan apa. Tip: "bagi bill makan 300rb sama desy dan budi pajak 10%" atau "bagi bill: aku 50rb, desy 80rb" untuk hitung langsung.':'Aku buka Split Bill. Tambah pesertanya di sana, lalu foto nota atau isi item manual.';
   CHAT.push({k:'bot',text:(SB.items.length?'Split Bill yang sedang berjalan dilanjutkan. ':'')+msg,priv:true});chatDraw();tab='split';pmenu=false;render();window.scrollTo(0,0);return true}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="sbOpen"],[data-act="sbCopy"]');if(!b)return;
   if(b.dataset.act==='sbOpen'){tab='split';pmenu=false;render();window.scrollTo(0,0)}else csvCopy(sbText())});
